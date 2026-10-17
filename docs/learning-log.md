@@ -314,6 +314,58 @@ Each step adds an entry: what was built, why it's designed that way, one risk, a
 2. How does the grocery aggregation engine handle items with incompatible unit families (e.g. 200 grams of an ingredient vs 2 cups of the same ingredient if no density conversion exists), and how are text-only ingredients classified (AC-78, AC-79)?
 3. When a user changes the servings of a planned meal from 1.0 to 2.0 (AC-76), how does the system ensure linear mathematical scaling of the meal's nutrient snapshot and total calories?
 
+---
+
+## Step 10 — Nutrition Logging, Planned vs. Logged Analytics, Combined Dashboard, and Non-Causal Insights (AC-82 to AC-87)
+
+**What was built:**
+- **Intake Logging & Historical Snapshot Persistence (`backend/app/services/nutrition_logs.py`, AC-82):**
+  - Allows users to log intake from either single food items or recipes with quantities in supported units (`g`, `ml`, `oz`, `serving`).
+  - Records `consumed_at` timestamp and `meal_type` (`breakfast`, `lunch`, `dinner`, `snack`).
+  - Computes and serializes an immutable `nutrient_snapshot` (`energy_kcal`, `protein_g`, `carbs_g`, `fat_g`) permanently attached to each `NutritionLogItem`. Future food catalogue edits or deletions never alter historical intake data.
+- **Pure Domain Planned vs. Logged Comparison (`backend/app/domain/comparison.py`, AC-83):**
+  - Calculates mathematical deltas: $\Delta = \text{logged} - \text{planned}$ and percentage deltas: $\%\Delta = ((\text{logged} - \text{planned}) / \text{planned}) \times 100$.
+  - Target range is defined as $\pm 10\%$ of planned energy.
+  - Assigns strictly neutral, non-moralizing status labels: `"Within target range"`, `"Above target"`, `"Below target"`.
+  - Statically verifies absence of judgmental terms (`"cheated"`, `"failed"`, `"bad"`, `"guilty"`, `"ruined"`).
+- **Unlogged Days Exclusion in Adherence & Averages (`backend/app/services/nutrition_logs.py`, AC-84):**
+  - Excludes days with zero logged meals from average calorie and protein calculations to prevent artificially depressing averages.
+  - Weekly adherence percentage equals $\frac{\text{logged days within target}}{\text{total logged days}} \times 100$.
+- **Unified Performance Dashboard (`backend/app/services/dashboard.py`, `backend/app/api/dashboard.py`, AC-85):**
+  - Aggregates weekly workout count vs target sessions.
+  - Computes total weekly volume lifted (kg) and converts dynamically to user-preferred units (lb or kg).
+  - Summarizes personal records (PRs) set during the current week.
+  - Reports average daily protein and calorie intake vs target across active logging days, with calorie privacy blurring when `calories_hidden` is enabled.
+- **Non-Causal Descriptive Insights Engine (`backend/app/domain/insights.py`, AC-86, AC-87):**
+  - Enforces minimum data threshold: requires $\ge 5$ completed workout sessions and $\ge 5$ logged nutrition days before unlocking insights.
+  - Returns clear progress indicators detailing remaining sessions and days needed when below threshold (AC-86c).
+  - **Strength Trend Insight (AC-86a):** Identifies muscle groups with positive, neutral, or negative volume trends over a 4-week window.
+  - **Volume-Nutrition Association Insight (AC-86b):** Produces observational comparisons between high-protein weeks ($\ge 1.8\text{g/kg}$) and lower-protein weeks ($< 1.8\text{g/kg}$).
+  - **Strict Non-Causal Language Enforcement (AC-87):** Every insight card displays strictly observational wording (`"associated with"`, `"observed during"`, `"correlated with"`). Verified via automated checker forbidding causal claims.
+  - Mandatory limitations note on every insight card: *"Descriptive observation only — does not establish causation."*
+- **Frontend Dashboard & Intake Logger (`frontend/src/components/Dashboard.tsx`):**
+  - Titanium dashboard view integrated into main navigation.
+  - Key weekly metric cards with progress bars and unit awareness.
+  - Planned vs. logged comparison table with neutral status badges and delta badges.
+  - Observational insights panel with live unlock progress bar and limitations callout.
+  - Interactive quick meal logging modal with recipe/food selector, unit converter, and immediate snapshot binding.
+  - 7 automated tests passing in `tests/test_nutrition_logs.py` and `tests/test_dashboard.py` (total 104 backend tests passing).
+
+**Why it's designed this way:**
+- **Exclusion of Unlogged Days (AC-84):** If a user logs meals on 3 out of 7 days, averaging across all 7 days by treating unlogged days as 0 kcal would artificially cut their reported intake by more than half, producing misleading clinical and nutritional feedback. Averaging solely over active logging days accurately reflects actual dietary habits.
+- **Neutral Status Terminology (AC-83):** In health and strength applications, stigmatizing and moralizing labels ("cheated", "failed", "bad", "guilty") foster unhealthy relationships with food and are clinically discouraged. Purely descriptive terminology ("Within target range", "Above target", "Below target") delivers objective data without judgment.
+- **Observational Correlation vs Causal Claims (AC-87, Rule S1):** Confounding variables such as sleep duration, training frequency, stress, and progressive overload make it scientifically invalid to state that protein intake *caused* a strength increase in a free-living individual. Explicit non-causal wording and mandatory limitations disclaimers safeguard user trust and adhere to scientific integrity.
+
+**What could go wrong:**
+- **Catalogue Data Drifts Over Time:** If a recipe or food item is updated or deleted in the future, recalculating historic meals from catalogue IDs would distort past records. Permanently embedding a snapshot of nutrients at log time (`nutrient_snapshot`) guarantees immutable historical accuracy.
+- **Timezone Boundary Skew:** A user logging a 11:30 PM meal could see it registered on the following day if grouped by UTC date rather than the user's localized calendar date. Timezone-aware date parsing ensures accurate daily assignment.
+
+**Quiz questions:**
+1. In planned vs. logged intake comparison (AC-83), why are unlogged days explicitly excluded from average calculations rather than recorded as 0 kcal (AC-84)?
+2. How does the dashboard enforce non-causal language (AC-87), and why is an explicit limitations disclaimer mandatory on every insight card?
+3. When a user logs a food or recipe intake, why does the system create an immutable `nutrient_snapshot` rather than simply storing a foreign key reference to the food's current nutrients (AC-82)?
+
+
 
 
 

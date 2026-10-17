@@ -157,14 +157,14 @@ export const api = {
     })
   },
 
-  // Catalogue
+  // Catalogue (AC-29, AC-30, AC-49, AC-53)
   async getExercises(params?: { q?: string; muscle?: string; equipment?: string }): Promise<Exercise[]> {
     const query = new URLSearchParams()
     if (params?.q) query.set('q', params.q)
     if (params?.muscle) query.set('muscle', params.muscle)
     if (params?.equipment) query.set('equipment', params.equipment)
     const qs = query.toString() ? `?${query.toString()}` : ''
-    return request<Exercise[]>(`/api/catalogue/exercises${qs}`)
+    return request<Exercise[]>(`/api/exercises${qs}`)
   },
 
   async createExercise(exercise: {
@@ -174,11 +174,53 @@ export const api = {
     equipment: string
     instructions?: string
   }): Promise<Exercise> {
-    return request<Exercise>('/api/catalogue/exercises', {
+    return request<Exercise>('/api/exercises', {
       method: 'POST',
       body: JSON.stringify(exercise),
     })
   },
+
+  async listFoods(params?: { q?: string; category?: string; limit?: number; offset?: number }): Promise<any[]> {
+    const query = new URLSearchParams()
+    if (params?.q) query.set('q', params.q)
+    if (params?.category) query.set('category', params.category)
+    if (params?.limit) query.set('limit', String(params.limit))
+    if (params?.offset) query.set('offset', String(params.offset))
+    const qs = query.toString() ? `?${query.toString()}` : ''
+    return request<any[]>(`/api/foods${qs}`)
+  },
+
+  async searchFoods(params?: { q?: string; category?: string; page?: number; page_size?: number }): Promise<{ items: any[] }> {
+    const limit = params?.page_size || 50
+    const offset = ((params?.page || 1) - 1) * limit
+    const items = await this.listFoods({ q: params?.q, category: params?.category, limit, offset })
+    return { items }
+  },
+
+  async listRecipes(params?: {
+    q?: string
+    cuisine?: string
+    diet_tag?: string
+    meal_type?: string
+    max_time?: number
+    page?: number
+    page_size?: number
+  }): Promise<{ items: any[] }> {
+    const query = new URLSearchParams()
+    if (params?.q) query.set('q', params.q)
+    if (params?.cuisine) query.set('cuisine', params.cuisine)
+    if (params?.diet_tag) query.set('diet_tag', params.diet_tag)
+    if (params?.meal_type) query.set('meal_type', params.meal_type)
+    if (params?.max_time) query.set('max_time', String(params.max_time))
+    const limit = params?.page_size || 50
+    const offset = ((params?.page || 1) - 1) * limit
+    query.set('limit', String(limit))
+    query.set('offset', String(offset))
+    const qs = query.toString() ? `?${query.toString()}` : ''
+    const items = await request<any[]>(`/api/recipes${qs}`)
+    return { items }
+  },
+
 
   // Routines
   async getRoutines(): Promise<Routine[]> {
@@ -368,4 +410,58 @@ export const api = {
     const qs = params.toString() ? `?${params.toString()}` : ''
     return request<any>(`/api/meal-plans/${planId}/grocery-list${qs}`)
   },
+
+  // Nutrition Logs & Intake Logging (AC-82 to AC-84)
+  async listNutritionLogs(fromDate?: string, toDate?: string): Promise<any[]> {
+    const params = new URLSearchParams()
+    if (fromDate) params.set('from_date', fromDate)
+    if (toDate) params.set('to_date', toDate)
+    const qs = params.toString() ? `?${params.toString()}` : ''
+    return request<any[]>(`/api/nutrition/logs${qs}`)
+  },
+
+  async createNutritionLog(payload: {
+    consumed_at: string
+    meal_type: string
+    notes?: string
+    items: Array<{
+      food_id?: string
+      recipe_id?: string
+      quantity: number
+      unit: string
+      notes?: string
+    }>
+  }): Promise<any> {
+    return request<any>('/api/nutrition/logs', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  },
+
+  async deleteNutritionLog(id: string): Promise<void> {
+    return request<void>(`/api/nutrition/logs/${id}`, {
+      method: 'DELETE',
+    })
+  },
+
+  async getNutritionAnalytics(startDate: string, endDate: string): Promise<any> {
+    const params = new URLSearchParams({
+      start_date: startDate,
+      end_date: endDate,
+    })
+    return request<any>(`/api/analytics/nutrition?${params.toString()}`)
+  },
+
+  // Dashboard & Non-Causal Insights (AC-85 to AC-87)
+  async getDashboard(): Promise<any> {
+    return request<any>('/api/dashboard')
+  },
+
+  async getInsights(minSessions: number = 5): Promise<any> {
+    return request<any>(`/api/dashboard/insights?min_sessions=${minSessions}`)
+  },
 }
+
+export const apiClient = api
+
+

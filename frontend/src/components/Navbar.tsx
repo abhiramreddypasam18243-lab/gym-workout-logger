@@ -1,8 +1,8 @@
 import React from 'react'
-import { Dumbbell, Calendar, ClipboardList, Activity, Settings, LogOut, Info, TrendingUp, Utensils, Sparkles } from 'lucide-react'
+import { Dumbbell, Calendar, ClipboardList, Activity, Settings, LogOut, Info, TrendingUp, Utensils, Sparkles, LayoutDashboard } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
-export type TabType = 'logger' | 'routines' | 'history' | 'analytics' | 'nutrition' | 'mealplan' | 'exercises' | 'profile'
+export type TabType = 'dashboard' | 'logger' | 'routines' | 'history' | 'analytics' | 'nutrition' | 'mealplan' | 'exercises' | 'profile'
 
 interface NavbarProps {
   activeTab: TabType
@@ -45,6 +45,16 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onSelectTab }) => {
 
         {/* Navigation Tabs */}
         <nav style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', overflowX: 'auto', maxWidth: '100%', padding: '0.25rem 0' }} aria-label="Main Navigation">
+          <button
+            type="button"
+            className={`btn btn-sm ${activeTab === 'dashboard' ? 'btn-primary' : 'btn-ghost'}`}
+            onClick={() => onSelectTab('dashboard')}
+            aria-current={activeTab === 'dashboard' ? 'page' : undefined}
+          >
+            <LayoutDashboard size={16} />
+            <span>Dashboard</span>
+          </button>
+
           <button
             type="button"
             className={`btn btn-sm ${activeTab === 'logger' ? 'btn-primary' : 'btn-ghost'}`}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { Navbar, type TabType } from './components/Navbar'
+import { Dashboard } from './components/Dashboard'
 import { WorkoutLogger } from './components/WorkoutLogger'
 import { RoutinesManager } from './components/RoutinesManager'
 import { WorkoutHistory } from './components/WorkoutHistory'
@@ -14,7 +15,7 @@ import type { Routine } from './types'
 
 const AppContent: React.FC = () => {
   const { user, isLoading } = useAuth()
-  const [activeTab, setActiveTab] = useState<TabType>('logger')
+  const [activeTab, setActiveTab] = useState<TabType>('dashboard')
   const [prefilledRoutine, setPrefilledRoutine] = useState<Routine | null>(null)
 
   if (isLoading) {
@@ -45,6 +46,12 @@ const AppContent: React.FC = () => {
       <Navbar activeTab={activeTab} onSelectTab={setActiveTab} />
 
       <main style={{ flex: 1, paddingBottom: '3rem' }}>
+        {activeTab === 'dashboard' && (
+          <Dashboard
+            onNavigateToLogger={() => setActiveTab('logger')}
+            onNavigateToMealPlan={() => setActiveTab('mealplan')}
+          />
+        )}
         {activeTab === 'logger' && (
           <WorkoutLogger
             prefilledRoutine={prefilledRoutine}
