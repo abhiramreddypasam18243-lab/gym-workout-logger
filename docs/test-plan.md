@@ -37,7 +37,7 @@ Maps every acceptance criterion to a test file/method or manual check.
 | AC-45–47 | Nutrients | `tests/test_domain_nutrients.py` | Unit | ✅ Step 2 |
 | AC-48–55 | Catalogue | `tests/test_catalogue.py` | DB+API | ✅ Step 4 |
 | AC-63–64 | Scoring | `tests/test_domain_scoring.py` | Unit | ✅ Step 2 |
-| AC-56–62, 65–72 | Plans | `tests/test_planner.py` | Unit+API | ⬜ Step 8 |
+| AC-56–62, 65–72 | Plans | `tests/test_planner.py` | Unit+API | ✅ Step 8 |
 | AC-73–76 | Substitutions | `tests/test_substitutions.py` | API | ⬜ Step 9 |
 | AC-77–79 | Grocery | `tests/test_domain_grocery.py` | Unit | ✅ Step 2 |
 | AC-80–81 | Grocery | `tests/test_grocery_service.py` | API | ⬜ Step 9 |

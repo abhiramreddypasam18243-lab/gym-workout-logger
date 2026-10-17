@@ -297,4 +297,32 @@ export const api = {
       body: JSON.stringify(prefs),
     })
   },
+
+  // Meal Planning (AC-56 to AC-72)
+  async generateMealPlan(payload: {
+    start_date: string
+    days?: number
+    meal_slots?: string[]
+    max_minutes?: number
+    daily_budget_minor?: number
+  }): Promise<any> {
+    return request<any>('/api/meal-plans/generate', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  },
+
+  async listMealPlans(): Promise<any[]> {
+    return request<any[]>('/api/meal-plans')
+  },
+
+  async getMealPlan(id: string): Promise<any> {
+    return request<any>(`/api/meal-plans/${id}`)
+  },
+
+  async deleteMealPlan(id: string): Promise<void> {
+    return request<void>(`/api/meal-plans/${id}`, {
+      method: 'DELETE',
+    })
+  },
 }

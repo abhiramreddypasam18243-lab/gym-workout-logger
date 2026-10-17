@@ -221,5 +221,56 @@ Each step adds an entry: what was built, why it's designed that way, one risk, a
 2. How does the system handle an automated calorie estimate that falls below the 1500 kcal floor (Rule S5), versus how it handles a manual target set below 1500 kcal?
 3. Why are nutrition targets versioned chronologically with `created_at` timestamps instead of updating a single record on the user profile?
 
+---
+
+## Step 8 — Deterministic 7-Day Plan Generator, Explainability, and 7-Day Grid UI (AC-56 to AC-72)
+
+**What was built:**
+- **Deterministic DietPlannerService (`backend/app/services/planner.py`):**
+  - **Deterministic Pipeline (AC-56):** Guarantees identical meal sequences, recipes, and serving sizes across repeated runs (verified over 20 runs).
+  - **Hard Safety Filter Pipeline (S9, AC-57, AC-58, AC-59):** Sequential safety pruning of candidate recipes:
+    1. EU-14 allergen filters (Rule S9, AC-57): Union of ingredient allergens evaluated; if any match user allergies, the recipe is immediately eliminated.
+    2. Unverified allergen exclusion (AC-58): If allergies are set, recipes with text-only ingredients or unverified allergen statuses are excluded.
+    3. Diet tag filters (AC-59): Requires exact presence of user diet tags (e.g. `vegan`, `vegetarian`, `gluten_free`, `halal`).
+    4. Excluded ingredients (AC-59): Case-insensitive token matching across ingredient names and food names.
+    5. Meal slot compatibility (`meal_types`).
+    6. User time cap (`prep_minutes + cook_minutes <= max_minutes`, AC-60).
+    7. Daily budget cap (per-slot budget allocation, AC-60).
+  - **Infeasible Explanation Block (AC-62, AC-72):** When hard filters leave a slot with zero candidates, returns HTTP 200 with `status: "infeasible"`, the slot and day, a breakdown of recipes removed per filter, and `relaxable` limits (`max_minutes`, `daily_budget`). Crucially, allergies and diet restrictions are never listed as relaxable (Rule S9). No partial plan row is stored in the database (AC-71).
+  - **Discrete Serving Size Selector (AC-64):** Evaluates allowed sizes $\{0.5, 1.0, 1.5, 2.0, 2.5, 3.0\}$ to minimize $|s \cdot \text{recipe\_kcal} - \text{slot\_kcal}|$, breaking ties to the smaller serving size.
+  - **Deterministic Multi-Factor Scoring (AC-63, AC-65):**
+    $$\text{score} = w_t \cdot \text{target\_fit} + w_c \cdot \text{cuisine\_match} - w_p \cdot \frac{\text{minutes}}{60} - w_b \cdot \text{budget\_ratio} - w_r \cdot \text{repetition}$$
+    Tie-breaking is strictly resolved by `recipe.id` ascending (AC-65).
+  - **Repetition Safeguards (AC-66):** When $\ge 10$ eligible recipes exist for a slot, recipes cannot appear more than twice in 7 days for that slot, and consecutive day repeats are disallowed.
+  - **Target Deviation Warnings & Day Totals (AC-67):** Day totals equal the exact sum of meals; warnings are emitted if daily calories deviate by $> 10\%$ or protein falls $< 90\%$ of daily target.
+  - **Transactional Persistence with Target Snapshot (AC-68, AC-71):** Atomic write of `MealPlan`, `PlannedMeal`, and `PlannedMealItem` snapshotting targets, constraints, weights, and catalogue version.
+- **Meal Plans API Router (`backend/app/api/meal_plans.py`):**
+  - `POST /api/meal-plans/generate`: Generates plan or returns infeasible explanation.
+  - `GET /api/meal-plans`: Lists user's saved plans.
+  - `GET /api/meal-plans/{id}`: Detailed plan view with day totals and explanation block.
+  - `DELETE /api/meal-plans/{id}`: Cascade deletion of plan.
+- **Frontend 7-Day Plan View (`frontend/src/components/MealPlanView.tsx`):**
+  - Full 7-day grid displaying each day's meals, serving multipliers, prep times, cuisine badges, and macro breakdowns.
+  - Day summary header with live comparisons against daily targets and deviation warnings.
+  - Plan generator modal with configurable slots, time caps, and daily budgets.
+  - Dedicated Infeasible Explanation Alert clearly delineating safety rules from relaxable caps.
+  - Expandable Heuristics & Scoring Details panel (AC-72) displaying weights and clinical disclaimer.
+  - Calorie privacy mode support (S7, AC-26) blurring calorie values while preserving protein targets.
+
+**Why it's designed this way:**
+- **Deterministic Heuristics vs Opaque Black-Box AI:** In clinical and strength nutrition, non-deterministic generative models (LLMs) hallucinate nonexistent foods, invent invalid nutrient quantities, violate allergen constraints unpredictably, and cannot be audited. A deterministic rule-based greedy generator guarantees 100% mathematical reproducibility, complete auditability, and verifiable allergen safety.
+- **Safety Pruning Precedes Scoring:** Ranking algorithms can trade off calories against preferences, but allergen safety and religious/ethical diet restrictions must never be subject to score trade-offs. Hard filtering guarantees that an unsafe recipe never enters candidate scoring.
+- **Discrete Serving Sizes:** Real humans cook discrete portions (half a portion, a double batch). Continuous serving optimization (e.g. 1.734 servings) produces absurd cooking measurements (e.g. 1.734 eggs or 13.87 ml of milk) that degrade real-world kitchen feasibility.
+
+**What could go wrong:**
+- In an async SQLAlchemy session with SQLite or PostgreSQL, accessing child entities like `ing.food.nutrients` without eager loading triggers `MissingGreenlet` exceptions. Eager loading nested hierarchies (`selectinload(Recipe.ingredients).selectinload(RecipeIngredient.food).selectinload(Food.nutrients)`) avoids runtime I/O in sync loops.
+- If an infeasible result accidentally saved a `meal_plans` row before aborting, orphaned plan shells would accumulate in the database. Deferring persistence until all days and slots succeed ensures complete transactional consistency.
+
+**Quiz questions:**
+1. Why does the system evaluate hard safety filters (allergens, diet tags, exclusions) in a separate strict pruning phase before candidate scoring, rather than simply applying a large negative penalty to the score?
+2. In the infeasibility explanation response (AC-62), why does the `relaxable` array strictly exclude user allergies and diet restrictions, and what fields are permitted in `relaxable`?
+3. How does the planner handle ties when two candidate recipes produce the exact same final score, and why is this critical for determinism?
+
+
 
 

@@ -1,8 +1,8 @@
 import React from 'react'
-import { Dumbbell, Calendar, ClipboardList, Activity, Settings, LogOut, Info, TrendingUp, Utensils } from 'lucide-react'
+import { Dumbbell, Calendar, ClipboardList, Activity, Settings, LogOut, Info, TrendingUp, Utensils, Sparkles } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
-export type TabType = 'logger' | 'routines' | 'history' | 'analytics' | 'nutrition' | 'exercises' | 'profile'
+export type TabType = 'logger' | 'routines' | 'history' | 'analytics' | 'nutrition' | 'mealplan' | 'exercises' | 'profile'
 
 interface NavbarProps {
   activeTab: TabType
@@ -93,6 +93,16 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onSelectTab }) => {
           >
             <Utensils size={16} />
             <span>Nutrition</span>
+          </button>
+
+          <button
+            type="button"
+            className={`btn btn-sm ${activeTab === 'mealplan' ? 'btn-primary' : 'btn-ghost'}`}
+            onClick={() => onSelectTab('mealplan')}
+            aria-current={activeTab === 'mealplan' ? 'page' : undefined}
+          >
+            <Sparkles size={16} />
+            <span>Meal Plan</span>
           </button>
 
           <button
