@@ -111,3 +111,57 @@ class MealPlanResponse(BaseModel):
     warnings: list[dict[str, Any]]
     explanation: ExplanationBlock
     disclaimer: str
+
+
+class SubstitutionSuggestRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    meal_id: UUID
+
+
+class NutrientDifference(BaseModel):
+    calories: Decimal
+    protein_g: Decimal
+    carbs_g: Decimal
+    fat_g: Decimal
+
+
+class SubstitutionOptionResponse(BaseModel):
+    recipe_id: UUID
+    recipe_name: str
+    cuisine_code: str
+    total_minutes: int
+    servings: Decimal
+    score: Decimal
+    nutrients: MealNutrientSummary
+    nutrient_diff: NutrientDifference
+
+
+class SubstitutionAcceptRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    meal_id: UUID
+    recipe_id: UUID
+    servings: Decimal = Field(default=Decimal("1.0"), ge=Decimal("0.5"), le=Decimal("10.0"))
+
+
+class MealEditRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    servings: Decimal | None = Field(default=None, ge=Decimal("0.5"), le=Decimal("10.0"))
+    recipe_id: UUID | None = None
+
+
+class GroceryItemResponse(BaseModel):
+    name: str
+    total_quantity: Decimal
+    canonical_unit: str
+    unit_family: str
+    display_quantity: str
+    food_id: UUID | None = None
+    category: str = "general"
+    is_text_only: bool = False
+
+
+class GroceryListResponse(BaseModel):
+    plan_id: UUID
+    from_date: date | None
+    to_date: date | None
+    items: list[GroceryItemResponse]

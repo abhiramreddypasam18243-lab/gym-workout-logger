@@ -271,6 +271,49 @@ Each step adds an entry: what was built, why it's designed that way, one risk, a
 2. In the infeasibility explanation response (AC-62), why does the `relaxable` array strictly exclude user allergies and diet restrictions, and what fields are permitted in `relaxable`?
 3. How does the planner handle ties when two candidate recipes produce the exact same final score, and why is this critical for determinism?
 
+---
+
+## Step 9 — Substitutions, Manual Edits, and Unit-Aware Grocery List Aggregation (AC-73 to AC-81)
+
+**What was built:**
+- **Substitution & Manual Edit Engine (`backend/app/services/substitutions.py`):**
+  - **Substitution Suggestions (AC-73):** Returns up to 5 valid candidate recipes for any planned meal slot. Strictly excludes the currently assigned recipe. Respects all hard safety constraints (Rule S9 allergens, diet tags, ingredient exclusions). Scores candidates against the slot target and calculates explicit nutrient differences ($\Delta\text{calories}$, $\Delta\text{protein}$, $\Delta\text{carbs}$, $\Delta\text{fat}$).
+  - **Substitution Acceptance (AC-74):** Atomically replaces the planned meal's recipe, recalculates snapshot items based on the chosen serving size, re-aggregates day nutrient totals, updates the grocery list, and flags the plan status as `"edited"`.
+  - **Hard Safety Validation on Manual Edits (Rule S9, AC-75):** Any manual edit or recipe substitution is strictly validated against the user's food constraints. If a chosen recipe introduces an allergen or violates a diet tag, the request is rejected with HTTP 422 `violates_hard_constraint`.
+  - **Servings Scaling & Range Enforcement (AC-76):** Servings are restricted to the continuous range $0.5 \le \text{servings} \le 10.0$. Submissions with servings $< 0.5$ (e.g. 0, -1) or $> 10.0$ (e.g. 11) are rejected with HTTP 422. Quantities and nutrients scale strictly linearly (doubling servings from 1 to 2 exactly doubles all nutrient totals).
+  - **Unit-Aware Grocery List Generation (AC-77 to AC-81):**
+    - Aggregates ingredients across all planned meals within a selected date range.
+    - Scales ingredient quantities by planned meal servings.
+    - Normalizes units within unit families (mass $\to$ grams, volume $\to$ milliliters) and sums quantities for matching foods (AC-78).
+    - Preserves uncatalogued/text-only ingredients in a distinct "Additional Items" section with recipe attribution (AC-79).
+    - Supports flexible date range filtering (`from_date` to `to_date`, AC-80).
+    - Groups items by food category (`produce`, `protein`, `dairy`, `grains`, `pantry`, `condiments`, `general`) (AC-81).
+- **Meal Plans API Extensions (`backend/app/api/meal_plans.py`):**
+  - `POST /api/meal-plans/{plan_id}/substitutions/suggest`: Fetches up to 5 scored substitution options with nutrient diffs.
+  - `POST /api/meal-plans/{plan_id}/substitutions/accept`: Commits substitution and updates plan status.
+  - `PATCH /api/meal-plans/{plan_id}/meals/{meal_id}`: Edits servings or recipe with hard constraint check.
+  - `GET /api/meal-plans/{plan_id}/grocery-list`: Retrieves date-filtered, categorized grocery checklist.
+- **Frontend UI Enhancements (`frontend/src/components/MealPlanView.tsx`):**
+  - "Substitute" button on every meal card triggering a substitution modal displaying candidate recipes, match scores, prep times, and $\pm$ nutrient badges.
+  - "Servings" button on every meal card opening a servings adjustment modal with quick presets (0.5x, 1x, 1.5x, 2x, 3x, 4x) and live calorie/protein preview.
+  - "Grocery List" action button in the plan header opening a categorized checklist modal with date range filters, interactive cross-off checkboxes, and one-click clipboard copying.
+- **Test Suite (`backend/tests/test_substitutions.py`):**
+  - 5 comprehensive automated tests passing covering AC-73 (suggestions & diffs), AC-74 (acceptance & status update), AC-75 (allergen rejection), AC-76 (servings validation & linear doubling), AC-80 & AC-81 (date filtering & category grouping). Total backend test suite: 97 passed in 35.9s.
+
+**Why it's designed this way:**
+- **Continuous Safety Enforcement on Manual Actions:** Automatic plan generation guarantees safety initially, but users can easily bypass safeguards if manual substitution endpoints are unverified. Enforcing hard safety constraints (allergens and diet tags) during manual edits ensures the meal plan never compromises user health.
+- **Unit Family Normalization:** Cooking measurements vary widely across recipes (grams vs kilograms, ml vs liters). Converting to base SI-like units (grams, milliliters) before summing prevents unit collisions while generating clean, actionable grocery amounts for shopping.
+- **Plan Status Tracking (`edited`):** Updating status from `ok` to `edited` provides complete provenance, indicating that the plan has been customized by the user and is no longer an untouched output of the initial greedy heuristic optimizer.
+
+**What could go wrong:**
+- When updating child collections in SQLAlchemy (`current_meal.items`), calling `.clear()` and then `session.add()` without directly assigning `current_meal.items = new_items` can leave the in-memory relationship empty within the same session identity map. Explicit list assignment guarantees immediate consistency for subsequent queries.
+- If date filtering bounds on the grocery list are not properly validated against the plan's start and end dates, an out-of-range date filter could return an empty list without user warning. Normalizing fallback bounds to `start_date` and `end_date` guarantees safe querying.
+
+**Quiz questions:**
+1. If a user with a registered peanut allergy attempts to manually substitute a meal with a recipe containing peanut butter (AC-75), how does the system respond, and why is this constraint non-negotiable?
+2. How does the grocery aggregation engine handle items with incompatible unit families (e.g. 200 grams of an ingredient vs 2 cups of the same ingredient if no density conversion exists), and how are text-only ingredients classified (AC-78, AC-79)?
+3. When a user changes the servings of a planned meal from 1.0 to 2.0 (AC-76), how does the system ensure linear mathematical scaling of the meal's nutrient snapshot and total calories?
+
 
 
 

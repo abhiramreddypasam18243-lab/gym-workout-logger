@@ -325,4 +325,47 @@ export const api = {
       method: 'DELETE',
     })
   },
+
+  // Substitutions & Manual Edits & Grocery List (AC-73 to AC-81)
+  async suggestSubstitutions(planId: string, mealId: string): Promise<any[]> {
+    return request<any[]>(`/api/meal-plans/${planId}/substitutions/suggest`, {
+      method: 'POST',
+      body: JSON.stringify({ meal_id: mealId }),
+    })
+  },
+
+  async acceptSubstitution(
+    planId: string,
+    mealId: string,
+    recipeId: string,
+    servings: number = 1.0,
+  ): Promise<any> {
+    return request<any>(`/api/meal-plans/${planId}/substitutions/accept`, {
+      method: 'POST',
+      body: JSON.stringify({ meal_id: mealId, recipe_id: recipeId, servings }),
+    })
+  },
+
+  async editPlannedMeal(
+    planId: string,
+    mealId: string,
+    payload: { servings?: number; recipe_id?: string },
+  ): Promise<any> {
+    return request<any>(`/api/meal-plans/${planId}/meals/${mealId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    })
+  },
+
+  async getGroceryList(
+    planId: string,
+    fromDate?: string,
+    toDate?: string,
+  ): Promise<any> {
+    const params = new URLSearchParams()
+    if (fromDate) params.set('from_date', fromDate)
+    if (toDate) params.set('to_date', toDate)
+    const qs = params.toString() ? `?${params.toString()}` : ''
+    return request<any>(`/api/meal-plans/${planId}/grocery-list${qs}`)
+  },
 }

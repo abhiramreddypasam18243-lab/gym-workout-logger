@@ -10,6 +10,15 @@ import {
   ChevronUp,
   Trash2,
   ShieldAlert,
+  ShoppingCart,
+  RefreshCw,
+  Sliders,
+  Check,
+  CheckSquare,
+  Square,
+  X,
+  Filter,
+  Copy,
 } from 'lucide-react'
 import { api, ApiError } from '../api/client'
 import { useAuth } from '../context/AuthContext'
@@ -56,6 +65,29 @@ export const MealPlanView: React.FC = () => {
   ])
   const [maxMinutes, setMaxMinutes] = useState<number | string>('')
   const [dailyBudget, setDailyBudget] = useState<number | string>('')
+
+  // Substitution state (AC-73, AC-74, AC-75)
+  const [activeMealForSub, setActiveMealForSub] = useState<any | null>(null)
+  const [subSuggestions, setSubSuggestions] = useState<any[]>([])
+  const [isLoadingSubs, setIsLoadingSubs] = useState(false)
+  const [subError, setSubError] = useState<string | null>(null)
+  const [selectedSubServings, setSelectedSubServings] = useState<Record<string, number>>({})
+  const [isAcceptingSub, setIsAcceptingSub] = useState(false)
+
+  // Servings quick edit state (AC-76)
+  const [activeMealForServings, setActiveMealForServings] = useState<any | null>(null)
+  const [editServingsValue, setEditServingsValue] = useState<number>(1.0)
+  const [isSavingServings, setIsSavingServings] = useState(false)
+  const [servingsError, setServingsError] = useState<string | null>(null)
+
+  // Grocery list modal state (AC-77 to AC-81)
+  const [showGroceryModal, setShowGroceryModal] = useState(false)
+  const [groceryFromDate, setGroceryFromDate] = useState<string>('')
+  const [groceryToDate, setGroceryToDate] = useState<string>('')
+  const [groceryList, setGroceryList] = useState<any | null>(null)
+  const [isLoadingGrocery, setIsLoadingGrocery] = useState(false)
+  const [checkedGroceryItems, setCheckedGroceryItems] = useState<Record<string, boolean>>({})
+  const [copiedNotice, setCopiedNotice] = useState(false)
 
   // Load existing plans
   const loadPlans = useCallback(async () => {
@@ -166,6 +198,125 @@ export const MealPlanView: React.FC = () => {
     }
   }
 
+  // --- Step 9 Substitution Handlers (AC-73, AC-74, AC-75) ---
+  const handleOpenSubstitute = async (meal: any) => {
+    if (!currentPlan) return
+    setActiveMealForSub(meal)
+    setSubSuggestions([])
+    setSubError(null)
+    setIsLoadingSubs(true)
+
+    try {
+      const suggestions = await api.suggestSubstitutions(currentPlan.id, meal.id)
+      setSubSuggestions(suggestions)
+      const initialServings: Record<string, number> = {}
+      suggestions.forEach((s: any) => {
+        initialServings[s.recipe_id] = Number(s.servings) || 1.0
+      })
+      setSelectedSubServings(initialServings)
+    } catch (err: any) {
+      setSubError(err.message || 'Could not fetch substitution suggestions.')
+    } finally {
+      setIsLoadingSubs(false)
+    }
+  }
+
+  const handleAcceptSubstitution = async (recipeId: string) => {
+    if (!currentPlan || !activeMealForSub) return
+    setIsAcceptingSub(true)
+    setSubError(null)
+
+    try {
+      const servings = selectedSubServings[recipeId] || 1.0
+      const updatedPlan = await api.acceptSubstitution(
+        currentPlan.id,
+        activeMealForSub.id,
+        recipeId,
+        servings
+      )
+      setCurrentPlan(updatedPlan)
+      setActiveMealForSub(null)
+      await loadPlans()
+    } catch (err: any) {
+      if (err instanceof ApiError && err.status === 422) {
+        setSubError('Cannot substitute: this recipe violates your allergy or diet constraints (Rule S9, AC-75).')
+      } else {
+        setSubError(err.message || 'Failed to accept substitution.')
+      }
+    } finally {
+      setIsAcceptingSub(false)
+    }
+  }
+
+  // --- Step 9 Servings Edit Handlers (AC-76) ---
+  const handleOpenEditServings = (meal: any) => {
+    setActiveMealForServings(meal)
+    setEditServingsValue(Number(meal.servings) || 1.0)
+    setServingsError(null)
+  }
+
+  const handleSaveServings = async () => {
+    if (!currentPlan || !activeMealForServings) return
+    if (editServingsValue < 0.5 || editServingsValue > 10.0) {
+      setServingsError('Servings must be between 0.5 and 10.0 (AC-76).')
+      return
+    }
+
+    setIsSavingServings(true)
+    setServingsError(null)
+
+    try {
+      const updatedPlan = await api.editPlannedMeal(
+        currentPlan.id,
+        activeMealForServings.id,
+        { servings: editServingsValue }
+      )
+      setCurrentPlan(updatedPlan)
+      setActiveMealForServings(null)
+    } catch (err: any) {
+      setServingsError(err.message || 'Failed to update servings.')
+    } finally {
+      setIsSavingServings(false)
+    }
+  }
+
+  // --- Step 9 Grocery List Handlers (AC-77 to AC-81) ---
+  const handleOpenGroceryList = async () => {
+    if (!currentPlan) return
+    setShowGroceryModal(true)
+    setGroceryFromDate(currentPlan.start_date || '')
+    setGroceryToDate(currentPlan.end_date || '')
+    await loadGroceryList(currentPlan.start_date, currentPlan.end_date)
+  }
+
+  const loadGroceryList = async (from?: string, to?: string) => {
+    if (!currentPlan) return
+    setIsLoadingGrocery(true)
+    try {
+      const res = await api.getGroceryList(currentPlan.id, from || undefined, to || undefined)
+      setGroceryList(res)
+    } catch (err: any) {
+      console.error('Could not load grocery list:', err)
+    } finally {
+      setIsLoadingGrocery(false)
+    }
+  }
+
+  const toggleGroceryChecked = (key: string) => {
+    setCheckedGroceryItems((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const handleCopyChecklist = () => {
+    if (!groceryList || !groceryList.items) return
+    const lines = groceryList.items.map((it: any) => {
+      const checked = checkedGroceryItems[it.name] ? '[x]' : '[ ]'
+      return `${checked} ${it.name} - ${it.display_quantity} (${it.category})`
+    })
+    navigator.clipboard.writeText(lines.join('\n'))
+    setCopiedNotice(true)
+    setTimeout(() => setCopiedNotice(false), 2000)
+  }
+
   if (isNutritionPaused) {
     return (
       <div style={{ maxWidth: '800px', margin: '2rem auto', padding: '1rem' }}>
@@ -228,10 +379,23 @@ export const MealPlanView: React.FC = () => {
             >
               {plans.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name} ({p.start_date})
+                  {p.name} ({p.start_date}) {p.status === 'edited' ? '• Edited' : ''}
                 </option>
               ))}
             </select>
+          )}
+
+          {currentPlan && (
+            <button
+              id="btn-open-grocery-list"
+              type="button"
+              className="btn btn-secondary"
+              onClick={handleOpenGroceryList}
+              title="View Unit-Aware Grocery List (AC-77 to AC-81)"
+            >
+              <ShoppingCart size={16} />
+              <span>Grocery List</span>
+            </button>
           )}
 
           <button
@@ -248,174 +412,154 @@ export const MealPlanView: React.FC = () => {
       {errorMsg && (
         <div
           style={{
-            background: 'var(--accent-rose-bg)',
-            border: '1px solid var(--accent-rose-border)',
-            color: 'var(--accent-rose)',
-            padding: '0.75rem 1rem',
+            background: 'var(--accent-danger-bg)',
+            border: '1px solid var(--accent-danger-border)',
             borderRadius: 'var(--radius-md)',
+            padding: '1rem',
             marginBottom: '1.5rem',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.5rem',
+            gap: '0.75rem',
           }}
           role="alert"
         >
-          <AlertTriangle size={18} />
-          <span>{errorMsg}</span>
+          <AlertTriangle size={20} style={{ color: 'var(--accent-danger)' }} />
+          <div>{errorMsg}</div>
         </div>
       )}
 
-      {/* Infeasible Explanation Card (AC-62, AC-72) */}
+      {/* Infeasible Generation Result (Rule S4, AC-62, AC-72) */}
       {infeasibleData && (
         <div
           className="card"
           style={{
+            borderLeft: '4px solid var(--accent-amber)',
             marginBottom: '2rem',
-            borderLeft: '4px solid var(--accent-rose)',
+            padding: '1.5rem',
             background: 'var(--bg-surface-elevated)',
           }}
-          role="alert"
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-            <ShieldAlert size={28} style={{ color: 'var(--accent-rose)' }} />
+            <AlertTriangle size={24} style={{ color: 'var(--accent-amber)' }} />
             <div>
-              <h2 style={{ fontSize: '1.25rem', color: 'var(--accent-rose)' }}>Plan Infeasible</h2>
-              <p style={{ fontSize: '0.875rem' }}>
-                No recipe in the catalogue satisfied all hard filters for slot{' '}
-                <strong style={{ color: 'var(--text-primary)' }}>{infeasibleData.slot}</strong> on{' '}
-                <strong style={{ color: 'var(--text-primary)' }}>{infeasibleData.day}</strong>.
+              <h2 style={{ fontSize: '1.25rem' }}>Generation Infeasible</h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                Slot: <strong style={{ textTransform: 'capitalize' }}>{infeasibleData.slot}</strong> on{' '}
+                <strong>{infeasibleData.day}</strong>
               </p>
             </div>
           </div>
 
-          <p style={{ fontSize: '0.9375rem', marginBottom: '1rem' }}>{infeasibleData.message}</p>
+          <p style={{ marginBottom: '1rem' }}>{infeasibleData.message}</p>
 
-          <h3 style={{ fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-            Recipes Removed By Hard Filter:
-          </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.5rem', marginBottom: '1rem' }}>
-            {infeasibleData.filters.map((f, idx) => (
+          <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Pruned Constraints Breakdown:</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>
+            {infeasibleData.filters.map((f, i) => (
               <div
-                key={idx}
+                key={i}
                 style={{
                   background: 'var(--bg-surface)',
-                  padding: '0.625rem 0.75rem',
+                  padding: '0.75rem',
                   borderRadius: 'var(--radius-sm)',
                   border: '1px solid var(--border-subtle)',
-                  display: 'flex',
-                  justifyContent: 'space-between',
                 }}
               >
-                <span style={{ fontSize: '0.875rem' }}>{f.filter}</span>
-                <span style={{ fontWeight: 600, color: 'var(--accent-rose)' }}>-{f.removed}</span>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
+                  {f.filter.replace('_', ' ')}
+                </div>
+                <div style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--accent-amber)' }}>
+                  {f.removed} recipes removed
+                </div>
               </div>
             ))}
           </div>
 
-          <div
-            style={{
-              padding: '0.75rem 1rem',
-              background: 'var(--accent-amber-bg)',
-              border: '1px solid var(--accent-amber-border)',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: '0.875rem',
-              color: 'var(--accent-amber)',
-            }}
-          >
-            <strong>Safety & Relaxation Notice:</strong>{' '}
-            {infeasibleData.relaxable.length > 0 ? (
-              <span>
-                You can consider adjusting your non-safety caps: <strong>{infeasibleData.relaxable.join(', ')}</strong>.
-              </span>
-            ) : (
-              <span>No user caps were active.</span>
-            )}{' '}
-            Allergies and diet restrictions are hard clinical safeguards and can never be relaxed by the algorithm.
-          </div>
+          {infeasibleData.relaxable && infeasibleData.relaxable.length > 0 && (
+            <div style={{ background: 'var(--bg-surface)', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
+              <div style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+                Suggested Soft Constraints to Relax:
+              </div>
+              <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                {infeasibleData.relaxable.map((r, i) => (
+                  <li key={i}>{r}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Loading Skeleton */}
-      {isLoading && (
-        <div className="card" style={{ padding: '3rem 2rem', textAlign: 'center' }}>
-          <div className="skeleton" style={{ height: '28px', width: '220px', margin: '0 auto 1rem', borderRadius: '4px' }} />
-          <div className="skeleton" style={{ height: '300px', width: '100%', borderRadius: '8px' }} />
+      {/* Main Plan Display */}
+      {isLoading ? (
+        <div className="card skeleton-card" style={{ padding: '3rem', textAlign: 'center' }}>
+          <div className="skeleton-pulse" style={{ height: '24px', width: '30%', margin: '0 auto 1rem' }} />
+          <div className="skeleton-pulse" style={{ height: '16px', width: '60%', margin: '0 auto' }} />
         </div>
-      )}
-
-      {/* Empty State */}
-      {!isLoading && !currentPlan && !infeasibleData && (
-        <div className="card" style={{ padding: '3rem 2rem', textAlign: 'center' }}>
+      ) : !currentPlan ? (
+        <div className="card" style={{ textAlign: 'center', padding: '3.5rem 1rem' }}>
           <ChefHat size={48} style={{ color: 'var(--text-muted)', margin: '0 auto 1rem' }} />
           <h2>No Meal Plans Generated Yet</h2>
-          <p style={{ maxWidth: '460px', margin: '0.5rem auto 1.5rem', color: 'var(--text-secondary)' }}>
-            Generate your first 7-day strength meal plan matching your macro targets, food exclusions, and allergen safeguards.
+          <p style={{ color: 'var(--text-secondary)', maxWidth: '500px', margin: '0.5rem auto 1.5rem' }}>
+            Generate a full 7-day meal plan tailored to your strength calorie and protein targets with zero hallucinated foods.
           </p>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => setShowGeneratorModal(true)}
-          >
+          <button className="btn btn-primary" onClick={() => setShowGeneratorModal(true)}>
             <Sparkles size={16} />
-            <span>Generate 7-Day Plan</span>
+            <span>Generate Your First Plan</span>
           </button>
         </div>
-      )}
-
-      {/* Main 7-Day Plan View */}
-      {!isLoading && currentPlan && (
+      ) : (
         <div>
-          {/* Plan Info Banner */}
+          {/* Plan Meta Banner */}
           <div
-            className="card"
             style={{
-              marginBottom: '1.5rem',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
+              marginBottom: '1.25rem',
               flexWrap: 'wrap',
               gap: '1rem',
-              padding: '1rem 1.25rem',
             }}
           >
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <h2 style={{ fontSize: '1.25rem' }}>{currentPlan.name}</h2>
-                <span
-                  style={{
-                    background: 'var(--accent-emerald-bg)',
-                    color: 'var(--accent-emerald)',
-                    padding: '0.125rem 0.5rem',
-                    borderRadius: '12px',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                  }}
-                >
-                  Version {currentPlan.generation_version}
-                </span>
+              <h2 style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span>{currentPlan.name}</span>
+                {currentPlan.status === 'edited' && (
+                  <span
+                    style={{
+                      background: 'var(--accent-cyan-bg, rgba(6,182,212,0.15))',
+                      color: 'var(--accent-cyan, #06b6d4)',
+                      fontSize: '0.75rem',
+                      padding: '0.125rem 0.5rem',
+                      borderRadius: '12px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    Edited (AC-74)
+                  </span>
+                )}
+              </h2>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                {currentPlan.start_date} to {currentPlan.end_date} • Engine v{currentPlan.generation_version}
               </div>
-              <p style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>
-                {currentPlan.start_date} to {currentPlan.end_date}
-              </p>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <button
-                type="button"
-                className="btn btn-secondary btn-sm"
+                className="btn btn-sm btn-ghost"
                 onClick={() => setShowExplanation(!showExplanation)}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                aria-expanded={showExplanation}
               >
                 <Info size={14} />
-                <span>{showExplanation ? 'Hide Heuristics' : 'View Heuristics (AC-72)'}</span>
+                <span>Heuristics</span>
                 {showExplanation ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               </button>
 
               <button
-                type="button"
-                className="btn btn-danger btn-sm"
+                className="btn btn-sm btn-ghost text-danger"
                 onClick={() => handleDeletePlan(currentPlan.id)}
-                title="Delete this meal plan"
-                aria-label="Delete plan"
+                title="Delete Meal Plan"
+                aria-label="Delete Meal Plan"
               >
                 <Trash2 size={14} />
               </button>
@@ -612,7 +756,7 @@ export const MealPlanView: React.FC = () => {
                     </div>
 
                     {/* Meals for this day */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
                       {dayMeals.map((meal: any) => (
                         <div
                           key={meal.id}
@@ -647,7 +791,7 @@ export const MealPlanView: React.FC = () => {
                                 {meal.meal_type}
                               </span>
                               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                                {meal.servings} serving{meal.servings > 1 ? 's' : ''}
+                                {meal.servings} serving{Number(meal.servings) > 1 ? 's' : ''}
                               </span>
                             </div>
 
@@ -678,30 +822,66 @@ export const MealPlanView: React.FC = () => {
                           </div>
 
                           {/* Meal Nutrients */}
-                          <div
-                            style={{
-                              borderTop: '1px solid var(--border-subtle)',
-                              paddingTop: '0.5rem',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              fontSize: '0.8125rem',
-                            }}
-                          >
-                            {!isCaloriesHidden && (
-                              <span>
-                                <strong>{Math.round(meal.nutrients.calories)}</strong> kcal
+                          <div>
+                            <div
+                              style={{
+                                borderTop: '1px solid var(--border-subtle)',
+                                paddingTop: '0.5rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                fontSize: '0.8125rem',
+                                marginBottom: '0.5rem',
+                              }}
+                            >
+                              {!isCaloriesHidden && (
+                                <span>
+                                  <strong>{Math.round(meal.nutrients.calories)}</strong> kcal
+                                </span>
+                              )}
+                              <span style={{ color: 'var(--accent-primary)' }}>
+                                <strong>{Math.round(meal.nutrients.protein_g)}g</strong> P
                               </span>
-                            )}
-                            <span style={{ color: 'var(--accent-primary)' }}>
-                              <strong>{Math.round(meal.nutrients.protein_g)}g</strong> P
-                            </span>
-                            <span>
-                              <strong>{Math.round(meal.nutrients.carbs_g)}g</strong> C
-                            </span>
-                            <span>
-                              <strong>{Math.round(meal.nutrients.fat_g)}g</strong> F
-                            </span>
+                              <span>
+                                <strong>{Math.round(meal.nutrients.carbs_g)}g</strong> C
+                              </span>
+                              <span>
+                                <strong>{Math.round(meal.nutrients.fat_g)}g</strong> F
+                              </span>
+                            </div>
+
+                            {/* Actions: Substitute & Adjust Servings (AC-73, AC-76) */}
+                            <div
+                              style={{
+                                display: 'flex',
+                                gap: '0.5rem',
+                                borderTop: '1px solid var(--border-subtle)',
+                                paddingTop: '0.5rem',
+                              }}
+                            >
+                              <button
+                                id={`btn-substitute-${meal.id}`}
+                                type="button"
+                                className="btn btn-xs btn-ghost"
+                                onClick={() => handleOpenSubstitute(meal)}
+                                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}
+                                title="Substitute with recipe matching slot target (AC-73)"
+                              >
+                                <RefreshCw size={12} />
+                                <span>Substitute</span>
+                              </button>
+                              <button
+                                id={`btn-edit-servings-${meal.id}`}
+                                type="button"
+                                className="btn btn-xs btn-ghost"
+                                onClick={() => handleOpenEditServings(meal)}
+                                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}
+                                title="Adjust meal servings (AC-76)"
+                              >
+                                <Sliders size={12} />
+                                <span>{meal.servings}x Servings</span>
+                              </button>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -720,56 +900,550 @@ export const MealPlanView: React.FC = () => {
               border: '1px solid var(--border-subtle)',
               borderRadius: 'var(--radius-md)',
               fontSize: '0.8125rem',
-              color: 'var(--text-muted)',
-              textAlign: 'center',
+              color: 'var(--text-secondary)',
+              lineHeight: 1.4,
             }}
           >
-            {currentPlan.disclaimer}
+            <strong>Informational Disclaimer (Rule S1):</strong> {currentPlan.disclaimer}
           </div>
         </div>
       )}
 
-      {/* Generator Modal */}
-      {showGeneratorModal && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0, 0, 0, 0.75)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-            padding: '1rem',
-          }}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="generator-title"
-        >
+      {/* --- Step 9: Substitution Modal (AC-73 to AC-75) --- */}
+      {activeMealForSub && (
+        <div className="modal-backdrop" onClick={() => setActiveMealForSub(null)}>
           <div
-            className="card"
-            style={{
-              maxWidth: '520px',
-              width: '100%',
-              padding: '1.75rem',
-              background: 'var(--bg-surface)',
-            }}
+            className="modal-content"
+            style={{ maxWidth: '640px' }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <h2 id="generator-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-              <Sparkles style={{ color: 'var(--accent-primary)' }} />
-              Generate 7-Day Meal Plan
-            </h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <div>
+                <h2 style={{ fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <RefreshCw size={18} style={{ color: 'var(--accent-primary)' }} />
+                  Substitute Planned Meal
+                </h2>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
+                  Replacing <strong>{activeMealForSub.title}</strong> ({activeMealForSub.meal_type}) on{' '}
+                  {activeMealForSub.plan_date}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => setActiveMealForSub(null)}
+                aria-label="Close modal"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {subError && (
+              <div
+                style={{
+                  background: 'var(--accent-danger-bg)',
+                  border: '1px solid var(--accent-danger-border)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '0.75rem 1rem',
+                  marginBottom: '1rem',
+                  fontSize: '0.875rem',
+                  color: 'var(--accent-danger)',
+                }}
+                role="alert"
+              >
+                {subError}
+              </div>
+            )}
+
+            {isLoadingSubs ? (
+              <div style={{ padding: '2.5rem', textAlign: 'center' }}>
+                <div className="skeleton-pulse" style={{ height: '20px', width: '50%', margin: '0 auto 1rem' }} />
+                <div className="skeleton-pulse" style={{ height: '60px', width: '100%', marginBottom: '0.75rem' }} />
+                <div className="skeleton-pulse" style={{ height: '60px', width: '100%' }} />
+              </div>
+            ) : subSuggestions.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-secondary)' }}>
+                No eligible replacement recipes found that respect your allergen constraints and slot targets.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '420px', overflowY: 'auto' }}>
+                {subSuggestions.map((s) => {
+                  const sServ = selectedSubServings[s.recipe_id] || Number(s.servings) || 1.0
+                  const diff = s.nutrient_diff || {}
+
+                  return (
+                    <div
+                      key={s.recipe_id}
+                      style={{
+                        background: 'var(--bg-surface)',
+                        border: '1px solid var(--border-subtle)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '1rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.5rem',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.75rem' }}>
+                        <div>
+                          <h4 style={{ fontSize: '1rem', marginBottom: '0.25rem' }}>{s.recipe_name}</h4>
+                          <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                            <span style={{ textTransform: 'capitalize' }}>{s.cuisine_code}</span>
+                            <span>•</span>
+                            <span>{s.total_minutes} mins</span>
+                            <span>•</span>
+                            <span>Fit Score: {Math.round(Number(s.score) * 100) / 100}</span>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <select
+                            className="input"
+                            style={{ padding: '0.25rem 0.5rem', fontSize: '0.8125rem', width: 'auto' }}
+                            value={sServ}
+                            onChange={(e) =>
+                              setSelectedSubServings((prev) => ({
+                                ...prev,
+                                [s.recipe_id]: Number(e.target.value),
+                              }))
+                            }
+                            aria-label="Select servings for substitution"
+                          >
+                            {[0.5, 1.0, 1.5, 2.0, 2.5, 3.0].map((num) => (
+                              <option key={num} value={num}>
+                                {num}x
+                              </option>
+                            ))}
+                          </select>
+
+                          <button
+                            id={`btn-accept-sub-${s.recipe_id}`}
+                            type="button"
+                            className="btn btn-sm btn-primary"
+                            onClick={() => handleAcceptSubstitution(s.recipe_id)}
+                            disabled={isAcceptingSub}
+                          >
+                            <Check size={14} />
+                            <span>Select</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Nutrient Difference Badges (AC-73) */}
+                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', fontSize: '0.75rem' }}>
+                        {!isCaloriesHidden && (
+                          <span
+                            style={{
+                              background: 'var(--bg-surface-elevated)',
+                              padding: '0.125rem 0.375rem',
+                              borderRadius: '4px',
+                            }}
+                          >
+                            Cal: {Math.round(Number(s.nutrients.calories))} (
+                            <span style={{ color: Number(diff.calories) >= 0 ? 'var(--accent-amber)' : 'var(--accent-primary)' }}>
+                              {Number(diff.calories) >= 0 ? `+${Math.round(Number(diff.calories))}` : Math.round(Number(diff.calories))}
+                            </span>
+                            )
+                          </span>
+                        )}
+                        <span
+                          style={{
+                            background: 'var(--bg-surface-elevated)',
+                            padding: '0.125rem 0.375rem',
+                            borderRadius: '4px',
+                          }}
+                        >
+                          Protein: {Math.round(Number(s.nutrients.protein_g))}g (
+                          <span style={{ color: Number(diff.protein_g) >= 0 ? 'var(--accent-primary)' : 'var(--text-muted)' }}>
+                            {Number(diff.protein_g) >= 0 ? `+${Math.round(Number(diff.protein_g))}` : Math.round(Number(diff.protein_g))}g
+                          </span>
+                          )
+                        </span>
+                        <span
+                          style={{
+                            background: 'var(--bg-surface-elevated)',
+                            padding: '0.125rem 0.375rem',
+                            borderRadius: '4px',
+                          }}
+                        >
+                          Carbs: {Math.round(Number(s.nutrients.carbs_g))}g (
+                          <span>
+                            {Number(diff.carbs_g) >= 0 ? `+${Math.round(Number(diff.carbs_g))}` : Math.round(Number(diff.carbs_g))}g
+                          </span>
+                          )
+                        </span>
+                        <span
+                          style={{
+                            background: 'var(--bg-surface-elevated)',
+                            padding: '0.125rem 0.375rem',
+                            borderRadius: '4px',
+                          }}
+                        >
+                          Fat: {Math.round(Number(s.nutrients.fat_g))}g (
+                          <span>
+                            {Number(diff.fat_g) >= 0 ? `+${Math.round(Number(diff.fat_g))}` : Math.round(Number(diff.fat_g))}g
+                          </span>
+                          )
+                        </span>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* --- Step 9: Servings Adjustment Modal (AC-76) --- */}
+      {activeMealForServings && (
+        <div className="modal-backdrop" onClick={() => setActiveMealForServings(null)}>
+          <div
+            className="modal-content"
+            style={{ maxWidth: '440px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h2 style={{ fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Sliders size={18} style={{ color: 'var(--accent-primary)' }} />
+                Adjust Servings (AC-76)
+              </h2>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => setActiveMealForServings(null)}
+                aria-label="Close modal"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
             <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>
-              Configure slot targets and user caps. Safety filters (allergies, diet tags, exclusions) are applied automatically.
+              Scale quantities and nutrients linearly for <strong>{activeMealForServings.title}</strong>. Allowed range: 0.5 to 10.0 servings.
             </p>
+
+            {servingsError && (
+              <div
+                style={{
+                  background: 'var(--accent-danger-bg)',
+                  border: '1px solid var(--accent-danger-border)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '0.75rem',
+                  marginBottom: '1rem',
+                  fontSize: '0.875rem',
+                  color: 'var(--accent-danger)',
+                }}
+                role="alert"
+              >
+                {servingsError}
+              </div>
+            )}
+
+            <div style={{ marginBottom: '1.25rem' }}>
+              <label className="label" htmlFor="servings-input">
+                Servings Multiplier
+              </label>
+              <input
+                id="servings-input"
+                type="number"
+                step="0.5"
+                min="0.5"
+                max="10.0"
+                className="input"
+                value={editServingsValue}
+                onChange={(e) => setEditServingsValue(Number(e.target.value))}
+              />
+
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                {[0.5, 1.0, 1.5, 2.0, 3.0, 4.0].map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    className={`btn btn-xs ${editServingsValue === v ? 'btn-primary' : 'btn-ghost'}`}
+                    onClick={() => setEditServingsValue(v)}
+                  >
+                    {v}x
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Nutrients Preview */}
+            <div
+              style={{
+                background: 'var(--bg-surface)',
+                padding: '0.75rem 1rem',
+                borderRadius: 'var(--radius-md)',
+                marginBottom: '1.25rem',
+                fontSize: '0.875rem',
+                display: 'flex',
+                justifyContent: 'space-between',
+              }}
+            >
+              <span>
+                Calories:{' '}
+                <strong>
+                  {Math.round(
+                    (Number(activeMealForServings.nutrients.calories) * editServingsValue) /
+                      Number(activeMealForServings.servings)
+                  )}
+                </strong>{' '}
+                kcal
+              </span>
+              <span>
+                Protein:{' '}
+                <strong style={{ color: 'var(--accent-primary)' }}>
+                  {Math.round(
+                    (Number(activeMealForServings.nutrients.protein_g) * editServingsValue) /
+                      Number(activeMealForServings.servings)
+                  )}
+                  g
+                </strong>
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => setActiveMealForServings(null)}
+                disabled={isSavingServings}
+              >
+                Cancel
+              </button>
+              <button
+                id="btn-confirm-save-servings"
+                type="button"
+                className="btn btn-primary"
+                onClick={handleSaveServings}
+                disabled={isSavingServings}
+              >
+                {isSavingServings ? 'Saving...' : 'Apply Servings'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- Step 9: Grocery List Modal (AC-77 to AC-81) --- */}
+      {showGroceryModal && currentPlan && (
+        <div className="modal-backdrop" onClick={() => setShowGroceryModal(false)}>
+          <div
+            className="modal-content"
+            style={{ maxWidth: '680px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <div>
+                <h2 style={{ fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <ShoppingCart size={20} style={{ color: 'var(--accent-primary)' }} />
+                  Unit-Aware Grocery List
+                </h2>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
+                  Scaled ingredient quantities aggregated by unit family and categorized (AC-77 to AC-81)
+                </p>
+              </div>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => setShowGroceryModal(false)}
+                aria-label="Close modal"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Date Filtering Bar (AC-80) */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                flexWrap: 'wrap',
+                background: 'var(--bg-surface)',
+                padding: '0.75rem 1rem',
+                borderRadius: 'var(--radius-md)',
+                marginBottom: '1rem',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>From:</span>
+                <input
+                  id="grocery-from-date"
+                  type="date"
+                  className="input"
+                  style={{ padding: '0.25rem 0.5rem', fontSize: '0.8125rem' }}
+                  value={groceryFromDate}
+                  min={currentPlan.start_date}
+                  max={currentPlan.end_date}
+                  onChange={(e) => setGroceryFromDate(e.target.value)}
+                />
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>To:</span>
+                <input
+                  id="grocery-to-date"
+                  type="date"
+                  className="input"
+                  style={{ padding: '0.25rem 0.5rem', fontSize: '0.8125rem' }}
+                  value={groceryToDate}
+                  min={currentPlan.start_date}
+                  max={currentPlan.end_date}
+                  onChange={(e) => setGroceryToDate(e.target.value)}
+                />
+              </div>
+
+              <button
+                id="btn-filter-grocery"
+                type="button"
+                className="btn btn-sm btn-secondary"
+                onClick={() => loadGroceryList(groceryFromDate, groceryToDate)}
+                disabled={isLoadingGrocery}
+              >
+                <Filter size={12} />
+                <span>Filter</span>
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-sm btn-ghost"
+                onClick={handleCopyChecklist}
+                style={{ marginLeft: 'auto' }}
+                title="Copy checklist to clipboard"
+              >
+                <Copy size={12} />
+                <span>{copiedNotice ? 'Copied!' : 'Copy'}</span>
+              </button>
+            </div>
+
+            {/* Grocery Checklist Grouped by Category (AC-81) */}
+            {isLoadingGrocery ? (
+              <div style={{ padding: '2.5rem', textAlign: 'center' }}>
+                <div className="skeleton-pulse" style={{ height: '24px', width: '40%', margin: '0 auto 1rem' }} />
+                <div className="skeleton-pulse" style={{ height: '40px', width: '100%', marginBottom: '0.5rem' }} />
+                <div className="skeleton-pulse" style={{ height: '40px', width: '100%', marginBottom: '0.5rem' }} />
+                <div className="skeleton-pulse" style={{ height: '40px', width: '100%' }} />
+              </div>
+            ) : !groceryList || groceryList.items.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-secondary)' }}>
+                No ingredients found for the selected date range.
+              </div>
+            ) : (
+              <div style={{ maxHeight: '420px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                {Object.entries(
+                  groceryList.items.reduce((acc: Record<string, any[]>, item: any) => {
+                    const cat = item.is_text_only ? 'Additional Items' : item.category || 'General'
+                    if (!acc[cat]) acc[cat] = []
+                    acc[cat].push(item)
+                    return acc
+                  }, {})
+                ).map(([category, items]: [string, any]) => (
+                  <div key={category}>
+                    <h3
+                      style={{
+                        fontSize: '0.875rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        color: 'var(--accent-primary)',
+                        marginBottom: '0.5rem',
+                        borderBottom: '1px solid var(--border-subtle)',
+                        paddingBottom: '0.25rem',
+                      }}
+                    >
+                      {category} ({items.length})
+                    </h3>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                      {items.map((item: any, idx: number) => {
+                        const itemKey = `${item.name}-${item.display_quantity}`
+                        const isChecked = checkedGroceryItems[itemKey] || false
+
+                        return (
+                          <div
+                            key={idx}
+                            onClick={() => toggleGroceryChecked(itemKey)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '0.5rem 0.75rem',
+                              background: isChecked ? 'transparent' : 'var(--bg-surface)',
+                              borderRadius: 'var(--radius-sm)',
+                              border: '1px solid var(--border-subtle)',
+                              cursor: 'pointer',
+                              opacity: isChecked ? 0.5 : 1,
+                              transition: 'opacity 0.15s ease',
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+                              {isChecked ? (
+                                <CheckSquare size={16} style={{ color: 'var(--accent-primary)' }} />
+                              ) : (
+                                <Square size={16} style={{ color: 'var(--text-muted)' }} />
+                              )}
+                              <span
+                                style={{
+                                  fontSize: '0.875rem',
+                                  textDecoration: isChecked ? 'line-through' : 'none',
+                                }}
+                              >
+                                {item.name}
+                              </span>
+                            </div>
+
+                            <span
+                              style={{
+                                fontSize: '0.8125rem',
+                                fontWeight: 600,
+                                color: 'var(--text-secondary)',
+                                textDecoration: isChecked ? 'line-through' : 'none',
+                              }}
+                            >
+                              {item.display_quantity}
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* --- Plan Generator Modal (AC-56 to AC-60) --- */}
+      {showGeneratorModal && (
+        <div className="modal-backdrop" onClick={() => setShowGeneratorModal(false)}>
+          <div
+            className="modal-content"
+            style={{ maxWidth: '520px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <h2 style={{ fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Sparkles size={20} style={{ color: 'var(--accent-primary)' }} />
+                Generate 7-Day Meal Plan
+              </h2>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => setShowGeneratorModal(false)}
+                aria-label="Close modal"
+              >
+                <X size={16} />
+              </button>
+            </div>
 
             <form onSubmit={handleGenerate}>
               <div style={{ marginBottom: '1rem' }}>
-                <label className="label" htmlFor="start-date-input">
+                <label className="label" htmlFor="plan-start-date">
                   Start Date
                 </label>
                 <input
-                  id="start-date-input"
+                  id="plan-start-date"
                   type="date"
                   className="input"
                   value={startDate}
@@ -779,17 +1453,17 @@ export const MealPlanView: React.FC = () => {
               </div>
 
               <div style={{ marginBottom: '1rem' }}>
-                <label className="label" htmlFor="days-count-input">
+                <label className="label" htmlFor="plan-days-count">
                   Duration (Days)
                 </label>
                 <input
-                  id="days-count-input"
+                  id="plan-days-count"
                   type="number"
                   className="input"
                   value={daysCount}
                   onChange={(e) => setDaysCount(Number(e.target.value))}
                   min={1}
-                  max={14}
+                  max={7}
                   required
                 />
               </div>

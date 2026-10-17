@@ -1,6 +1,7 @@
 """Meal plans router (spec §7, FR-08, AC-56–72)."""
 
 from collections import defaultdict
+from datetime import date
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
@@ -17,14 +18,20 @@ from app.models.user import User
 from app.schemas.meal_plan import (
     DayNutrientTotal,
     ExplanationBlock,
+    GroceryListResponse,
     InfeasibleExplanationResponse,
+    MealEditRequest,
     MealNutrientSummary,
     MealPlanGenerateRequest,
     MealPlanResponse,
     PlannedMealItemResponse,
     PlannedMealResponse,
+    SubstitutionAcceptRequest,
+    SubstitutionOptionResponse,
+    SubstitutionSuggestRequest,
 )
 from app.services.planner import DISCLAIMER_TEXT, DietPlannerService
+from app.services.substitutions import SubstitutionService
 
 router = APIRouter(prefix="/api/meal-plans", tags=["meal-plans"])
 
@@ -86,7 +93,8 @@ async def get_meal_plan(
         .where(MealPlan.id == plan_id, MealPlan.user_id == current_user.id)
         .options(
             selectinload(MealPlan.meals)
-            .selectinload(PlannedMeal.items),
+            .selectinload(PlannedMeal.items)
+            .selectinload(PlannedMealItem.food),
             selectinload(MealPlan.meals)
             .selectinload(PlannedMeal.recipe),
         )
@@ -258,3 +266,62 @@ async def delete_meal_plan(
 
     await db.delete(plan)
     await db.commit()
+
+
+@router.post("/{plan_id}/substitutions/suggest", response_model=list[SubstitutionOptionResponse])
+async def suggest_substitutions(
+    plan_id: UUID,
+    payload: SubstitutionSuggestRequest,
+    auth: tuple[User, Any] = Depends(check_nutrition_access),
+    _: None = Depends(verify_csrf),
+    db: AsyncSession = Depends(get_db),
+) -> list[SubstitutionOptionResponse]:
+    """Suggest up to 5 valid replacement recipes scored against slot target (AC-73)."""
+    current_user, _ = auth
+    service = SubstitutionService(db)
+    return await service.suggest_substitutions(current_user.id, plan_id, payload.meal_id)
+
+
+@router.post("/{plan_id}/substitutions/accept", response_model=MealPlanResponse)
+async def accept_substitution(
+    plan_id: UUID,
+    payload: SubstitutionAcceptRequest,
+    auth: tuple[User, Any] = Depends(check_nutrition_access),
+    _: None = Depends(verify_csrf),
+    db: AsyncSession = Depends(get_db),
+) -> MealPlanResponse:
+    """Accept substitution: updates meal, day totals, grocery list, and sets status to edited (AC-74)."""
+    current_user, _ = auth
+    service = SubstitutionService(db)
+    await service.accept_substitution(current_user.id, plan_id, payload)
+    return await get_meal_plan(plan_id, auth, db)
+
+
+@router.patch("/{plan_id}/meals/{meal_id}", response_model=MealPlanResponse)
+async def edit_planned_meal(
+    plan_id: UUID,
+    meal_id: UUID,
+    payload: MealEditRequest,
+    auth: tuple[User, Any] = Depends(check_nutrition_access),
+    _: None = Depends(verify_csrf),
+    db: AsyncSession = Depends(get_db),
+) -> MealPlanResponse:
+    """Edit meal servings or recipe with hard safety validation (AC-75, AC-76)."""
+    current_user, _ = auth
+    service = SubstitutionService(db)
+    await service.edit_meal(current_user.id, plan_id, meal_id, payload)
+    return await get_meal_plan(plan_id, auth, db)
+
+
+@router.get("/{plan_id}/grocery-list", response_model=GroceryListResponse)
+async def get_plan_grocery_list(
+    plan_id: UUID,
+    from_date: date | None = None,
+    to_date: date | None = None,
+    auth: tuple[User, Any] = Depends(check_nutrition_access),
+    db: AsyncSession = Depends(get_db),
+) -> GroceryListResponse:
+    """Generate unit-aware grocery list for chosen days with food categorization (AC-77–81)."""
+    current_user, _ = auth
+    service = SubstitutionService(db)
+    return await service.get_grocery_list(current_user.id, plan_id, from_date, to_date)
