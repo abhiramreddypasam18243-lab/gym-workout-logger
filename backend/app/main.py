@@ -53,12 +53,13 @@ async def security_and_limits_middleware(request: Request, call_next):
     return response
 
 
-# CORS (SEC9, AC-11) — strictly limited to configured origin
+# CORS (SEC9, AC-11) — configured origins
+allowed_origins = list({settings.allowed_origin, "http://localhost:5173", "http://localhost:8080", "http://127.0.0.1:5173"})
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.allowed_origin],
+    allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PATCH", "DELETE"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "X-CSRF-Token"],
 )
 
