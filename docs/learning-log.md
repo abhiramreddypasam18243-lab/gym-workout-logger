@@ -408,6 +408,43 @@ Each step adds an entry: what was built, why it's designed that way, one risk, a
 2. How does the user data export verify compliance with data portability requirements (AC-88)?
 3. What distinguishes user-owned tables from shared catalogue tables during account deletion, and why must the shared catalogue remain intact?
 
+---
+
+## Step 12: Production Deployment, Synthetic Demo Suite, Performance Benchmarks & Viva Readiness (AC-14, AC-99 to AC-118)
+
+**What was built:**
+- **Synthetic Demo Account Generator (`backend/app/demo_user.py`, `backend/tests/test_demo_user.py`, AC-106):**
+  - CLI command `python -m app.demo_user` (and `docker compose run --rm backend python -m app.demo_user`) generates a realistic synthetic user: `demo@titanstrength.test`.
+  - Populates a full 2-year training timeline (~500 sessions, ~10,000 sets) featuring progressive overload curves across compound lifts (Bench Press, Incline Press, Deadlift).
+  - Seeds upper/lower routines, personalized nutrition goals (2,800 kcal, 160g protein), a complete 7-day multi-slot meal plan, and 14 days of logged intake with immutable nutrient snapshots.
+  - Explicitly tags every session, note, and profile display name with `Synthetic Demo (AC-106)` to strictly avoid confusing synthetic data with authentic clinical records.
+- **Empirical Performance Benchmarks (`backend/tests/test_performance.py`, AC-103):**
+  - Measures p95 query latency against the synthetic dataset under realistic multi-year load.
+  - History endpoint (`/api/workouts?limit=20`): **72.47 ms** (target: $\le 300\text{ ms}$).
+  - Unified Dashboard (`/api/dashboard`): **70.73 ms** (target: $\le 500\text{ ms}$).
+  - Proves composite index efficiency (`idx_workout_sessions_user_started`) and cursor pagination speed.
+- **Comprehensive Viva & Architectural Documentation (`docs/DECISIONS.md`, `README.md`, `docs/test-plan.md`, AC-114–118):**
+  - Created `docs/DECISIONS.md` documenting all 20 architectural decisions (D-01 to D-20).
+  - Documented peer-reviewed clinical citations for all safety thresholds (Mifflin–St Jeor BMR, Morton 2018 protein meta-analysis, Helms 2015 surplus, Epley 1RM formula, USDA 1,500/1,200 kcal floors).
+  - Explicitly recorded v1 limitations in `README.md` (self-declared adult check, no mass-to-volume density guessing in grocery checklist, greedy planner heuristic, argon2id authentication without third-party OAuth).
+  - Verified non-root container security (`USER appuser`, `USER nginx`) in `Dockerfile` and `docker-compose.yml` (AC-107).
+  - Zero ruff lint errors (`All checks passed!`), 109 passing backend tests, and clean Vite/TypeScript frontend builds.
+
+**Why it's designed this way:**
+- **Indexed Cursor Pagination (AC-103, D-13):** Offset pagination (`LIMIT 20 OFFSET 5000`) forces the database to scan and discard 5,000 index entries. Cursor pagination (`WHERE (started_at, id) < (cursor_date, cursor_id)`) leverages the composite index `(user_id, started_at)` for instant $O(\log N)$ seeks regardless of total history size.
+- **Explicit Synthetic Labelling (AC-106, Rule S1):** Ethical engineering principles dictate that test and demo data in health and fitness platforms must be unmistakably identified as synthetic to prevent accidental reliance by testers or examiners.
+- **Non-Root Container Enforcement (AC-107, D-02):** Running containers as non-root (`appuser` / `nginx`) enforces the principle of least privilege. In the event of an application vulnerability or dependency exploit, the attacker cannot modify container filesystem binaries or escalate privileges to the host.
+
+**What could go wrong:**
+- **Bulk Insert Memory Bloat:** Inserting 10,000 sets simultaneously in a single list could exceed client memory or SQLite parameter limits (32,766 variables). Batching sets into 1,000-element chunks (`session.add_all(sets[c:c+1000])`) guarantees stable memory and high-throughput execution.
+- **Timezone Drift in Historical Sessions:** Generating sessions across 2 years requires explicit UTC timestamps. Using `datetime.now(timezone.utc)` and explicit timezones prevents daylight-savings calculation shifts.
+
+**Quiz questions:**
+1. Why does cursor pagination (`started_at, id`) provide stable sub-100ms response times (AC-103) while offset-based pagination degrades on large workout datasets?
+2. Why is running application containers under dedicated non-root users (`appuser`, `nginx`) a critical container hardening requirement (AC-107)?
+3. What are the key mathematical differences between a deterministic greedy meal planner (D-06) and an integer programming solver, and why was the greedy approach chosen for v1?
+
+
 
 
 

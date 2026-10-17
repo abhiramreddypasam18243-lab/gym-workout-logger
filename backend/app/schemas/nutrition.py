@@ -4,7 +4,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Any, Literal
 
-from pydantic import Field, field_validator
+from pydantic import Field
 
 from app.schemas.base import StrictSchema
 

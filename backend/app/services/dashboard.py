@@ -1,8 +1,7 @@
 """Combined dashboard and non-causal insights service (spec §6, §5.9, FR-13, AC-85–87)."""
 
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import Any
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
@@ -11,15 +10,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.domain.insights import (
-    DEFAULT_LIMITATIONS_STATEMENT,
     generate_strength_trend_insight,
-    generate_volume_nutrition_association_insight,
-    verify_non_causal_wording,
 )
 from app.domain.strength import calculate_epley_e1rm
 from app.models.nutrition import MealPlan, NutritionGoal
 from app.models.user import UserProfile
-from app.models.workout import Exercise, WorkoutExercise, WorkoutSession, WorkoutSet
+from app.models.workout import Exercise, WorkoutExercise, WorkoutSession
 from app.schemas.dashboard import (
     DashboardSummaryResponse,
     InsightItemResponse,

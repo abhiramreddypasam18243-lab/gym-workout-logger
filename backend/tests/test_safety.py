@@ -12,7 +12,6 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from app.api.deps import get_db
 from app.main import app
 from app.models.base import Base
-from app.models.nutrition import NutritionGoal
 from app.models.user import Session, User, UserProfile
 from app.services.security import generate_csrf_token, generate_session_token, hash_token
 

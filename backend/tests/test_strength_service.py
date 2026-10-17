@@ -1,8 +1,6 @@
 """Tests for Strength Analytics Service & Endpoints (spec §5.2, FR-05, AC-39–44)."""
 
-import uuid
 from datetime import UTC, datetime, timedelta
-from decimal import Decimal
 
 import pytest
 import pytest_asyncio

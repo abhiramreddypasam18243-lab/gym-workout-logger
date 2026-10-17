@@ -2,7 +2,7 @@
 
 import uuid
 from collections import defaultdict
-from datetime import UTC, date, datetime, time, timedelta
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from zoneinfo import ZoneInfo
 
@@ -11,13 +11,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.domain.strength import (
-    calculate_epley_e1rm,
-    calculate_working_volume,
-    detect_personal_records,
     StrengthSetInput,
+    calculate_epley_e1rm,
+    detect_personal_records,
 )
 from app.domain.units import kg_to_lb
-from app.models.workout import Exercise, WorkoutExercise, WorkoutSession, WorkoutSet
+from app.models.workout import WorkoutExercise, WorkoutSession
 
 
 class StrengthAnalyticsService:

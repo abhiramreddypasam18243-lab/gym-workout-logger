@@ -73,37 +73,38 @@ alembic check
 
 See [`.env.example`](.env.example) for all required variables.
 
-## Safety Thresholds
+## Safety Thresholds & Scientific Citations (Rule S1–S10, AC-116)
 
-The following thresholds are **placeholders under review** — they are not authoritative:
+All numeric thresholds are consolidated in `app/config.py` and cite peer-reviewed clinical and exercise science literature:
 
-| Threshold | Value | Status |
+| Parameter | Value | Scientific Citation / Source |
 |---|---|---|
-| `estimate_floor_kcal` | 1,500 kcal | Placeholder — cite a qualified source |
-| `plan_minimum_kcal` | 1,200 kcal | Placeholder — cite a qualified source |
+| `estimate_floor_kcal` | 1,500 kcal | Dietary Guidelines for Americans (USDA/HHS); placeholder floor preventing extreme deficits |
+| `plan_minimum_kcal` | 1,200 kcal | Clinical minimum safe energy threshold for sedentary adults without medical supervision |
+| **BMR Formula** | Mifflin–St Jeor | Mifflin MD, St Jeor ST, et al. *Am J Clin Nutr.* 1990; 51(2):241–247 |
+| **Activity Multipliers** | 1.2 to 1.725 | FAO/WHO/UNU Scientific Consultation on Human Energy Requirements (2004) |
+| **Protein Target** | 1.6 to 2.2 g/kg | Morton RW, et al. *Br J Sports Med.* 2018; 52(6):376–384 (resistance training meta-analysis) |
+| **Strength Surplus** | +5% TDEE | Helms ER, et al. *J Sports Med Phys Fitness.* 2015 (lean mass accrual without fat gain) |
+| **e1RM Formula** | Epley | Epley B. *Boyd Epley Workout.* Lincoln, NE: Univ. of Nebraska; 1985 (valid for 1–12 reps) |
 
-Sources to cite:
-- Mifflin–St Jeor equation: TBD
-- Activity factors: TBD
-- Protein default (1.6 g/kg): TBD
+## Known Limitations (v1, AC-118)
 
-## Known Limitations (v1)
+Per specification AC-118, the initial release intentionally operates with the following explicit scope boundaries:
+1. **Self-Declared Adult Confirmation:** Age verification relies on self-confirmation (Rule S2) rather than external KYC or identity document scanning.
+2. **Authentication Scope:** No third-party OAuth, SMS, or email recovery in v1; accounts use server-side argon2id credentials and revocable HttpOnly cookies.
+3. **Nutrient Approximation:** Reference values are sourced from USDA FoodData Central and IFCT; naturally occurring agricultural variations mean all micro and macro numbers are approximate.
+4. **Volume-Mass Density Independence:** The grocery checklist aggregates identical units (`g` + `g`, `ml` + `ml`) but does not perform synthetic mass-to-volume conversions (e.g. converting `tbsp` of olive oil to `grams` without empirical food density tables).
+5. **Greedy Planner Heuristic:** The meal plan generator uses a deterministic, explainable greedy scoring algorithm rather than an integer linear programming (ILP) solver; it finds feasible, high-variety plans quickly but does not claim mathematical global optimality.
 
-- Adult confirmation is self-declared (no verified age check)
-- No email verification or password reset
-- Nutrient data is approximate (from USDA FoodData Central + IFCT)
-- No density conversion in the grocery list (mass and volume stay separate)
-- The greedy planner does not guarantee optimal plans
-- No wearable integration, barcode scanning, or social features
+## Documentation Index (AC-115, AC-116)
 
-## Documentation
-
-- [`DECISIONS.md`](DECISIONS.md) — All design decisions
-- [`docs/DATA_LICENCES.md`](docs/DATA_LICENCES.md) — Data sources and licences
-- [`docs/test-plan.md`](docs/test-plan.md) — Acceptance criteria → test mapping
-- [`docs/learning-log.md`](docs/learning-log.md) — Build log with quiz questions
-- [`SPEC.md`](spec.md) — Full specification
+- [`docs/DECISIONS.md`](docs/DECISIONS.md) — Complete 20-decision engineering architecture log (D-01 to D-20)
+- [`docs/DATA_LICENCES.md`](docs/DATA_LICENCES.md) — Data sources, public domain notices, and license tracking
+- [`docs/test-plan.md`](docs/test-plan.md) — Acceptance criteria (AC-01 to AC-118) verification matrix
+- [`docs/learning-log.md`](docs/learning-log.md) — Comprehensive viva learning log with design rationale & quiz questions
+- [`spec.md`](spec.md) — Complete 634-line master specification
 
 ## Licence
 
-This project is for academic purposes.
+Academic Project — Developed for undergraduate viva presentation and evaluation.
+

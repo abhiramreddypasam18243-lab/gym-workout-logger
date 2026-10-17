@@ -1,6 +1,6 @@
 """Pydantic schemas for meal plan generation, inspection, and infeasibility explanations (spec §7, FR-08, AC-56–72)."""
 
-from datetime import date, datetime
+from datetime import date
 from decimal import Decimal
 from typing import Any, Literal
 from uuid import UUID

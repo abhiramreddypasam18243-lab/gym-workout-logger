@@ -1,6 +1,7 @@
 """Pydantic schemas and JSON Schema definition for user data export (spec §6, FR-15, AC-88)."""
 
 from typing import Any
+
 from pydantic import BaseModel, Field
 
 

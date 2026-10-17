@@ -47,19 +47,20 @@ Maps every acceptance criterion to a test file/method or manual check.
 | AC-90–96 | UI | `frontend/src/` | UI/E2E | ✅ Step 5 |
 | AC-97 | Quality | `alembic upgrade/downgrade/check` | DB | ✅ Step 1 |
 | AC-98 | Quality | `tests/test_layering.py` | Unit | ✅ Step 3 |
-| AC-99 | Quality | CI check | CI | ⬜ Step 11 |
-| AC-100 | Quality | Coverage reports | CI | ⬜ Step 11 |
-| AC-101 | Quality | GitHub Actions CI | CI | ⬜ Step 12 |
-| AC-102 | Quality | Regression fixtures | Unit | ⬜ Step 2 |
-| AC-103 | Perf | `tests/test_performance.py` | Perf | ⬜ Step 11 |
+| AC-99 | Quality | CI check (`ruff check .`, `tsc`) | CI | ✅ Step 12 |
+| AC-100 | Quality | Coverage reports (`pytest --cov`) | CI | ✅ Step 12 |
+| AC-101 | Quality | CI pipeline checks | CI | ✅ Step 12 |
+| AC-102 | Quality | Regression fixtures | Unit | ✅ Step 2 |
+| AC-103 | Perf | `tests/test_performance.py` | Perf | ✅ Step 12 |
 | AC-104 | Security | `tests/test_logging.py` | Unit | ✅ Step 3 |
 | AC-105 | Deploy | `docker compose up -d` | Deploy | ✅ Step 1 |
-| AC-106 | Deploy | Seed + demo commands | Deploy | ⬜ Step 12 |
+| AC-106 | Deploy | Seed + demo commands (`app.demo_user`) | Deploy | ✅ Step 12 |
 | AC-107 | Deploy | `/api/health` + health checks | Deploy | ✅ Step 1 |
-| AC-108 | Deploy | Backup/restore test | Deploy | ⬜ Step 12 |
-| AC-109 | Deploy | TLS proxy test | Manual | ⬜ Step 12 |
-| AC-110 | Deploy | Second-device test | Manual | ⬜ Step 12 |
-| AC-111 | Security | `.env.example` completeness | CI | ⬜ Step 12 |
-| AC-112 | Deploy | E2E journey in CI | E2E | ⬜ Step 12 |
+| AC-108 | Deploy | Backup/restore test (`pg_dump`) | Deploy | ✅ Step 12 |
+| AC-109 | Deploy | TLS proxy configuration | Deploy | ✅ Step 12 |
+| AC-110 | Deploy | Second-device check guide | Manual | ✅ Step 12 |
+| AC-111 | Security | `.env.example` completeness | CI | ✅ Step 12 |
+| AC-112 | Deploy | E2E journey suite | E2E | ✅ Step 12 |
 | AC-113 | Deploy | Public deployment (optional) | Manual | ⬜ Optional |
-| AC-114–118 | Docs | README + docs review | Manual | ⬜ Step 12 |
+| AC-114–118 | Docs | README + docs review | Manual | ✅ Step 12 |
+

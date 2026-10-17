@@ -1,13 +1,13 @@
 """Tests for data controls: complete user data export (AC-88) and verified account deletion (AC-89)."""
 
-from datetime import UTC, date, datetime, timedelta
-from decimal import Decimal
 import json
 import uuid
+from datetime import UTC, date, datetime, timedelta
+from decimal import Decimal
 
-from httpx import ASGITransport, AsyncClient
 import jsonschema
 import pytest
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
@@ -27,9 +27,21 @@ from app.models.nutrition import (
     RecipeIngredient,
 )
 from app.models.user import Session, User, UserCuisinePreference, UserFoodConstraint, UserProfile
-from app.models.workout import Exercise, RoutineExercise, WorkoutExercise, WorkoutRoutine, WorkoutSession, WorkoutSet
+from app.models.workout import (
+    Exercise,
+    RoutineExercise,
+    WorkoutExercise,
+    WorkoutRoutine,
+    WorkoutSession,
+    WorkoutSet,
+)
 from app.schemas.data_export import get_export_json_schema
-from app.services.security import generate_csrf_token, generate_session_token, hash_password, hash_token
+from app.services.security import (
+    generate_csrf_token,
+    generate_session_token,
+    hash_password,
+    hash_token,
+)
 
 
 @pytest.fixture

@@ -1,6 +1,5 @@
 """Combined dashboard and non-causal insights router (spec §7, §5.9, FR-13, AC-85–87)."""
 
-from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query

@@ -8,8 +8,7 @@ target snapshot preservation (AC-68), and transactional persistence (AC-71).
 """
 
 from collections import defaultdict
-from collections.abc import Sequence
-from datetime import date, timedelta
+from datetime import timedelta
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
@@ -367,11 +366,12 @@ class DietPlannerService:
                     surviving = []
                     removed = 0
                     for cand in candidates:
-                        if cand.cost_minor_per_serving is not None:
-                            # At minimal allowed serving size 0.5
-                            if (Decimal(cand.cost_minor_per_serving) * Decimal("0.5")) > slot_budget:
-                                removed += 1
-                                continue
+                        if (
+                            cand.cost_minor_per_serving is not None
+                            and (Decimal(cand.cost_minor_per_serving) * Decimal("0.5")) > slot_budget
+                        ):
+                            removed += 1
+                            continue
                         surviving.append(cand)
                     candidates = surviving
                     slot_filters_removed.append(

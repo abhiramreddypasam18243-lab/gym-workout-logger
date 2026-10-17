@@ -11,9 +11,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.api.deps import check_nutrition_access, get_current_user_required, get_db, verify_csrf
+from app.api.deps import check_nutrition_access, get_db, verify_csrf
 from app.domain.scoring import DEFAULT_WEIGHTS
-from app.models.nutrition import MealPlan, PlannedMeal, PlannedMealItem, Recipe
+from app.models.nutrition import MealPlan, PlannedMeal, PlannedMealItem
 from app.models.user import User
 from app.schemas.meal_plan import (
     DayNutrientTotal,
@@ -196,20 +196,19 @@ async def get_meal_plan(
                         "difference_pct": round(float(diff_pct * 100), 1),
                     }
                 )
-        if target_protein:
-            if d_prot < Decimal("0.90") * Decimal(target_protein):
-                is_within = False
-                diff_prot_pct = (d_prot - Decimal(target_protein)) / Decimal(target_protein)
-                deviations.append(
-                    {
-                        "warning": "target_deviation",
-                        "day": str(p_date),
-                        "metric": "protein",
-                        "target": target_protein,
-                        "actual": int(round(d_prot)),
-                        "difference_pct": round(float(diff_prot_pct * 100), 1),
-                    }
-                )
+        if target_protein and d_prot < Decimal("0.90") * Decimal(target_protein):
+            is_within = False
+            diff_prot_pct = (d_prot - Decimal(target_protein)) / Decimal(target_protein)
+            deviations.append(
+                {
+                    "warning": "target_deviation",
+                    "day": str(p_date),
+                    "metric": "protein",
+                    "target": target_protein,
+                    "actual": int(round(d_prot)),
+                    "difference_pct": round(float(diff_prot_pct * 100), 1),
+                }
+            )
 
         response_days.append(
             DayNutrientTotal(

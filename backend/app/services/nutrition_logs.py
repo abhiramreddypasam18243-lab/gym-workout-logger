@@ -2,14 +2,14 @@
 
 from collections import defaultdict
 from collections.abc import Sequence
-from datetime import UTC, date, datetime
+from datetime import date
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException, status
-from sqlalchemy import delete, func, or_, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -21,13 +21,11 @@ from app.domain.nutrients import (
 )
 from app.models.nutrition import (
     Food,
-    FoodNutrient,
     MealPlan,
     NutritionGoal,
     NutritionLog,
     NutritionLogItem,
     PlannedMeal,
-    PlannedMealItem,
     Recipe,
     RecipeIngredient,
 )
@@ -229,13 +227,13 @@ class NutritionLogService:
 
         tz = await self.get_user_timezone(user_id)
         filtered_logs: list[NutritionLogResponse] = []
-        for l in logs:
-            local_day = l.consumed_at.astimezone(tz).date()
+        for log_entry in logs:
+            local_day = log_entry.consumed_at.astimezone(tz).date()
             if from_date and local_day < from_date:
                 continue
             if to_date and local_day > to_date:
                 continue
-            filtered_logs.append(self._serialize_log(l))
+            filtered_logs.append(self._serialize_log(log_entry))
 
         return filtered_logs
 
@@ -411,13 +409,13 @@ class NutritionLogService:
         logged_by_date: dict[date, tuple[Decimal, Decimal]] = defaultdict(lambda: (Decimal("0"), Decimal("0")))
         logged_days_set: set[date] = set()
 
-        for l in all_logs:
-            local_day = l.consumed_at.astimezone(tz).date()
+        for log_entry in all_logs:
+            local_day = log_entry.consumed_at.astimezone(tz).date()
             if start_date <= local_day <= end_date:
                 logged_days_set.add(local_day)
                 l_cal = Decimal("0")
                 l_prot = Decimal("0")
-                for it in l.items:
+                for it in log_entry.items:
                     if it.nutrient_snapshot:
                         snap = it.nutrient_snapshot
                         is_rec = snap.get("is_recipe_per_serving") == "true"

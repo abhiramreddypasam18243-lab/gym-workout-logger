@@ -1,11 +1,11 @@
 """Data export and account deletion service (spec §6, FR-15, SEC1, S10, AC-88, AC-89)."""
 
+import uuid
 from datetime import UTC, datetime
 from typing import Any
-import uuid
 
-from fastapi import HTTPException, Response, status
 import jsonschema
+from fastapi import HTTPException, Response, status
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload

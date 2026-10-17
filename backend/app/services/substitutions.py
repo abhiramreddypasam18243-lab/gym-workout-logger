@@ -1,10 +1,7 @@
 """Substitution, manual edit, and grocery list aggregation services (spec §5.6, §5.7, FR-10, FR-11, AC-73–81)."""
 
-from collections import defaultdict
-from collections.abc import Sequence
 from datetime import date
 from decimal import Decimal
-from typing import Any
 from uuid import UUID
 
 from fastapi import HTTPException, status
@@ -15,12 +12,6 @@ from sqlalchemy.orm import selectinload
 from app.domain.grocery import (
     GroceryItemInput,
     aggregate_grocery_items,
-    scale_ingredient_quantity,
-)
-from app.domain.nutrients import (
-    NutrientProfile,
-    RecipeIngredientInput,
-    calculate_recipe_nutrients,
 )
 from app.domain.scoring import (
     DEFAULT_WEIGHTS,
@@ -38,20 +29,15 @@ from app.models.nutrition import (
 )
 from app.models.user import UserCuisinePreference, UserFoodConstraint
 from app.schemas.meal_plan import (
-    DayNutrientTotal,
-    ExplanationBlock,
     GroceryItemResponse,
     GroceryListResponse,
     MealEditRequest,
     MealNutrientSummary,
-    MealPlanResponse,
     NutrientDifference,
-    PlannedMealItemResponse,
-    PlannedMealResponse,
     SubstitutionAcceptRequest,
     SubstitutionOptionResponse,
 )
-from app.services.planner import DEFAULT_SLOT_SHARES, DISCLAIMER_TEXT, PreparedRecipe
+from app.services.planner import DEFAULT_SLOT_SHARES, PreparedRecipe
 
 
 class SubstitutionService:

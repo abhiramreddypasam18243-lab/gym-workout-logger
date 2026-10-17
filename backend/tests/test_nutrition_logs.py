@@ -1,34 +1,32 @@
 """Tests for intake logging, snapshots, and planned vs logged comparison (spec §5.8, FR-12, AC-82–84)."""
 
+import uuid
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
-import uuid
 
-from httpx import ASGITransport, AsyncClient
 import pytest
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import selectinload
 
 from app.api.deps import get_db
-from app.services.security import generate_csrf_token, generate_session_token, hash_token
 from app.domain.comparison import compare_planned_vs_logged
 from app.main import app
 from app.models.base import Base
 from app.models.nutrition import (
     Food,
-    FoodAllergen,
     FoodNutrient,
     MealPlan,
     NutritionGoal,
     NutritionLog,
-    NutritionLogItem,
     PlannedMeal,
     PlannedMealItem,
     Recipe,
     RecipeIngredient,
 )
 from app.models.user import Session, User, UserProfile
+from app.services.security import generate_csrf_token, generate_session_token, hash_token
 
 
 @pytest.fixture

@@ -3,29 +3,25 @@
 import time
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
-from uuid import UUID, uuid4
+from uuid import UUID
 
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import selectinload
 
 from app.api.deps import get_db
 from app.main import app
 from app.models.base import Base
 from app.models.nutrition import (
     Food,
-    FoodAllergen,
-    FoodNutrient,
     MealPlan,
     NutritionGoal,
-    PlannedMeal,
-    PlannedMealItem,
     Recipe,
     RecipeIngredient,
 )
-from sqlalchemy.orm import selectinload
 from app.models.user import Session, User, UserCuisinePreference, UserFoodConstraint, UserProfile
 from app.seed.loader import run_seed
 from app.services.security import generate_csrf_token, generate_session_token, hash_token

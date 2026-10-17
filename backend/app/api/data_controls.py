@@ -1,6 +1,7 @@
 """Data controls API routes for data export and account deletion (spec §6, FR-15, AC-88, AC-89)."""
 
 from typing import Annotated
+
 from fastapi import APIRouter, Depends, Response, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession

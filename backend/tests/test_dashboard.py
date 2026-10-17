@@ -1,20 +1,20 @@
 """Tests for combined dashboard and non-causal insights (spec §5.9, FR-13, AC-85–87, Rule S8)."""
 
+import uuid
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
-import uuid
 
-from httpx import ASGITransport, AsyncClient
 import pytest
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.api.deps import get_db
-from app.services.security import generate_csrf_token, generate_session_token, hash_token
-from app.domain.insights import BANNED_WORDS, verify_non_causal_wording
+from app.domain.insights import verify_non_causal_wording
 from app.main import app
 from app.models.base import Base
 from app.models.user import Session, User, UserProfile
 from app.models.workout import Exercise, WorkoutExercise, WorkoutSession, WorkoutSet
+from app.services.security import generate_csrf_token, generate_session_token, hash_token
 
 
 @pytest.fixture

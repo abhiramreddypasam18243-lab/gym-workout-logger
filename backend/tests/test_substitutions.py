@@ -2,7 +2,6 @@
 
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
-from uuid import UUID, uuid4
 
 import pytest
 import pytest_asyncio
@@ -16,15 +15,11 @@ from app.models.base import Base
 from app.models.nutrition import (
     Food,
     FoodAllergen,
-    FoodNutrient,
-    MealPlan,
     NutritionGoal,
-    PlannedMeal,
-    PlannedMealItem,
     Recipe,
     RecipeIngredient,
 )
-from app.models.user import Session, User, UserCuisinePreference, UserFoodConstraint, UserProfile
+from app.models.user import Session, User, UserFoodConstraint, UserProfile
 from app.seed.loader import run_seed
 from app.services.security import generate_csrf_token, generate_session_token, hash_token
 

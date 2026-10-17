@@ -1,6 +1,5 @@
 """Nutrition targets, estimation, preferences, and safety rules router (spec §5.4, §7, S2–S7, AC-17–28)."""
 
-import uuid
 from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Annotated
@@ -9,9 +8,8 @@ from zoneinfo import ZoneInfo
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
-from app.api.deps import check_nutrition_access, get_current_session, verify_csrf
+from app.api.deps import check_nutrition_access, verify_csrf
 from app.database import get_db
 from app.domain.targets import calculate_target_estimate
 from app.models.nutrition import NutritionGoal
