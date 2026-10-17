@@ -1,0 +1,89 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  backend-quality-and-tests:
+    name: Backend Lint, Types & Tests (AC-98, AC-100, AC-101)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: gymlogger
+          POSTGRES_PASSWORD: test_password_1234
+          POSTGRES_DB: gymlogger
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+          pip install ruff mypy pytest pytest-asyncio pytest-cov aiosqlite pip-audit
+
+      - name: Lint with ruff
+        working-directory: ./backend
+        run: ruff check .
+
+      - name: Audit Python dependencies (AC-14)
+        working-directory: ./backend
+        run: pip-audit
+
+      - name: Run test suite with coverage (AC-100)
+        working-directory: ./backend
+        env:
+          DATABASE_URL: postgresql+asyncpg://gymlogger:test_password_1234@localhost:5432/gymlogger
+          SESSION_SECRET: test_session_secret_at_least_32_chars_long
+          ALLOWED_ORIGIN: http://localhost:8080
+          ENVIRONMENT: test
+        run: |
+          pytest --cov=app.domain --cov=app.services --cov-report=term-missing -v
+
+  frontend-quality-and-build:
+    name: Frontend Build, Lint & Types (AC-99, AC-101)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Audit npm dependencies (AC-14)
+        working-directory: ./frontend
+        run: npm audit
+
+      - name: Type check and production build (AC-99)
+        working-directory: ./frontend
+        run: npm run build
