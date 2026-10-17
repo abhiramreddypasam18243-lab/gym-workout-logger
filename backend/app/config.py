@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str = Field(
-        default="postgresql+asyncpg://postgres:postgres@localhost:5432/gym_app"
+        default="sqlite+aiosqlite:///./gym_dev.db"
     )
 
     # Security (SEC10)
@@ -45,7 +45,12 @@ class Settings(BaseSettings):
     # Compatibility properties
     @property
     def database_url(self) -> str:
-        return self.DATABASE_URL
+        url = (self.DATABASE_URL or "").strip()
+        if url.startswith("postgres://"):
+            url = "postgresql+asyncpg://" + url[len("postgres://") :]
+        elif url.startswith("postgresql://") and not url.startswith("postgresql+asyncpg://"):
+            url = "postgresql+asyncpg://" + url[len("postgresql://") :]
+        return url
 
     @property
     def allowed_origin(self) -> str:

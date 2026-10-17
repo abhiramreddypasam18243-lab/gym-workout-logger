@@ -47,7 +47,7 @@ async def security_and_limits_middleware(request: Request, call_next):
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Content-Security-Policy"] = (
-        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'"
+        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'"
     )
 
     return response
@@ -55,13 +55,22 @@ async def security_and_limits_middleware(request: Request, call_next):
 
 # CORS (SEC9, AC-11) — configured origins
 allowed_origins = list({settings.allowed_origin, "http://localhost:5173", "http://localhost:8080", "http://127.0.0.1:5173"})
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "X-CSRF-Token"],
-)
+if settings.allowed_origin == "*" or "*" in settings.allowed_origin:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origin_regex=r".*",
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+        allow_headers=["Content-Type", "X-CSRF-Token"],
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=allowed_origins,
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+        allow_headers=["Content-Type", "X-CSRF-Token"],
+    )
 
 # Register routers
 app.include_router(health_router)
@@ -75,4 +84,23 @@ app.include_router(meal_plans_router)
 app.include_router(nutrition_logs_router)
 app.include_router(dashboard_router)
 app.include_router(data_controls_router)
+
+# Static frontend assets and SPA fallback for production deployment
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+static_dir = Path(__file__).resolve().parent.parent / "static"
+if static_dir.exists() and (static_dir / "index.html").exists():
+    if (static_dir / "assets").exists():
+        app.mount("/assets", StaticFiles(directory=str(static_dir / "assets")), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        if full_path.startswith("api/"):
+            return JSONResponse(status_code=404, content={"error": "Not Found"})
+        target = static_dir / full_path
+        if full_path and target.is_file():
+            return FileResponse(target)
+        return FileResponse(static_dir / "index.html")
 

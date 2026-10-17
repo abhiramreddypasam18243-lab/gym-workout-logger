@@ -17,6 +17,7 @@ COPY . .
 # Run migrations then start the server
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+RUN chown -R appuser:appuser /app
 
 USER appuser
 
