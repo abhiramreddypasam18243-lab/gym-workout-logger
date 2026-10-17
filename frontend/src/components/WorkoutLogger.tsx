@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Plus, Trash2, Clock, Check, AlertCircle, Dumbbell, Copy } from 'lucide-react'
+import { Plus, Trash2, Clock, Check, AlertCircle, Dumbbell, Copy, Timer } from 'lucide-react'
 import { api, ApiError } from '../api/client'
 import { useAuth } from '../context/AuthContext'
+import { playSetCompleteSound, playMicroClick } from '../utils/audio'
 import type { Exercise, Routine } from '../types'
 
 interface ActiveSet {
@@ -10,6 +11,7 @@ interface ActiveSet {
   load_display: number | string
   rpe?: number | string
   is_warmup: boolean
+  completed?: boolean
   notes?: string
 }
 
@@ -155,6 +157,33 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
     }
     setExercises(updated)
   }
+
+  const toggleSetComplete = (exerciseIndex: number, setIndex: number) => {
+    const isNowComplete = !exercises[exerciseIndex].sets[setIndex].completed
+    updateSet(exerciseIndex, setIndex, 'completed', isNowComplete)
+    if (isNowComplete) {
+      playSetCompleteSound()
+      window.dispatchEvent(new CustomEvent('titan-start-timer', { detail: { seconds: 90 } }))
+    } else {
+      playMicroClick()
+    }
+  }
+
+  // Calculate live session statistics
+  const totalVolume = exercises.reduce((accEx, ex) => {
+    return accEx + ex.sets.reduce((accSet, s) => {
+      const load = Number(s.load_display) || 0
+      const reps = Number(s.reps) || 0
+      return accSet + (load * reps)
+    }, 0)
+  }, 0)
+
+  const totalSetsCount = exercises.reduce((acc, ex) => acc + ex.sets.length, 0)
+  const completedSetsCount = exercises.reduce(
+    (acc, ex) => acc + ex.sets.filter((s) => s.completed).length,
+    0
+  )
+  const sessionCompletionPct = totalSetsCount > 0 ? Math.round((completedSetsCount / totalSetsCount) * 100) : 0
 
   // Save Workout
   const handleSaveWorkout = async () => {
@@ -323,6 +352,73 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
             onChange={(e) => setSessionNotes(e.target.value)}
           />
         </div>
+
+        {/* Live Session Telemetry HUD */}
+        {exercises.length > 0 && (
+          <div
+            style={{
+              marginTop: '1.25rem',
+              padding: '1rem',
+              background: 'rgba(5, 10, 24, 0.7)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid rgba(56, 189, 248, 0.2)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span className="badge badge-live">
+                  <span className="pulse-dot" /> LIVE TRACKING
+                </span>
+                <span style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
+                  {exercises.length} {exercises.length === 1 ? 'Movement' : 'Movements'} in rotation
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                <div style={{ fontSize: '0.875rem' }}>
+                  <span style={{ color: 'var(--text-dim)' }}>Volume: </span>
+                  <span className="mono-stat" style={{ color: 'var(--accent-primary)', fontSize: '1rem' }}>
+                    {totalVolume.toLocaleString()} {isLb ? 'lb' : 'kg'}
+                  </span>
+                </div>
+
+                <div style={{ fontSize: '0.875rem' }}>
+                  <span style={{ color: 'var(--text-dim)' }}>Sets: </span>
+                  <span className="mono-stat" style={{ color: '#10b981', fontSize: '1rem' }}>
+                    {completedSetsCount}/{totalSetsCount} ({sessionCompletionPct}%)
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => window.dispatchEvent(new CustomEvent('titan-start-timer', { detail: { seconds: 90 } }))}
+                  style={{ padding: '0.2rem 0.5rem', height: '28px', fontSize: '0.75rem' }}
+                  title="Trigger 90s rest timer"
+                >
+                  <Timer size={13} style={{ color: 'var(--accent-primary)' }} />
+                  <span>Rest 90s</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Session set completion progress bar */}
+            <div style={{ width: '100%', height: '6px', background: 'rgba(255, 255, 255, 0.08)', borderRadius: '3px', overflow: 'hidden' }}>
+              <div
+                style={{
+                  width: `${sessionCompletionPct}%`,
+                  height: '100%',
+                  background: 'linear-gradient(90deg, #38bdf8, #10b981)',
+                  borderRadius: '3px',
+                  transition: 'width 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Exercises in Session */}
@@ -363,7 +459,7 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
 
               {/* Set Table */}
               <div style={{ overflowX: 'auto', marginBottom: '0.75rem' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '320px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '340px' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-dim)', fontSize: '0.75rem', textTransform: 'uppercase' }}>
                       <th style={{ padding: '0.5rem' }}>Set</th>
@@ -371,6 +467,7 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
                       <th style={{ padding: '0.5rem' }}>Reps</th>
                       <th style={{ padding: '0.5rem' }}>RPE</th>
                       <th style={{ padding: '0.5rem', textAlign: 'center' }}>Warm-up</th>
+                      <th style={{ padding: '0.5rem', textAlign: 'center' }}>Done</th>
                       <th style={{ padding: '0.5rem', textAlign: 'right' }}>Action</th>
                     </tr>
                   </thead>
@@ -378,23 +475,45 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
                     {ex.sets.map((s, sIdx) => {
                       const loadErrKey = `ex_${exIdx}_set_${sIdx}_load`
                       const repsErrKey = `ex_${exIdx}_set_${sIdx}_reps`
+                      const loadNum = Number(s.load_display) || 0
+                      const repsNum = Number(s.reps) || 0
+                      const e1rm = loadNum > 0 && repsNum > 0 ? (repsNum === 1 ? loadNum : Math.round(loadNum * (1 + repsNum / 30) * 10) / 10) : null
 
                       return (
-                        <tr key={sIdx} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                          <td style={{ padding: '0.5rem', fontWeight: 600 }}>{s.set_number}</td>
+                        <tr
+                          key={sIdx}
+                          className={s.completed ? 'set-row-completed' : ''}
+                          style={{
+                            borderBottom: '1px solid rgba(255,255,255,0.03)',
+                            background: s.completed ? 'rgba(16, 185, 129, 0.08)' : 'transparent',
+                            transition: 'background 0.25s ease',
+                          }}
+                        >
+                          <td style={{ padding: '0.5rem', fontWeight: 700 }}>
+                            <span style={{ color: s.completed ? '#10b981' : 'var(--text-main)' }}>
+                              {s.set_number}
+                            </span>
+                          </td>
 
                           <td style={{ padding: '0.5rem' }}>
-                            <input
-                              type="number"
-                              className="form-input"
-                              style={{ width: '85px', minHeight: '36px', padding: '0.35rem 0.5rem' }}
-                              value={s.load_display}
-                              min="0"
-                              step={isLb ? '0.5' : '0.5'}
-                              aria-describedby={fieldErrors[loadErrKey] ? loadErrKey : undefined}
-                              aria-invalid={!!fieldErrors[loadErrKey]}
-                              onChange={(e) => updateSet(exIdx, sIdx, 'load_display', e.target.value)}
-                            />
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                              <input
+                                type="number"
+                                className="form-input"
+                                style={{ width: '85px', minHeight: '36px', padding: '0.35rem 0.5rem', fontFamily: 'var(--font-mono)' }}
+                                value={s.load_display}
+                                min="0"
+                                step={isLb ? '0.5' : '0.5'}
+                                aria-describedby={fieldErrors[loadErrKey] ? loadErrKey : undefined}
+                                aria-invalid={!!fieldErrors[loadErrKey]}
+                                onChange={(e) => updateSet(exIdx, sIdx, 'load_display', e.target.value)}
+                              />
+                              {e1rm && !s.is_warmup && (
+                                <span style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', marginTop: '2px', fontFamily: 'var(--font-mono)' }}>
+                                  e1RM: {e1rm}
+                                </span>
+                              )}
+                            </div>
                             {fieldErrors[loadErrKey] && (
                               <div id={loadErrKey} className="form-error">{fieldErrors[loadErrKey]}</div>
                             )}
@@ -404,7 +523,7 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
                             <input
                               type="number"
                               className="form-input"
-                              style={{ width: '75px', minHeight: '36px', padding: '0.35rem 0.5rem' }}
+                              style={{ width: '75px', minHeight: '36px', padding: '0.35rem 0.5rem', fontFamily: 'var(--font-mono)' }}
                               value={s.reps}
                               min="1"
                               step="1"
@@ -420,7 +539,7 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
                           <td style={{ padding: '0.5rem' }}>
                             <select
                               className="form-select"
-                              style={{ width: '80px', minHeight: '36px', padding: '0.35rem 0.5rem' }}
+                              style={{ width: '80px', minHeight: '36px', padding: '0.35rem 0.5rem', fontFamily: 'var(--font-mono)' }}
                               value={s.rpe || ''}
                               onChange={(e) => updateSet(exIdx, sIdx, 'rpe', e.target.value)}
                             >
@@ -439,6 +558,32 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
                               style={{ width: '18px', height: '18px', accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
                               aria-label={`Mark set ${s.set_number} as warm-up`}
                             />
+                          </td>
+
+                          {/* Interactive Done Checkmark */}
+                          <td style={{ padding: '0.5rem', textAlign: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => toggleSetComplete(exIdx, sIdx)}
+                              style={{
+                                width: '30px',
+                                height: '30px',
+                                borderRadius: '8px',
+                                border: s.completed ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.15)',
+                                background: s.completed ? '#10b981' : 'rgba(255, 255, 255, 0.05)',
+                                color: s.completed ? '#031120' : 'var(--text-dim)',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                boxShadow: s.completed ? '0 0 12px rgba(16, 185, 129, 0.45)' : 'none',
+                              }}
+                              title={s.completed ? 'Mark incomplete' : 'Mark set done and start 90s recovery timer'}
+                              aria-label={`Toggle set ${s.set_number} completion`}
+                            >
+                              <Check size={16} strokeWidth={s.completed ? 3 : 2} />
+                            </button>
                           </td>
 
                           <td style={{ padding: '0.5rem', textAlign: 'right' }}>

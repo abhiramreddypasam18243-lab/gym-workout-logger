@@ -199,184 +199,246 @@ export const Dashboard: React.FC<{
   const targetCalories = dashboardData?.target_daily_calories_kcal ?? 0
   const isCaloriesHidden = profile?.calories_hidden || false
 
+  // Dynamic greeting based on current local hour
+  const currentHour = new Date().getHours()
+  const greeting = currentHour < 12 ? 'Good morning' : currentHour < 17 ? 'Good afternoon' : 'Good evening'
+  const athleteName = profile?.display_name || 'Champion'
+
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1.5rem 1rem' }}>
-      {/* Top Header / Actions Bar */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            Titan Performance <span style={{ color: 'var(--accent-primary)' }}>Dashboard</span>
-          </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
-            Unified training load, weekly adherence, and non-causal performance correlations.
-          </p>
-        </div>
+    <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '1.75rem 1.25rem' }}>
+      {/* Top Hero Header with Animated Streak and Status Pills */}
+      <div
+        className="card"
+        style={{
+          marginBottom: '1.75rem',
+          padding: '1.75rem',
+          background: 'linear-gradient(135deg, rgba(14, 21, 38, 0.85), rgba(7, 12, 26, 0.95))',
+          border: '1px solid rgba(56, 189, 248, 0.25)',
+          boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 20px 48px -10px rgba(0, 0, 0, 0.7)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1.25rem' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+              <span className="badge badge-live">
+                <span className="pulse-dot" /> LIVE ADHERENCE
+              </span>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  padding: '0.25rem 0.65rem',
+                  borderRadius: '9999px',
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                  background: 'rgba(245, 158, 11, 0.15)',
+                  border: '1px solid rgba(245, 158, 11, 0.4)',
+                  color: '#fbbf24',
+                  boxShadow: '0 0 12px rgba(245, 158, 11, 0.25)',
+                }}
+              >
+                🔥 7-DAY STREAK
+              </span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', fontWeight: 600 }}>
+                {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
+              </span>
+            </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-          {onNavigateToLogger && (
+            <h1 style={{ fontSize: '2.1rem', fontWeight: 900, letterSpacing: '-0.035em' }}>
+              {greeting}, <span className="text-gradient-cyan">{athleteName}</span>
+            </h1>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9375rem', marginTop: '0.35rem', maxWidth: '650px' }}>
+              High-performance strength overload analytics, progressive training volume, and macronutrient targets.
+            </p>
+          </div>
+
+          {/* Quick Action Station */}
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            {onNavigateToLogger && (
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={onNavigateToLogger}
+                id="dash-start-workout-btn"
+                style={{ boxShadow: '0 4px 20px rgba(56, 189, 248, 0.45)' }}
+              >
+                <Dumbbell size={17} strokeWidth={2.5} />
+                <span>Start Session</span>
+              </button>
+            )}
+
+            {onNavigateToMealPlan && (
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={onNavigateToMealPlan}
+                id="dash-view-mealplan-btn"
+              >
+                <UtensilsCrossed size={16} />
+                <span>Active Meal Plan</span>
+              </button>
+            )}
+
             <button
               type="button"
-              className="btn btn-secondary btn-sm"
-              onClick={onNavigateToLogger}
-              id="dash-start-workout-btn"
+              className="btn btn-secondary"
+              onClick={() => setShowLogModal(true)}
+              id="quick-log-intake-btn"
             >
-              <Dumbbell size={15} />
-              <span>Start Workout</span>
+              <PlusCircle size={16} />
+              <span>Log Meal Intake</span>
             </button>
-          )}
 
-          {onNavigateToMealPlan && (
             <button
               type="button"
-              className="btn btn-secondary btn-sm"
-              onClick={onNavigateToMealPlan}
-              id="dash-view-mealplan-btn"
+              className="btn btn-ghost"
+              onClick={loadData}
+              title="Refresh performance telemetry"
+              id="refresh-dashboard-btn"
+              style={{ padding: '0.5rem' }}
             >
-              <UtensilsCrossed size={15} />
-              <span>Active Plan</span>
+              <RefreshCw size={16} />
             </button>
-          )}
-
-          <button
-            type="button"
-            className="btn btn-secondary btn-sm"
-            onClick={loadData}
-            title="Refresh metrics"
-            id="refresh-dashboard-btn"
-          >
-            <RefreshCw size={15} />
-            <span>Refresh</span>
-          </button>
-
-          <button
-            type="button"
-            className="btn btn-primary btn-sm"
-            onClick={() => setShowLogModal(true)}
-            id="quick-log-intake-btn"
-          >
-            <PlusCircle size={16} />
-            <span>Log Meal Intake</span>
-          </button>
+          </div>
         </div>
       </div>
 
       {logSuccessMessage && (
-        <div style={{ marginBottom: '1.25rem', padding: '0.75rem 1rem', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: 'var(--radius-md)', color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div style={{ marginBottom: '1.25rem', padding: '0.85rem 1.15rem', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.35)', borderRadius: 'var(--radius-md)', color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.625rem', fontWeight: 600 }}>
           <CheckCircle size={18} />
           <span>{logSuccessMessage}</span>
         </div>
       )}
 
       {error && (
-        <div style={{ marginBottom: '1.25rem', padding: '0.75rem 1rem', background: 'rgba(244, 63, 94, 0.15)', border: '1px solid rgba(244, 63, 94, 0.3)', borderRadius: 'var(--radius-md)', color: '#f43f5e', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div style={{ marginBottom: '1.25rem', padding: '0.85rem 1.15rem', background: 'rgba(244, 63, 94, 0.15)', border: '1px solid rgba(244, 63, 94, 0.35)', borderRadius: 'var(--radius-md)', color: '#f43f5e', display: 'flex', alignItems: 'center', gap: '0.625rem', fontWeight: 600 }}>
           <AlertCircle size={18} />
           <span>{error}</span>
         </div>
       )}
 
-      {/* Grid of Key Weekly Metrics (AC-85) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-        {/* Metric 1: Weekly Workouts */}
-        <div className="card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-            <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Workouts This Week
-            </span>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(56, 189, 248, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)' }}>
-              <Activity size={18} />
-            </div>
-          </div>
+      {/* Grid of Key Weekly Metrics (AC-85) with Circular Ring Gauges */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', marginBottom: '1.75rem' }}>
+        {/* Metric 1: Weekly Workouts with Circular Ring Gauge */}
+        <div className="card card-glow-cyan" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem' }}>
-              <span style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-main)' }}>
-                {workoutCount}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Weekly Workouts
               </span>
-              <span style={{ color: 'var(--text-dim)', fontSize: '0.9375rem' }}>
-                / {workoutTarget} target
-              </span>
+              <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(56, 189, 248, 0.15)', border: '1px solid rgba(56, 189, 248, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)' }}>
+                <Activity size={18} />
+              </div>
             </div>
-            {/* Progress bar */}
-            <div style={{ width: '100%', height: '6px', background: 'var(--border-subtle)', borderRadius: '3px', marginTop: '0.5rem', overflow: 'hidden' }}>
-              <div
-                style={{
-                  width: `${workoutProgressPct}%`,
-                  height: '100%',
-                  background: workoutCount >= workoutTarget ? '#10b981' : 'var(--accent-primary)',
-                  borderRadius: '3px',
-                  transition: 'width 0.4s ease',
-                }}
-              />
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem' }}>
+                  <span className="mono-stat" style={{ fontSize: '2.25rem', color: '#fff', lineHeight: 1 }}>
+                    {workoutCount}
+                  </span>
+                  <span style={{ color: 'var(--text-dim)', fontSize: '1rem', fontWeight: 700 }}>
+                    / {workoutTarget} target
+                  </span>
+                </div>
+                <p style={{ fontSize: '0.75rem', color: workoutCount >= workoutTarget ? '#10b981' : 'var(--text-dim)', marginTop: '0.5rem', fontWeight: 600 }}>
+                  {workoutCount >= workoutTarget ? '✓ Target completed this week' : `${workoutTarget - workoutCount} more session to hit target`}
+                </p>
+              </div>
+
+              {/* Circular Mini Gauge */}
+              <div style={{ position: 'relative', width: '56px', height: '56px', flexShrink: 0 }}>
+                <svg width="56" height="56" viewBox="0 0 56 56" style={{ transform: 'rotate(-90deg)' }}>
+                  <circle cx="28" cy="28" r="22" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="5" fill="none" />
+                  <circle
+                    cx="28"
+                    cy="28"
+                    r="22"
+                    stroke={workoutCount >= workoutTarget ? '#10b981' : '#38bdf8'}
+                    strokeWidth="5"
+                    fill="none"
+                    strokeDasharray={2 * Math.PI * 22}
+                    strokeDashoffset={2 * Math.PI * 22 * (1 - Math.min(1, workoutCount / Math.max(1, workoutTarget)))}
+                    strokeLinecap="round"
+                    style={{ transition: 'stroke-dashoffset 0.8s ease' }}
+                  />
+                </svg>
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6875rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#fff' }}>
+                  {Math.round(workoutProgressPct)}%
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Metric 2: Weekly Volume Lifted (AC-85b) */}
-        <div className="card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-            <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Weekly Volume Lifted
+        {/* Metric 2: Weekly Volume Lifted */}
+        <div className="card card-glow-cyan" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              Weekly Work Tonnage
             </span>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981' }}>
               <TrendingUp size={18} />
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-main)' }}>
+            <div className="mono-stat" style={{ fontSize: '2.1rem', color: '#fff', lineHeight: 1 }}>
               {formatVolume(volumeKg)}
             </div>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: '0.25rem' }}>
-              Total work completed across all sets
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: '0.5rem', fontWeight: 600 }}>
+              Calculated load × reps across all completed sets
             </p>
           </div>
         </div>
 
-        {/* Metric 3: Personal Records Set (AC-85c) */}
-        <div className="card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-            <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        {/* Metric 3: Personal Records Set */}
+        <div className="card card-glow-gold" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               Personal Records
             </span>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(245, 158, 11, 0.15)', border: '1px solid rgba(245, 158, 11, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b' }}>
               <Award size={18} />
             </div>
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem' }}>
-              <span style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-main)' }}>
+              <span className="mono-stat text-gradient-gold" style={{ fontSize: '2.25rem', lineHeight: 1 }}>
                 {prCount}
               </span>
-              <span style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>
-                PRs unlocked this week
+              <span style={{ color: 'var(--text-dim)', fontSize: '0.9375rem', fontWeight: 700 }}>
+                PRs unlocked
               </span>
             </div>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: '0.25rem' }}>
-              Top 1RM calculations & load milestones
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: '0.5rem', fontWeight: 600 }}>
+              Top load & estimated 1RM milestones achieved
             </p>
           </div>
         </div>
 
-        {/* Metric 4: Weekly Nutrition Adherence (AC-85d, e, f, AC-84) */}
-        <div className="card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-            <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        {/* Metric 4: Weekly Nutrition Adherence */}
+        <div className="card card-glow-emerald" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               Nutrition Adherence
             </span>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(168, 85, 247, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#c084fc' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(168, 85, 247, 0.15)', border: '1px solid rgba(168, 85, 247, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#c084fc' }}>
               <ShieldCheck size={18} />
             </div>
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem' }}>
-              <span style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-main)' }}>
+              <span className="mono-stat text-gradient-emerald" style={{ fontSize: '2.25rem', lineHeight: 1 }}>
                 {loggedDaysCount > 0 ? `${Math.round(adherencePct)}%` : '—'}
               </span>
-              <span style={{ color: 'var(--text-dim)', fontSize: '0.8125rem' }}>
-                ({loggedDaysCount} of 7 days logged)
+              <span style={{ color: 'var(--text-dim)', fontSize: '0.8125rem', fontWeight: 700 }}>
+                ({loggedDaysCount}/7 days logged)
               </span>
             </div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: '0.25rem' }}>
-              Within ±10% energy target. <span style={{ color: 'var(--text-muted)' }}>Unlogged days excluded (AC-84).</span>
-            </div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: '0.5rem', fontWeight: 600 }}>
+              Within ±10% energy goal. Unlogged days excluded.
+            </p>
           </div>
         </div>
       </div>

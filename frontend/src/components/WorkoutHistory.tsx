@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Calendar, Trash2, Dumbbell, AlertCircle, RefreshCw } from 'lucide-react'
+import { Calendar, Trash2, Dumbbell, AlertCircle, RefreshCw, Activity, Layers } from 'lucide-react'
 import { api } from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import type { WorkoutSession } from '../types'
@@ -45,7 +45,7 @@ export const WorkoutHistory: React.FC = () => {
     } finally {
       setIsLoadingMore(false)
     }
-  };
+  }
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this workout session?')) return
@@ -85,15 +85,35 @@ export const WorkoutHistory: React.FC = () => {
     return `${Number(loadKg).toFixed(1)} kg`
   }
 
+  const countTotalSets = (session: WorkoutSession) => {
+    return session.exercises.reduce((acc, e) => acc + e.sets.length, 0)
+  }
+
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto', padding: '1.5rem 1rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-        <div>
-          <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-            <Calendar style={{ color: 'var(--accent-primary)' }} />
-            Training History
-          </h1>
-          <p style={{ marginTop: '0.25rem' }}>Review past workout sessions and volume</p>
+    <div style={{ maxWidth: '960px', margin: '0 auto', padding: '1.5rem 1rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+          <div style={{
+            width: '38px',
+            height: '38px',
+            borderRadius: 'var(--radius-md)',
+            background: 'linear-gradient(135deg, rgba(56,189,248,0.2), rgba(2,132,199,0.2))',
+            border: '1px solid rgba(56,189,248,0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 0 16px rgba(56,189,248,0.2)',
+          }}>
+            <Calendar style={{ color: 'var(--accent-primary)' }} size={20} />
+          </div>
+          <div>
+            <h1 style={{ fontSize: '1.65rem', fontWeight: 800, letterSpacing: '-0.02em', margin: 0 }}>
+              Training History
+            </h1>
+            <p style={{ marginTop: '0.15rem', fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
+              Detailed ledger of past training sessions, working volume & set telemetry
+            </p>
+          </div>
         </div>
 
         <button
@@ -102,9 +122,10 @@ export const WorkoutHistory: React.FC = () => {
           onClick={loadInitial}
           disabled={isLoading}
           aria-label="Refresh history"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}
         >
           <RefreshCw size={14} className={isLoading ? 'spinner' : ''} />
-          <span>Refresh</span>
+          <span>Refresh Ledger</span>
         </button>
       </div>
 
@@ -117,20 +138,34 @@ export const WorkoutHistory: React.FC = () => {
 
       {/* Loading Skeletons (AC-90) */}
       {isLoading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {[1, 2, 3].map((n) => (
-            <div key={n} className="card skeleton" style={{ height: '140px' }} />
+            <div key={n} className="card skeleton" style={{ height: '180px' }} />
           ))}
         </div>
       ) : workouts.length === 0 ? (
         /* Empty State (AC-90) */
-        <div className="empty-state">
-          <Dumbbell size={40} style={{ color: 'var(--accent-primary)', opacity: 0.8 }} />
-          <h3>No workout sessions recorded yet</h3>
-          <p>Complete a session in the Workout Logger to see your training history and volume trends here.</p>
+        <div className="empty-state" style={{ padding: '3.5rem 1.5rem' }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            borderRadius: '50%',
+            background: 'rgba(56,189,248,0.1)',
+            border: '1px solid rgba(56,189,248,0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 1.25rem auto',
+          }}>
+            <Dumbbell size={32} style={{ color: 'var(--accent-primary)' }} />
+          </div>
+          <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>No workout sessions recorded yet</h3>
+          <p style={{ maxWidth: '440px', margin: '0 auto' }}>
+            Complete a workout in the Workout Logger to generate detailed session archives and volume telemetry here.
+          </p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {workouts.map((session) => {
             const date = new Date(session.started_at)
             const dateStr = date.toLocaleDateString(undefined, {
@@ -140,22 +175,61 @@ export const WorkoutHistory: React.FC = () => {
               day: 'numeric',
             })
             const timeStr = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
+            const totalSets = countTotalSets(session)
+            const totalVolume = calculateSessionVolume(session)
 
             return (
-              <div key={session.id} className="card">
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.75rem' }}>
+              <div key={session.id} className="card card-glow-cyan" style={{ padding: '1.5rem' }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '1rem',
+                  marginBottom: '1.25rem',
+                  borderBottom: '1px solid var(--border-subtle)',
+                  paddingBottom: '1rem',
+                }}>
                   <div>
-                    <h2 style={{ fontSize: '1.15rem', color: '#fff' }}>{dateStr}</h2>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
-                      Started at {timeStr}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                      <h2 style={{ fontSize: '1.25rem', color: '#fff', fontWeight: 800, margin: 0 }}>
+                        {dateStr}
+                      </h2>
+                      <span className="badge badge-blue" style={{ fontSize: '0.6875rem' }}>
+                        {timeStr}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                        <Layers size={13} style={{ color: 'var(--accent-primary)' }} />
+                        {session.exercises.length} Exercises
+                      </span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                        <Activity size={13} style={{ color: '#10b981' }} />
+                        {totalSets} Total Sets
+                      </span>
+                    </div>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <div style={{ textAlign: 'right' }}>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', display: 'block' }}>Total Volume</span>
-                      <strong style={{ color: 'var(--accent-primary)', fontSize: '0.95rem' }}>
-                        {calculateSessionVolume(session)}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                    <div style={{
+                      background: 'rgba(9, 14, 26, 0.75)',
+                      border: '1px solid var(--border-card)',
+                      borderRadius: 'var(--radius-md)',
+                      padding: '0.5rem 0.85rem',
+                      textAlign: 'right',
+                    }}>
+                      <span style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                        Total Load Volume
+                      </span>
+                      <strong style={{
+                        color: 'var(--accent-primary)',
+                        fontSize: '1.15rem',
+                        fontFamily: 'JetBrains Mono, monospace',
+                        fontWeight: 900,
+                      }}>
+                        {totalVolume}
                       </strong>
                     </div>
 
@@ -166,7 +240,7 @@ export const WorkoutHistory: React.FC = () => {
                       disabled={deletingId === session.id}
                       title="Delete session"
                       aria-label="Delete workout session"
-                      style={{ color: 'var(--accent-rose)' }}
+                      style={{ color: 'var(--accent-rose)', padding: '0.5rem' }}
                     >
                       <Trash2 size={16} />
                     </button>
@@ -174,17 +248,44 @@ export const WorkoutHistory: React.FC = () => {
                 </div>
 
                 {session.notes && (
-                  <p style={{ fontSize: '0.8125rem', fontStyle: 'italic', marginBottom: '0.75rem', color: 'var(--text-muted)' }}>
+                  <div style={{
+                    fontSize: '0.8125rem',
+                    fontStyle: 'italic',
+                    marginBottom: '1rem',
+                    color: 'var(--text-muted)',
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    borderLeft: '3px solid var(--accent-primary)',
+                    padding: '0.5rem 0.85rem',
+                    borderRadius: '0 var(--radius-sm) var(--radius-sm) 0',
+                  }}>
                     "{session.notes}"
-                  </p>
+                  </div>
                 )}
 
                 {/* Exercises list in this session */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
                   {session.exercises.map((we) => (
-                    <div key={we.id} style={{ background: '#090e1a', borderRadius: 'var(--radius-md)', padding: '0.75rem', border: '1px solid var(--border-subtle)' }}>
-                      <div style={{ fontWeight: 600, color: '#fff', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
-                        {we.exercise?.name || 'Exercise'}
+                    <div
+                      key={we.id}
+                      style={{
+                        background: 'rgba(9, 14, 26, 0.6)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '0.85rem 1rem',
+                        border: '1px solid var(--border-subtle)',
+                      }}
+                    >
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: '0.65rem',
+                      }}>
+                        <span style={{ fontWeight: 700, color: '#fff', fontSize: '0.925rem' }}>
+                          {we.exercise?.name || 'Exercise'}
+                        </span>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                          {we.sets.length} {we.sets.length === 1 ? 'set' : 'sets'}
+                        </span>
                       </div>
 
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -192,22 +293,31 @@ export const WorkoutHistory: React.FC = () => {
                           <div
                             key={s.id}
                             style={{
-                              background: s.is_warmup ? 'rgba(255,255,255,0.03)' : 'var(--bg-surface-elevated)',
-                              border: s.is_warmup ? '1px dashed var(--border-subtle)' : '1px solid var(--border-active)',
+                              background: s.is_warmup ? 'rgba(255,255,255,0.03)' : 'rgba(12, 19, 36, 0.9)',
+                              border: s.is_warmup ? '1px dashed var(--border-subtle)' : '1px solid rgba(56, 189, 248, 0.25)',
                               borderRadius: 'var(--radius-sm)',
-                              padding: '0.35rem 0.6rem',
+                              padding: '0.4rem 0.65rem',
                               fontSize: '0.8125rem',
                               display: 'flex',
                               alignItems: 'center',
-                              gap: '0.375rem',
+                              gap: '0.45rem',
+                              fontFamily: 'JetBrains Mono, monospace',
                             }}
                           >
                             <span style={{ color: 'var(--text-dim)', fontSize: '0.75rem' }}>#{s.set_number}</span>
-                            <strong style={{ color: s.is_warmup ? 'var(--text-dim)' : 'var(--text-main)' }}>
+                            <strong style={{ color: s.is_warmup ? 'var(--text-dim)' : '#fff' }}>
                               {formatLoad(s.load_kg)} × {s.reps}
                             </strong>
-                            {s.rpe && <span className="badge badge-amber" style={{ fontSize: '0.6875rem' }}>@{s.rpe}</span>}
-                            {s.is_warmup && <span style={{ fontSize: '0.6875rem', color: 'var(--text-dim)' }}>(warmup)</span>}
+                            {s.rpe && (
+                              <span className="badge badge-amber" style={{ fontSize: '0.625rem', padding: '0.1rem 0.35rem' }}>
+                                @{s.rpe}
+                              </span>
+                            )}
+                            {s.is_warmup && (
+                              <span style={{ fontSize: '0.6875rem', color: 'var(--text-dim)' }}>
+                                warmup
+                              </span>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -226,6 +336,7 @@ export const WorkoutHistory: React.FC = () => {
                 className="btn btn-secondary"
                 onClick={loadMore}
                 disabled={isLoadingMore}
+                style={{ minWidth: '180px' }}
               >
                 {isLoadingMore ? <span className="spinner" style={{ width: '16px', height: '16px' }} /> : null}
                 <span>Load Earlier Workouts</span>

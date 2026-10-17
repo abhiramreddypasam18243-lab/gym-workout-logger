@@ -1,166 +1,314 @@
 import React from 'react'
-import { Dumbbell, Calendar, ClipboardList, Activity, Settings, LogOut, Info, TrendingUp, Utensils, Sparkles, LayoutDashboard } from 'lucide-react'
+import {
+  Dumbbell,
+  Calendar,
+  ClipboardList,
+  Activity,
+  Settings,
+  LogOut,
+  Info,
+  TrendingUp,
+  Utensils,
+  Sparkles,
+  LayoutDashboard,
+  Search,
+  Timer,
+  Volume2,
+  VolumeX,
+} from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { isSoundEnabled, setSoundEnabled, playMicroClick } from '../utils/audio'
 
-export type TabType = 'dashboard' | 'logger' | 'routines' | 'history' | 'analytics' | 'nutrition' | 'mealplan' | 'exercises' | 'profile'
+export type TabType =
+  | 'dashboard'
+  | 'logger'
+  | 'routines'
+  | 'history'
+  | 'analytics'
+  | 'nutrition'
+  | 'mealplan'
+  | 'exercises'
+  | 'profile'
 
 interface NavbarProps {
   activeTab: TabType
   onSelectTab: (tab: TabType) => void
+  onOpenCommandPalette: () => void
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ activeTab, onSelectTab }) => {
+export const Navbar: React.FC<NavbarProps> = ({
+  activeTab,
+  onSelectTab,
+  onOpenCommandPalette,
+}) => {
   const { user, profile, units, updateUnits, logout } = useAuth()
+  const [soundOn, setSoundOn] = React.useState(() => isSoundEnabled())
 
   const toggleUnits = () => {
     const next = units === 'kg' ? 'lb' : 'kg'
     updateUnits(next)
+    playMicroClick()
   }
 
+  const toggleSound = () => {
+    const next = !soundOn
+    setSoundOn(next)
+    setSoundEnabled(next)
+    if (next) playMicroClick()
+  }
+
+  const openTimer = () => {
+    window.dispatchEvent(new CustomEvent('titan-start-timer', { detail: { seconds: 90 } }))
+    playMicroClick()
+  }
+
+  const navItems: { tab: TabType; label: string; icon: React.ReactNode }[] = [
+    { tab: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={16} /> },
+    { tab: 'logger', label: 'Workout', icon: <Dumbbell size={16} /> },
+    { tab: 'routines', label: 'Routines', icon: <ClipboardList size={16} /> },
+    { tab: 'history', label: 'History', icon: <Calendar size={16} /> },
+    { tab: 'analytics', label: 'Strength', icon: <TrendingUp size={16} /> },
+    { tab: 'nutrition', label: 'Nutrition', icon: <Utensils size={16} /> },
+    { tab: 'mealplan', label: 'Meal Plan', icon: <Sparkles size={16} /> },
+    { tab: 'exercises', label: 'Catalogue', icon: <Activity size={16} /> },
+    { tab: 'profile', label: 'Settings', icon: <Settings size={16} /> },
+  ]
+
   return (
-    <header style={{ borderBottom: '1px solid var(--border-subtle)', background: 'rgba(9, 13, 22, 0.95)', position: 'sticky', top: 0, zIndex: 50, backdropFilter: 'blur(12px)' }}>
+    <header
+      style={{
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        background: 'rgba(7, 11, 22, 0.88)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
+      }}
+    >
       {/* Informational Disclaimer (AC-28, S1) */}
       <div className="disclaimer-banner">
-        <Info size={14} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+        <Info size={13} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
         <span>
-          <strong>Informational notice:</strong> Estimates are informational and not medical advice. This app is not a substitute for a registered dietitian or doctor.
+          <strong>Titan Intelligence:</strong> Estimates and recommendations are strictly informational and non-medical.
         </span>
       </div>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-        {/* Brand */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-          <div style={{ background: 'linear-gradient(135deg, #0284c7, #38bdf8)', width: '36px', height: '36px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#04111d' }}>
-            <Dumbbell size={20} strokeWidth={2.5} />
+      <div
+        style={{
+          maxWidth: '1360px',
+          margin: '0 auto',
+          padding: '0.65rem 1.25rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1rem',
+          flexWrap: 'wrap',
+        }}
+      >
+        {/* Brand Logo with Glow */}
+        <div
+          style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}
+          onClick={() => {
+            onSelectTab('dashboard')
+            playMicroClick()
+          }}
+        >
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #0284c7, #38bdf8)',
+              width: '38px',
+              height: '38px',
+              borderRadius: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#031120',
+              boxShadow: '0 0 16px rgba(56, 189, 248, 0.45)',
+              flexShrink: 0,
+            }}
+          >
+            <Dumbbell size={22} strokeWidth={2.6} />
           </div>
           <div>
-            <div style={{ fontWeight: 800, fontSize: '1.05rem', letterSpacing: '-0.02em', color: '#fff' }}>
-              TITAN <span style={{ color: 'var(--accent-primary)' }}>STRENGTH</span>
+            <div
+              style={{
+                fontWeight: 900,
+                fontSize: '1.15rem',
+                letterSpacing: '-0.03em',
+                lineHeight: 1.1,
+              }}
+            >
+              <span style={{ color: '#fff' }}>TITAN</span>{' '}
+              <span className="text-gradient-cyan">STRENGTH</span>
             </div>
-            <div style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', marginTop: '-2px' }}>
-              Workout Logger & Diet Planner
+            <div
+              style={{
+                fontSize: '0.6875rem',
+                fontWeight: 600,
+                color: 'var(--text-dim)',
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+              }}
+            >
+              Pro Strength & Diet Suite
             </div>
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <nav className="nav-scroll" aria-label="Main Navigation">
-          <button
-            type="button"
-            className={`btn btn-sm ${activeTab === 'dashboard' ? 'btn-primary' : 'btn-ghost'}`}
-            onClick={() => onSelectTab('dashboard')}
-            aria-current={activeTab === 'dashboard' ? 'page' : undefined}
+        {/* Global Quick Search / Command Palette Bar */}
+        <button
+          type="button"
+          onClick={onOpenCommandPalette}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.4rem 0.85rem',
+            background: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.09)',
+            borderRadius: '9999px',
+            color: 'var(--text-dim)',
+            fontSize: '0.8125rem',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.4)'
+            e.currentTarget.style.color = 'var(--text-muted)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.09)'
+            e.currentTarget.style.color = 'var(--text-dim)'
+          }}
+          title="Search or press Ctrl+K"
+          aria-label="Open Command Palette"
+        >
+          <Search size={14} style={{ color: 'var(--accent-primary)' }} />
+          <span>Search or Ctrl+K</span>
+          <span
+            style={{
+              background: 'rgba(255, 255, 255, 0.07)',
+              padding: '1px 5px',
+              borderRadius: '4px',
+              fontSize: '0.6875rem',
+              fontWeight: 700,
+              fontFamily: 'var(--font-mono)',
+            }}
           >
-            <LayoutDashboard size={16} />
-            <span>Dashboard</span>
-          </button>
+            ⌘K
+          </span>
+        </button>
 
-          <button
-            type="button"
-            className={`btn btn-sm ${activeTab === 'logger' ? 'btn-primary' : 'btn-ghost'}`}
-            onClick={() => onSelectTab('logger')}
-            aria-current={activeTab === 'logger' ? 'page' : undefined}
-          >
-            <Dumbbell size={16} />
-            <span>Logger</span>
-          </button>
-
-          <button
-            type="button"
-            className={`btn btn-sm ${activeTab === 'routines' ? 'btn-primary' : 'btn-ghost'}`}
-            onClick={() => onSelectTab('routines')}
-            aria-current={activeTab === 'routines' ? 'page' : undefined}
-          >
-            <ClipboardList size={16} />
-            <span>Routines</span>
-          </button>
-
-          <button
-            type="button"
-            className={`btn btn-sm ${activeTab === 'history' ? 'btn-primary' : 'btn-ghost'}`}
-            onClick={() => onSelectTab('history')}
-            aria-current={activeTab === 'history' ? 'page' : undefined}
-          >
-            <Calendar size={16} />
-            <span>History</span>
-          </button>
-
-          <button
-            type="button"
-            className={`btn btn-sm ${activeTab === 'analytics' ? 'btn-primary' : 'btn-ghost'}`}
-            onClick={() => onSelectTab('analytics')}
-            aria-current={activeTab === 'analytics' ? 'page' : undefined}
-          >
-            <TrendingUp size={16} />
-            <span>Strength</span>
-          </button>
-
-          <button
-            type="button"
-            className={`btn btn-sm ${activeTab === 'nutrition' ? 'btn-primary' : 'btn-ghost'}`}
-            onClick={() => onSelectTab('nutrition')}
-            aria-current={activeTab === 'nutrition' ? 'page' : undefined}
-          >
-            <Utensils size={16} />
-            <span>Nutrition</span>
-          </button>
-
-          <button
-            type="button"
-            className={`btn btn-sm ${activeTab === 'mealplan' ? 'btn-primary' : 'btn-ghost'}`}
-            onClick={() => onSelectTab('mealplan')}
-            aria-current={activeTab === 'mealplan' ? 'page' : undefined}
-          >
-            <Sparkles size={16} />
-            <span>Meal Plan</span>
-          </button>
-
-          <button
-            type="button"
-            className={`btn btn-sm ${activeTab === 'exercises' ? 'btn-primary' : 'btn-ghost'}`}
-            onClick={() => onSelectTab('exercises')}
-            aria-current={activeTab === 'exercises' ? 'page' : undefined}
-          >
-            <Activity size={16} />
-            <span>Exercises</span>
-          </button>
-
-          <button
-            type="button"
-            className={`btn btn-sm ${activeTab === 'profile' ? 'btn-primary' : 'btn-ghost'}`}
-            onClick={() => onSelectTab('profile')}
-            aria-current={activeTab === 'profile' ? 'page' : undefined}
-          >
-            <Settings size={16} />
-            <span>Settings</span>
-          </button>
+        {/* Navigation Tabs Pill Container */}
+        <nav
+          className="nav-scroll"
+          aria-label="Main Navigation"
+          style={{
+            background: 'rgba(14, 21, 38, 0.65)',
+            padding: '4px',
+            borderRadius: '12px',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
+          }}
+        >
+          {navItems.map((item) => {
+            const isActive = activeTab === item.tab
+            return (
+              <button
+                key={item.tab}
+                type="button"
+                className={`btn btn-sm ${isActive ? 'btn-primary' : 'btn-ghost'}`}
+                onClick={() => {
+                  onSelectTab(item.tab)
+                  playMicroClick()
+                }}
+                aria-current={isActive ? 'page' : undefined}
+                style={{
+                  borderRadius: '8px',
+                  fontWeight: isActive ? 800 : 600,
+                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                  boxShadow: isActive ? '0 4px 12px rgba(56, 189, 248, 0.35)' : 'none',
+                }}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </button>
+            )
+          })}
         </nav>
 
-        {/* User controls & Units Toggle (AC-96) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+        {/* Right Utility Actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          {/* Quick Rest Timer Trigger */}
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={openTimer}
+            title="Start Rest Timer (90s)"
+            style={{ padding: '0.35rem 0.65rem', height: '34px' }}
+          >
+            <Timer size={15} style={{ color: 'var(--accent-primary)' }} />
+            <span style={{ fontSize: '0.75rem', fontWeight: 700 }}>90s</span>
+          </button>
+
+          {/* Sound Toggle */}
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={toggleSound}
+            title={soundOn ? 'Sound On' : 'Sound Muted'}
+            aria-label="Toggle Sound"
+            style={{ padding: '0.35rem', height: '34px', width: '34px' }}
+          >
+            {soundOn ? (
+              <Volume2 size={16} style={{ color: 'var(--accent-primary)' }} />
+            ) : (
+              <VolumeX size={16} style={{ color: 'var(--text-dim)' }} />
+            )}
+          </button>
+
+          {/* Units Switcher */}
           <button
             type="button"
             className="btn btn-secondary btn-sm"
             onClick={toggleUnits}
-            title="Click to toggle units between kg and lb"
+            title="Toggle weight units"
             aria-label={`Toggle units, currently ${units}`}
-            style={{ fontWeight: 700, padding: '0.25rem 0.625rem', height: '32px' }}
+            style={{ fontWeight: 800, padding: '0.25rem 0.65rem', height: '34px', fontFamily: 'var(--font-mono)' }}
           >
             <span style={{ color: 'var(--accent-primary)' }}>{units.toUpperCase()}</span>
           </button>
 
+          {/* User Profile / Logout */}
           {user && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
-                {profile?.display_name || user.email.split('@')[0]}
-              </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: '0.25rem' }}>
+              <div
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(99, 102, 241, 0.2))',
+                  border: '1px solid rgba(56, 189, 248, 0.35)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: '0.8125rem',
+                  color: '#fff',
+                }}
+                title={profile?.display_name || user.email}
+              >
+                {(profile?.display_name || user.email)[0].toUpperCase()}
+              </div>
+
               <button
                 type="button"
                 className="btn btn-ghost btn-sm"
                 onClick={logout}
                 title="Sign out"
                 aria-label="Sign out"
-                style={{ padding: '0.35rem' }}
+                style={{ padding: '0.35rem', height: '34px', width: '34px' }}
               >
                 <LogOut size={16} />
               </button>
