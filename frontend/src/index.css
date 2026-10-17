@@ -53,6 +53,67 @@
   --shadow-emerald-glow: 0 0 30px rgba(16, 185, 129, 0.22);
 }
 
+/* Dynamic Athletic Theme Overrides */
+:root, [data-theme="cyber-cyan"] {
+  --accent-primary: #38bdf8;
+  --accent-primary-hover: #0ea5e9;
+  --accent-primary-glow: rgba(56, 189, 248, 0.35);
+  --border-hover: rgba(56, 189, 248, 0.45);
+  --border-focus: #38bdf8;
+  --border-active: rgba(56, 189, 248, 0.4);
+  --shadow-glow: 0 0 32px rgba(56, 189, 248, 0.28);
+  --aura-color-1: rgba(56, 189, 248, 0.16);
+  --aura-color-2: rgba(99, 102, 241, 0.1);
+  --text-gradient-primary: linear-gradient(135deg, #ffffff 0%, #38bdf8 100%);
+  --btn-gradient-primary: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+  --btn-gradient-primary-hover: linear-gradient(135deg, #0369a1 0%, #0ea5e9 100%);
+}
+
+[data-theme="hyper-violet"] {
+  --accent-primary: #a855f7;
+  --accent-primary-hover: #9333ea;
+  --accent-primary-glow: rgba(168, 85, 247, 0.4);
+  --border-hover: rgba(168, 85, 247, 0.5);
+  --border-focus: #a855f7;
+  --border-active: rgba(168, 85, 247, 0.45);
+  --shadow-glow: 0 0 32px rgba(168, 85, 247, 0.3);
+  --aura-color-1: rgba(168, 85, 247, 0.18);
+  --aura-color-2: rgba(236, 72, 153, 0.14);
+  --text-gradient-primary: linear-gradient(135deg, #ffffff 0%, #c084fc 60%, #ec4899 100%);
+  --btn-gradient-primary: linear-gradient(135deg, #7c3aed 0%, #c084fc 100%);
+  --btn-gradient-primary-hover: linear-gradient(135deg, #6d28d9 0%, #a855f7 100%);
+}
+
+[data-theme="volt-lime"] {
+  --accent-primary: #10b981;
+  --accent-primary-hover: #059669;
+  --accent-primary-glow: rgba(16, 185, 129, 0.4);
+  --border-hover: rgba(16, 185, 129, 0.5);
+  --border-focus: #10b981;
+  --border-active: rgba(16, 185, 129, 0.45);
+  --shadow-glow: 0 0 32px rgba(16, 185, 129, 0.3);
+  --aura-color-1: rgba(16, 185, 129, 0.18);
+  --aura-color-2: rgba(132, 204, 22, 0.14);
+  --text-gradient-primary: linear-gradient(135deg, #ffffff 0%, #34d399 70%, #84cc16 100%);
+  --btn-gradient-primary: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  --btn-gradient-primary-hover: linear-gradient(135deg, #047857 0%, #059669 100%);
+}
+
+[data-theme="solar-amber"] {
+  --accent-primary: #f59e0b;
+  --accent-primary-hover: #d97706;
+  --accent-primary-glow: rgba(245, 158, 11, 0.4);
+  --border-hover: rgba(245, 158, 11, 0.5);
+  --border-focus: #f59e0b;
+  --border-active: rgba(245, 158, 11, 0.45);
+  --shadow-glow: 0 0 32px rgba(245, 158, 11, 0.3);
+  --aura-color-1: rgba(245, 158, 11, 0.18);
+  --aura-color-2: rgba(234, 88, 12, 0.14);
+  --text-gradient-primary: linear-gradient(135deg, #ffffff 0%, #fbbf24 70%, #ea580c 100%);
+  --btn-gradient-primary: linear-gradient(135deg, #d97706 0%, #fbbf24 100%);
+  --btn-gradient-primary-hover: linear-gradient(135deg, #b45309 0%, #d97706 100%);
+}
+
 /* Custom Sleek Scrollbar */
 ::-webkit-scrollbar {
   width: 7px;
@@ -66,7 +127,7 @@
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #38bdf8;
+  background: var(--accent-primary);
 }
 
 *, *::before, *::after {
@@ -95,11 +156,11 @@ body::before {
   left: 20%;
   width: 65vw;
   height: 55vh;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(99, 102, 241, 0.07) 40%, transparent 70%);
+  background: radial-gradient(circle, var(--aura-color-1, rgba(56, 189, 248, 0.16)) 0%, var(--aura-color-2, rgba(99, 102, 241, 0.08)) 40%, transparent 70%);
   filter: blur(85px);
   pointer-events: none;
   z-index: 0;
-  opacity: 0.85;
+  opacity: 0.9;
   animation: pulseAura 14s ease-in-out infinite alternate;
 }
 
@@ -110,11 +171,11 @@ body::after {
   right: 15%;
   width: 60vw;
   height: 55vh;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(6, 182, 212, 0.06) 45%, transparent 70%);
+  background: radial-gradient(circle, var(--aura-color-2, rgba(16, 185, 129, 0.1)) 0%, transparent 70%);
   filter: blur(95px);
   pointer-events: none;
   z-index: 0;
-  opacity: 0.75;
+  opacity: 0.8;
   animation: pulseAura2 18s ease-in-out infinite alternate;
 }
 
@@ -224,12 +285,12 @@ p, span, label {
   cursor: not-allowed;
 }
 
-/* Primary Cyan Neon Shimmer Button */
+/* Primary Neon Shimmer Button */
 .btn-primary {
-  background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
-  color: #031120;
+  background: var(--btn-gradient-primary, linear-gradient(135deg, #0284c7 0%, #38bdf8 100%));
+  color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 16px var(--accent-primary-glow, rgba(56, 189, 248, 0.35)), inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .btn-primary::after {
@@ -248,8 +309,8 @@ p, span, label {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0369a1 0%, #0ea5e9 100%);
-  box-shadow: 0 6px 22px rgba(56, 189, 248, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  background: var(--btn-gradient-primary-hover, linear-gradient(135deg, #0369a1 0%, #0ea5e9 100%));
+  box-shadow: 0 6px 24px var(--accent-primary-glow, rgba(56, 189, 248, 0.5)), inset 0 1px 0 rgba(255, 255, 255, 0.5);
   transform: translateY(-1.5px);
 }
 
@@ -535,3 +596,34 @@ p, span, label {
   border-left: 3px solid #10b981 !important;
   transition: all 0.3s ease;
 }
+
+/* Dynamic Gradient Text */
+.text-gradient-cyan, .text-gradient-primary {
+  background: var(--text-gradient-primary, linear-gradient(135deg, #ffffff 0%, #38bdf8 100%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+/* Theme Picker Pills */
+.theme-pill {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-block;
+  position: relative;
+}
+
+.theme-pill:hover {
+  transform: scale(1.2);
+}
+
+.theme-pill.active {
+  border-color: #fff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 16px var(--accent-primary-glow);
+  transform: scale(1.15);
+}
+

@@ -13,6 +13,7 @@ import { ProfileSettings } from './components/ProfileSettings'
 import { AuthModal } from './components/AuthModal'
 import { RestTimerHud } from './components/RestTimerHud'
 import { CommandPalette } from './components/CommandPalette'
+import { initTheme } from './utils/theme'
 import type { Routine } from './types'
 
 const AppContent: React.FC = () => {
@@ -20,6 +21,11 @@ const AppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard')
   const [prefilledRoutine, setPrefilledRoutine] = useState<Routine | null>(null)
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
+
+  // Initialize active theme
+  useEffect(() => {
+    initTheme()
+  }, [])
 
   // Global Ctrl+K / Cmd+K listener
   useEffect(() => {

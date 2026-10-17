@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { isSoundEnabled, setSoundEnabled, playMicroClick } from '../utils/audio'
+import { AVAILABLE_THEMES, getStoredTheme, applyTheme, type ThemeId } from '../utils/theme'
 
 export type TabType =
   | 'dashboard'
@@ -43,6 +44,13 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const { user, profile, units, updateUnits, logout } = useAuth()
   const [soundOn, setSoundOn] = React.useState(() => isSoundEnabled())
+  const [activeTheme, setActiveTheme] = React.useState<ThemeId>(() => getStoredTheme())
+
+  const handleThemeChange = (newTheme: ThemeId) => {
+    setActiveTheme(newTheme)
+    applyTheme(newTheme)
+    playMicroClick()
+  }
 
   const toggleUnits = () => {
     const next = units === 'kg' ? 'lb' : 'kg'
@@ -267,6 +275,35 @@ export const Navbar: React.FC<NavbarProps> = ({
               <VolumeX size={16} style={{ color: 'var(--text-dim)' }} />
             )}
           </button>
+
+          {/* Dynamic Athletic Theme Selector (Cyber Cyan, Hyper Violet, Volt Lime, Solar Amber) */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'rgba(14, 21, 38, 0.7)',
+              padding: '4px 8px',
+              borderRadius: '9999px',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+            }}
+            title="Change Athletic Color Theme"
+          >
+            {AVAILABLE_THEMES.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                className={`theme-pill ${activeTheme === t.id ? 'active' : ''}`}
+                style={{
+                  background: t.gradient,
+                  outline: 'none',
+                }}
+                onClick={() => handleThemeChange(t.id)}
+                title={`Theme: ${t.name} (${t.label})`}
+                aria-label={`Select ${t.name} theme`}
+              />
+            ))}
+          </div>
 
           {/* Units Switcher */}
           <button

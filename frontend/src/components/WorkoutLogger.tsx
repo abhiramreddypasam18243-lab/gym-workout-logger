@@ -3,6 +3,7 @@ import { Plus, Trash2, Clock, Check, AlertCircle, Dumbbell, Copy, Timer } from '
 import { api, ApiError } from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { playSetCompleteSound, playMicroClick } from '../utils/audio'
+import { MotivationalQuoteCard } from './MotivationalQuoteCard'
 import type { Exercise, Routine } from '../types'
 
 interface ActiveSet {
@@ -293,6 +294,11 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
 
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto', padding: '1.5rem 1rem' }}>
+      {/* Morale Boost Strip */}
+      <div style={{ marginBottom: '1.25rem' }}>
+        <MotivationalQuoteCard variant="strip" />
+      </div>
+
       {/* Session Header Card */}
       <div className="card" style={{ marginBottom: '1.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>

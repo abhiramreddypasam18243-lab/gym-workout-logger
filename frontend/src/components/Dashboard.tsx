@@ -19,6 +19,7 @@ import {
 import { apiClient } from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { kgToLb } from '../utils/units'
+import { MotivationalQuoteCard } from './MotivationalQuoteCard'
 
 export const Dashboard: React.FC<{
   onNavigateToLogger?: () => void
@@ -302,6 +303,11 @@ export const Dashboard: React.FC<{
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Morale Boost Motivational Quote Card */}
+      <div style={{ marginBottom: '1.75rem' }}>
+        <MotivationalQuoteCard variant="hero" />
       </div>
 
       {logSuccessMessage && (

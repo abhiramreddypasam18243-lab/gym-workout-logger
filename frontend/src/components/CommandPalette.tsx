@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Search, Dumbbell, Utensils, TrendingUp, Calendar, ClipboardList, Sparkles, Activity, X, ArrowRight } from 'lucide-react'
 import { api } from '../api/client'
+import { AVAILABLE_THEMES, applyTheme } from '../utils/theme'
 import type { Exercise } from '../types'
 import type { TabType } from './Navbar'
 
@@ -115,6 +116,26 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         window.dispatchEvent(new CustomEvent('titan-start-timer', { detail: { seconds: 90 } }))
       },
     },
+    {
+      id: 'action-morale-boost',
+      title: 'Boost Morale (Daily Motivation)',
+      subtitle: 'View uplifting quotes to fuel your training session',
+      category: 'Action',
+      icon: <Sparkles size={16} style={{ color: 'var(--accent-primary)' }} />,
+      onSelect: () => {
+        onSelectTab('dashboard')
+      },
+    },
+    ...AVAILABLE_THEMES.map((t) => ({
+      id: `theme-${t.id}`,
+      title: `Switch Theme: ${t.name}`,
+      subtitle: `Switch color scheme to ${t.label}`,
+      category: 'Action' as const,
+      icon: <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: t.gradient, display: 'inline-block' }} />,
+      onSelect: () => {
+        applyTheme(t.id)
+      },
+    })),
   ]
 
   // Filter exercises based on query
