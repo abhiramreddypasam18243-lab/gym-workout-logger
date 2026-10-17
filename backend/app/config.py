@@ -1,44 +1,90 @@
-"""Application configuration loaded from environment variables.
+"""Application configuration loaded from environment variables (spec SEC10, AC-12, AC-111).
 
-Safety thresholds are kept here in one place (ag.md safety rule).
+Safety thresholds are kept here in one configuration module (ag.md safety rule).
 All numeric values marked 'initial' in the spec are placeholders for review.
 """
 
-from pydantic_settings import BaseSettings
+from pydantic import Field, model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     """Application settings from environment variables."""
 
     # Database
-    database_url: str
+    DATABASE_URL: str = Field(
+        default="postgresql+asyncpg://postgres:postgres@localhost:5432/gym_app"
+    )
 
-    # Security
-    secret_key: str
-    allowed_origin: str = "http://localhost:8080"
-    environment: str = "development"
-    trusted_proxy_ip: str = "127.0.0.1"
+    # Security (SEC10)
+    SESSION_SECRET: str = Field(default="change-this-in-production-to-a-secure-random-string")
+    SECRET_KEY: str | None = None
+    ALLOWED_ORIGIN: str = "http://localhost:8080"
+    ENVIRONMENT: str = "development"
+    TRUSTED_PROXY_IP: str = "127.0.0.1"
 
     # Feature flags
-    registration_enabled: bool = True
-    demo_mode: bool = False
+    REGISTRATION_ENABLED: bool = True
+    DEMO_MODE: bool = False
 
-    # Safety thresholds (initial values — review against qualified sources)
-    # These are NOT authoritative; see spec section 3 and DECISIONS.md.
-    estimate_floor_kcal: int = 1500
-    plan_minimum_kcal: int = 1200
+    # Safety thresholds (spec §3, D-16)
+    ESTIMATE_FLOOR_KCAL: int = 1500
+    PLAN_MINIMUM_KCAL: int = 1200
 
     # Session
-    session_max_age_seconds: int = 86400 * 7  # 7 days
+    SESSION_LIFETIME_DAYS: int = 14
+    SESSION_MAX_AGE_SECONDS: int = 86400 * 14
 
-    # Rate limiting
-    max_failed_logins: int = 5
-    rate_limit_window_seconds: int = 900  # 15 minutes
+    # Rate limiting (SEC6)
+    MAX_FAILED_LOGINS: int = 5
+    RATE_LIMIT_WINDOW_SECONDS: int = 900  # 15 minutes
 
-    # Request limits
-    max_body_size_bytes: int = 1_048_576  # 1 MB (SEC8)
+    # Request limits (SEC8)
+    MAX_BODY_SIZE_BYTES: int = 1_048_576  # 1 MB
 
-    model_config = {"env_file": ".env", "case_sensitive": False}
+    # Compatibility properties
+    @property
+    def database_url(self) -> str:
+        return self.DATABASE_URL
+
+    @property
+    def allowed_origin(self) -> str:
+        return self.ALLOWED_ORIGIN
+
+    @property
+    def environment(self) -> str:
+        return self.ENVIRONMENT
+
+    @property
+    def secret_key(self) -> str:
+        return self.SECRET_KEY or self.SESSION_SECRET
+
+    @model_validator(mode="after")
+    def validate_production_secrets(self) -> "Settings":
+        """AC-12 (SEC10): Refuse to start in production mode with missing or placeholder secrets."""
+        if self.ENVIRONMENT.lower() == "production":
+            key = (self.SECRET_KEY or self.SESSION_SECRET or "").strip()
+            placeholder_values = {
+                "",
+                "change-this-in-production-to-a-secure-random-string",
+                "insecure-secret-key-change-in-production",
+                "placeholder",
+            }
+            if key in placeholder_values or len(key) < 16:
+                raise ValueError(
+                    "Production mode requires a strong, non-placeholder secret key (spec SEC10, AC-12)"
+                )
+        return self
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=False,
+        extra="ignore",
+    )
 
 
-settings = Settings()  # type: ignore[call-arg]
+def get_settings() -> Settings:
+    return Settings()
+
+
+settings = get_settings()

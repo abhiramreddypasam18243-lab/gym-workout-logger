@@ -4,21 +4,21 @@ Maps every acceptance criterion to a test file/method or manual check.
 
 | AC | Category | Test Location | Type | Status |
 | --- | --- | --- | --- | --- |
-| AC-01 | Security | `tests/test_auth.py::test_ac_01_*` | API | ⬜ Step 3 |
-| AC-02 | Security | `tests/test_auth.py::test_ac_02_*` | API | ⬜ Step 3 |
-| AC-03 | Security | `tests/test_auth.py::test_ac_03_*` | API | ⬜ Step 3 |
-| AC-04 | Security | `tests/test_auth.py::test_ac_04_*` | API | ⬜ Step 3 |
-| AC-05 | Security | `tests/test_auth.py::test_ac_05_*` | API | ⬜ Step 3 |
-| AC-06 | Security | `tests/test_auth.py::test_ac_06_*` | API | ⬜ Step 3 |
-| AC-07 | Security | `tests/test_auth.py::test_ac_07_*` | API | ⬜ Step 3 |
-| AC-08 | Security | `tests/test_auth.py::test_ac_08_*` | API | ⬜ Step 3 |
-| AC-09 | Security | `tests/test_auth.py::test_ac_09_*` | API | ⬜ Step 3 |
-| AC-10 | Security | `tests/test_auth.py::test_ac_10_*` | API | ⬜ Step 3 |
-| AC-11 | Security | `tests/test_auth.py::test_ac_11_*` | API | ⬜ Step 3 |
-| AC-12 | Security | `tests/test_secrets.py::test_ac_12_*` | CI | ⬜ Step 3 |
-| AC-13 | Security | `tests/test_auth.py::test_ac_13_*` | API | ⬜ Step 3 |
+| AC-01 | Security | `tests/test_auth.py::test_ac_01_*` | API | ✅ Step 3 |
+| AC-02 | Security | `tests/test_auth.py::test_ac_02_*` | API | ✅ Step 3 |
+| AC-03 | Security | `tests/test_auth.py::test_ac_03_*` | API | ✅ Step 3 |
+| AC-04 | Security | `tests/test_auth.py::test_ac_04_*` | API | ✅ Step 3 |
+| AC-05 | Security | `tests/test_auth.py::test_ac_05_*` | API | ✅ Step 3 |
+| AC-06 | Security | `tests/test_auth.py::test_ac_06_*` | API | ✅ Step 3 |
+| AC-07 | Security | `tests/test_auth.py::test_ac_07_*` | API | ✅ Step 3 |
+| AC-08 | Security | `tests/test_ownership.py::test_ac_08_*` | API | ✅ Step 3 |
+| AC-09 | Security | `tests/test_auth.py::test_ac_09_*` | API | ✅ Step 3 |
+| AC-10 | Security | `tests/test_auth.py::test_ac_10_*` | API | ✅ Step 3 |
+| AC-11 | Security | `tests/test_auth.py::test_ac_11_*` | API | ✅ Step 3 |
+| AC-12 | Security | `tests/test_secrets.py::test_ac_12_*` | CI | ✅ Step 3 |
+| AC-13 | Security | `tests/test_auth.py::test_ac_13_*` | API | ✅ Step 3 |
 | AC-14 | Security | Manual: `pip-audit` + `npm audit` | CI | ⬜ Step 12 |
-| AC-15 | Profile | `tests/test_profile.py::test_ac_15_*` | API | ⬜ Step 3 |
+| AC-15 | Profile | `tests/test_profile.py::test_ac_15_*` | API | ✅ Step 3 |
 | AC-16 | Units | `tests/test_domain_units.py::test_ac_16_*` | Unit | ✅ Step 2 |
 | AC-17 | Safety | `tests/test_safety.py::test_ac_17_*` | API | ⬜ Step 7 |
 | AC-18 | Safety | `tests/test_safety.py::test_ac_18_*` | API | ⬜ Step 7 |
@@ -46,13 +46,13 @@ Maps every acceptance criterion to a test file/method or manual check.
 | AC-88–89 | Data | `tests/test_data_controls.py` | API | ⬜ Step 11 |
 | AC-90–96 | UI | `frontend/e2e/` | E2E | ⬜ Step 5+ |
 | AC-97 | Quality | `alembic upgrade/downgrade/check` | DB | ✅ Step 1 |
-| AC-98 | Quality | `tests/test_layering.py` | Unit | ⬜ Step 3 |
+| AC-98 | Quality | `tests/test_layering.py` | Unit | ✅ Step 3 |
 | AC-99 | Quality | CI check | CI | ⬜ Step 11 |
 | AC-100 | Quality | Coverage reports | CI | ⬜ Step 11 |
 | AC-101 | Quality | GitHub Actions CI | CI | ⬜ Step 12 |
 | AC-102 | Quality | Regression fixtures | Unit | ⬜ Step 2 |
 | AC-103 | Perf | `tests/test_performance.py` | Perf | ⬜ Step 11 |
-| AC-104 | Security | `tests/test_logging.py` | Unit | ⬜ Step 3 |
+| AC-104 | Security | `tests/test_logging.py` | Unit | ✅ Step 3 |
 | AC-105 | Deploy | `docker compose up -d` | Deploy | ✅ Step 1 |
 | AC-106 | Deploy | Seed + demo commands | Deploy | ⬜ Step 12 |
 | AC-107 | Deploy | `/api/health` + health checks | Deploy | ✅ Step 1 |
