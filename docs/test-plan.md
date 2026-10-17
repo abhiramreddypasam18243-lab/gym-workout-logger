@@ -28,10 +28,10 @@ Maps every acceptance criterion to a test file/method or manual check.
 | AC-22 | Safety | `tests/test_safety.py::test_ac_22_*` | API | ⬜ Step 7 |
 | AC-23 | Targets | `tests/test_targets.py::test_ac_23_*` | API | ⬜ Step 7 |
 | AC-24–28 | Safety | `tests/test_safety.py` | E2E | ⬜ Step 7 |
-| AC-29–30 | Exercises | `tests/test_exercises.py` | API | ⬜ Step 5 |
-| AC-31–34 | Workouts | `tests/test_workouts.py` | API | ⬜ Step 5 |
-| AC-35 | Routines | `tests/test_routines.py` | API | ⬜ Step 5 |
-| AC-36–38 | Workouts | `tests/test_workouts.py` | API | ⬜ Step 5 |
+| AC-29–30 | Exercises | `tests/test_catalogue.py` | API | ✅ Step 4, 5 |
+| AC-31–34 | Workouts | `tests/test_workouts.py` | API | ✅ Step 5 |
+| AC-35 | Routines | `tests/test_workouts.py` | API | ✅ Step 5 |
+| AC-36–38 | Workouts | `tests/test_workouts.py` | API | ✅ Step 5 |
 | AC-39–41, 43 | Strength | `tests/test_domain_strength.py` | Unit | ✅ Step 2 |
 | AC-42, 44 | Strength | `tests/test_strength_service.py` | API | ⬜ Step 6 |
 | AC-45–47 | Nutrients | `tests/test_domain_nutrients.py` | Unit | ✅ Step 2 |
@@ -44,7 +44,7 @@ Maps every acceptance criterion to a test file/method or manual check.
 | AC-82–84 | Logging | `tests/test_nutrition_logs.py` | API | ⬜ Step 10 |
 | AC-85–87 | Dashboard | `tests/test_dashboard.py` | API | ⬜ Step 10 |
 | AC-88–89 | Data | `tests/test_data_controls.py` | API | ⬜ Step 11 |
-| AC-90–96 | UI | `frontend/e2e/` | E2E | ⬜ Step 5+ |
+| AC-90–96 | UI | `frontend/src/` | UI/E2E | ✅ Step 5 |
 | AC-97 | Quality | `alembic upgrade/downgrade/check` | DB | ✅ Step 1 |
 | AC-98 | Quality | `tests/test_layering.py` | Unit | ✅ Step 3 |
 | AC-99 | Quality | CI check | CI | ⬜ Step 11 |

@@ -114,3 +114,38 @@ Each step adds an entry: what was built, why it's designed that way, one risk, a
 1. What is the 4-4-9 Atwater energy balance equation, and why is an absolute and percentage tolerance ($\max(20\text{ kcal}, 15\%)$) necessary when validating real food composition data?
 2. Why do historical intake logs and meal plans store a frozen JSON `nutrient_snapshot` rather than simply joining against the `foods` table on every query?
 3. How does the system handle allergen safety when a recipe contains text-only ingredients (i.e. ingredients not linked to a verified food item)?
+
+---
+
+## Step 5 — Workout Logging, Routines, Keyset Pagination, and Responsive Titanium UI (AC-29 to AC-38, AC-90 to AC-96)
+
+**What was built:**
+- **Pydantic Validation & Atomic Transactions (`backend/app/schemas/workout.py`, `backend/app/api/workouts.py`):**
+  - Validation enforcing reps $> 0$, load $\ge 0$, RPE strictly between 1.0 and 10.0 in 0.5 increments (accepting 7.5, rejecting 7.3 and 11.0), unique set numbers per exercise, set completion times $\ge$ session start time, and routine rep ranges (`rep_min <= rep_max`) (AC-32, AC-35).
+  - Atomic workout session persistence: if any set is invalid or database failure occurs, the entire transaction rolls back cleanly, leaving zero orphaned sessions or sets (AC-33).
+  - Cascade replacement on edits and strict ownership-scoped deletes leaving other users' data unaffected (AC-34).
+  - Keyset history pagination using a composite cursor `(started_at, id)` ensuring zero duplicate or skipped sessions during concurrent inserts, verified with `(user_id, started_at)` index usage (AC-37, AC-38).
+  - Routine duplication and template workout initialization pre-filling exercises with zero logged sets (AC-35).
+- **Dark Titanium Design System & UI Components (`frontend/src/`):**
+  - Glassmorphic dark gym titanium theme (`#090d16`, `#0f172a`, `#38bdf8`, `#10b981`, `#f59e0b`, `#f43f5e`) in `frontend/src/index.css`.
+  - Zero horizontal overflow guaranteed down to 360px viewport width (AC-94).
+  - Visible `:focus-visible` ring on all interactive elements for accessible keyboard navigation (AC-91).
+  - Loading skeletons, empty states, and field-level error messages connected via `aria-describedby` across all views (AC-90).
+  - Fast set logging with 1-click set copying that duplicates previous reps and load, taking $< 3$ interactions per set (AC-95).
+  - Unit toggle and conversion: automatic live conversion between kilograms and pounds with 1-decimal formatting, storing canonical kg in the database (AC-16, AC-96).
+  - Informational disclaimer banner (Rule S1, AC-28) and wellbeing controls (Rule S7: hide calories, pause nutrition, track body weight opt-in, professional guidance flag).
+
+**Why it's designed this way:**
+- **Atomic Multi-Row Logging:** A gym workout is a hierarchical entity (`session` $\to$ `workout_exercises` $\to$ `workout_sets`). Partial saves (e.g. logging a squat set without the exercise or session) result in corrupt volume and PR analytics. Running the entire hierarchy inside an ACID transaction ensures absolute data integrity.
+- **Keyset vs Offset Pagination:** Traditional `OFFSET / LIMIT` pagination suffers from $O(N)$ scanning performance degradation on large tables and causes duplicate or missing items if new sessions are inserted while a user scrolls. Keyset pagination using `WHERE (started_at, id) < (cursor_date, cursor_id) ORDER BY started_at DESC, id DESC LIMIT 10` leverages the composite B-tree index in $O(\log N)$ time with complete stability.
+- **Fast Set Entry (< 3 Clicks):** Gym users log sets between exhausting intervals with sweaty hands on a phone screen. Requiring users to re-type exercise names, weights, and reps on every set creates friction and leads to abandoned logging. Auto-duplicating the previous set's parameters allows logging a set in a single tap.
+
+**What could go wrong:**
+- In an async SQLAlchemy session with `expire_all()`, accessing an entity attribute outside an active transaction without eager loading triggers greenlet asynchronous I/O exceptions (`MissingGreenlet`).
+- In keyset pagination, if timestamps are identical across multiple sessions created programmatically, sorting solely on `started_at` causes non-deterministic ordering; combining `(started_at, id)` breaks ties deterministically.
+
+**Quiz questions:**
+1. Why is keyset (cursor) pagination superior to offset-based (`OFFSET N LIMIT M`) pagination for an infinite-scroll workout history feed?
+2. Why is RPE validated specifically to multiples of 0.5 between 1.0 and 10.0, and how does the backend enforce atomicity when logging a workout with 5 exercises and 20 sets?
+3. How does the frontend ensure fast set entry (AC-95) and consistent unit conversion between metric (kg) and imperial (lb) without corrupting the canonical database storage?
+

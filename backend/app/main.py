@@ -8,6 +8,7 @@ from app.api.auth import router as auth_router
 from app.api.catalogue import router as catalogue_router
 from app.api.health import router as health_router
 from app.api.profile import router as profile_router
+from app.api.workouts import router as workout_router
 from app.config import settings
 
 app = FastAPI(
@@ -60,3 +61,4 @@ app.include_router(health_router)
 app.include_router(auth_router)
 app.include_router(profile_router)
 app.include_router(catalogue_router)
+app.include_router(workout_router)
