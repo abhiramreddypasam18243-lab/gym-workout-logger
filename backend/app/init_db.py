@@ -9,10 +9,10 @@ Ensures:
 import asyncio
 import logging
 
-from alembic import command
 from alembic.config import Config
 from sqlalchemy import select
 
+from alembic import command
 from app.config import settings
 from app.database import async_session_factory, engine
 from app.demo_user import DEMO_EMAIL, create_demo_user

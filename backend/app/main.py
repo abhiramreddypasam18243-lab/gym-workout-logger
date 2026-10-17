@@ -1,8 +1,11 @@
 """FastAPI application entry point with security middleware and routers (spec §7, §10, SEC8, SEC9)."""
 
+from pathlib import Path
+
 from fastapi import FastAPI, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.api.analytics import router as analytics_router
 from app.api.auth import router as auth_router
@@ -86,10 +89,6 @@ app.include_router(dashboard_router)
 app.include_router(data_controls_router)
 
 # Static frontend assets and SPA fallback for production deployment
-from pathlib import Path
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-
 static_dir = Path(__file__).resolve().parent.parent / "static"
 if static_dir.exists() and (static_dir / "index.html").exists():
     if (static_dir / "assets").exists():
