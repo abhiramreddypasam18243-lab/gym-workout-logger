@@ -251,4 +251,19 @@ export const api = {
       method: 'DELETE',
     })
   },
+
+  // Strength Analytics (AC-39 to AC-44)
+  async getStrengthTrends(exerciseId: string, days?: number): Promise<any[]> {
+    const query = new URLSearchParams({ exercise_id: exerciseId })
+    if (days) query.set('days', days.toString())
+    return request<any[]>(`/api/analytics/strength?${query.toString()}`)
+  },
+
+  async getWeeklyConsistency(weeks = 12): Promise<{ weekly_target: number; weeks: any[] }> {
+    return request<{ weekly_target: number; weeks: any[] }>(`/api/analytics/consistency?weeks=${weeks}`)
+  },
+
+  async getExercisePrs(exerciseId: string): Promise<any[]> {
+    return request<any[]>(`/api/analytics/prs/${exerciseId}`)
+  },
 }

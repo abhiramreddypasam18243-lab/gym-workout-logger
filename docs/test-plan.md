@@ -33,7 +33,7 @@ Maps every acceptance criterion to a test file/method or manual check.
 | AC-35 | Routines | `tests/test_workouts.py` | API | ✅ Step 5 |
 | AC-36–38 | Workouts | `tests/test_workouts.py` | API | ✅ Step 5 |
 | AC-39–41, 43 | Strength | `tests/test_domain_strength.py` | Unit | ✅ Step 2 |
-| AC-42, 44 | Strength | `tests/test_strength_service.py` | API | ⬜ Step 6 |
+| AC-42, 44 | Strength | `tests/test_strength_service.py` | API | ✅ Step 6 |
 | AC-45–47 | Nutrients | `tests/test_domain_nutrients.py` | Unit | ✅ Step 2 |
 | AC-48–55 | Catalogue | `tests/test_catalogue.py` | DB+API | ✅ Step 4 |
 | AC-63–64 | Scoring | `tests/test_domain_scoring.py` | Unit | ✅ Step 2 |

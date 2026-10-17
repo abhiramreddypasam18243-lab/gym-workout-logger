@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.api.analytics import router as analytics_router
 from app.api.auth import router as auth_router
 from app.api.catalogue import router as catalogue_router
 from app.api.health import router as health_router
@@ -62,3 +63,4 @@ app.include_router(auth_router)
 app.include_router(profile_router)
 app.include_router(catalogue_router)
 app.include_router(workout_router)
+app.include_router(analytics_router)

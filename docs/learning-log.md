@@ -149,3 +149,39 @@ Each step adds an entry: what was built, why it's designed that way, one risk, a
 2. Why is RPE validated specifically to multiples of 0.5 between 1.0 and 10.0, and how does the backend enforce atomicity when logging a workout with 5 exercises and 20 sets?
 3. How does the frontend ensure fast set entry (AC-95) and consistent unit conversion between metric (kg) and imperial (lb) without corrupting the canonical database storage?
 
+---
+
+## Step 6 — Strength Analytics Service, e1RM Trends, PR Detection, and Consistency (AC-39 to AC-44)
+
+**What was built:**
+- **StrengthAnalyticsService (`backend/app/services/strength.py`):**
+  - Best e1RM trends computation per exercise, grouped by local date in user timezone, excluding warm-up sets, with transparent labelling (`is_estimated = True`), converting units dynamically for imperial (`lb`) users to 1 decimal place, returning an empty list with status 200 when no data exists (AC-39, AC-42, AC-96).
+  - Exact Decimal preservation: exact decimal representation preserved in `e1rm_exact` (e.g. 82.5 kg × 3 reps gives exactly `90.75`, AC-43).
+  - Chronological Personal Record (PR) evaluation: baseline established on first working set, strictly greater e1RM flagged as PR, equal e1RM not flagged, and automatic dynamic recomputation upon set deletion or modification (AC-41).
+  - Weekly training consistency: calculates completed workout sessions per calendar week (Monday to Sunday) in user timezone; weeks with none return 0; sessions containing only warm-up sets are strictly excluded (AC-44).
+- **Analytics API Router (`backend/app/api/analytics.py`):**
+  - `GET /api/analytics/strength`: trend query by exercise and optional window.
+  - `GET /api/analytics/consistency`: weekly session frequency vs weekly target.
+  - `GET /api/analytics/prs/{exercise_id}`: chronological PR progression.
+- **Frontend Strength Analytics Component (`frontend/src/components/StrengthAnalytics.tsx`):**
+  - Movement and time window selectors.
+  - Visual e1RM bar progression graph with max-scaling.
+  - Accessible data table alternative right alongside the visual chart (AC-93).
+  - PR milestones timeline highlighting baseline benchmark and PR records.
+  - Weekly consistency grid displaying sessions against target with success badges.
+
+**Why it's designed this way:**
+- **Strict Inequality for PRs (AC-41):** Lifting the exact same calculated e1RM as a previous set does not demonstrate strength progression; requiring strictly greater e1RM ($e1RM > \max(prior)$) ensures milestones reflect genuine progress.
+- **Warm-Up Exclusion from Metrics:** Warm-up sets (e.g. 40kg × 10 on bench press) are light preparation. Including them in volume, e1RM trends, or session counting would dilute training volume and register false sessions for warm-up-only warm-down days.
+- **Dual Representation (`e1rm` vs `e1rm_exact`):** For UI displays, users expect human-readable rounded metrics (`90.8 kg` or `200.1 lb`), but analytics calculations, test assertions, and PR rankings must never accumulate floating-point rounding errors. Providing both ensures exact math alongside clean presentation.
+
+**What could go wrong:**
+- If user timezones are ignored and UTC dates are used to aggregate daily bests, a late-night session at 11:30 PM in New York (`America/New_York`) would be incorrectly grouped into the following UTC day, separating sets that occurred in the same physical gym session.
+- If consistency counting does not verify the presence of working sets, a session with only warm-up mobility sets would increment the consistency count, violating rule AC-44.
+
+**Quiz questions:**
+1. Why does the system evaluate PRs dynamically on demand rather than storing a static boolean `is_pr` column on each set in the database?
+2. How does the system ensure that a user working out at 11:45 PM in their local timezone has their sets credited to the correct calendar day rather than the following UTC date?
+3. Why are warm-up sets strictly excluded from e1RM calculations, training volume summations, and weekly session consistency counts?
+
+

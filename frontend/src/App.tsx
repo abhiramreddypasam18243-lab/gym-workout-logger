@@ -4,6 +4,7 @@ import { Navbar, type TabType } from './components/Navbar'
 import { WorkoutLogger } from './components/WorkoutLogger'
 import { RoutinesManager } from './components/RoutinesManager'
 import { WorkoutHistory } from './components/WorkoutHistory'
+import { StrengthAnalytics } from './components/StrengthAnalytics'
 import { ExercisesCatalogue } from './components/ExercisesCatalogue'
 import { ProfileSettings } from './components/ProfileSettings'
 import { AuthModal } from './components/AuthModal'
@@ -52,6 +53,7 @@ const AppContent: React.FC = () => {
           <RoutinesManager onStartRoutine={handleStartRoutine} />
         )}
         {activeTab === 'history' && <WorkoutHistory />}
+        {activeTab === 'analytics' && <StrengthAnalytics />}
         {activeTab === 'exercises' && <ExercisesCatalogue />}
         {activeTab === 'profile' && <ProfileSettings />}
       </main>
