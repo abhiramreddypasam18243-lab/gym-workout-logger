@@ -8,6 +8,7 @@ from app.api.analytics import router as analytics_router
 from app.api.auth import router as auth_router
 from app.api.catalogue import router as catalogue_router
 from app.api.health import router as health_router
+from app.api.nutrition import router as nutrition_router
 from app.api.profile import router as profile_router
 from app.api.workouts import router as workout_router
 from app.config import settings
@@ -64,3 +65,5 @@ app.include_router(profile_router)
 app.include_router(catalogue_router)
 app.include_router(workout_router)
 app.include_router(analytics_router)
+app.include_router(nutrition_router)
+

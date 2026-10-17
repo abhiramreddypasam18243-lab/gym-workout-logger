@@ -5,6 +5,7 @@ import { WorkoutLogger } from './components/WorkoutLogger'
 import { RoutinesManager } from './components/RoutinesManager'
 import { WorkoutHistory } from './components/WorkoutHistory'
 import { StrengthAnalytics } from './components/StrengthAnalytics'
+import { NutritionPlanner } from './components/NutritionPlanner'
 import { ExercisesCatalogue } from './components/ExercisesCatalogue'
 import { ProfileSettings } from './components/ProfileSettings'
 import { AuthModal } from './components/AuthModal'
@@ -54,6 +55,7 @@ const AppContent: React.FC = () => {
         )}
         {activeTab === 'history' && <WorkoutHistory />}
         {activeTab === 'analytics' && <StrengthAnalytics />}
+        {activeTab === 'nutrition' && <NutritionPlanner />}
         {activeTab === 'exercises' && <ExercisesCatalogue />}
         {activeTab === 'profile' && <ProfileSettings />}
       </main>

@@ -184,4 +184,42 @@ Each step adds an entry: what was built, why it's designed that way, one risk, a
 2. How does the system ensure that a user working out at 11:45 PM in their local timezone has their sets credited to the correct calendar day rather than the following UTC date?
 3. Why are warm-up sets strictly excluded from e1RM calculations, training volume summations, and weekly session consistency counts?
 
+---
+
+## Step 7 — Nutrition Targets, Transparent Mifflin-St Jeor Estimator, Safety Rules S1–S8, and Preferences (AC-17 to AC-28)
+
+**What was built:**
+- **Nutrition Access Safeguards (`backend/app/api/deps.py` - `check_nutrition_access`):**
+  - Minor block (Rule S2, AC-17): Users under 18 years old are strictly forbidden from accessing nutrition targets, calorie estimates, and diet generation with `nutrition_not_available_for_minors` (HTTP 403).
+  - Adult self-attestation guard (Rule S2, AC-17): Users without a recorded `adult_confirmed_at` timestamp receive `adult_confirmation_required` (HTTP 403).
+  - Paused nutrition guard (Rule S7, AC-25): When `nutrition_paused = True`, all nutrition write/read access is cleanly blocked with `nutrition_paused` (HTTP 403).
+- **Target Computation & Estimation (`backend/app/api/nutrition.py`):**
+  - Transparent formula estimation: Implements the validated Mifflin-St Jeor equation showing step-by-step math (BMR, TDEE, surplus/deficit multipliers, and macro derivations) (Rule S4, AC-19, AC-20).
+  - Energy floor detection: If calculated TDEE or target is $< 1500$ kcal, no target is auto-saved; instead, the system returns `estimate_below_floor` with an educational explanation (Rule S5, AC-21).
+  - Professional guidance conflict: If a user has `under_professional_guidance = True`, automated estimation is disallowed with HTTP 409 `manual_targets_required` (Rule S3, AC-18).
+  - Versioned targets (AC-23): Nutrition targets store `created_at` and `source` (`estimated` vs `manual`), allowing historical workout queries to reference the target active on that date without mutating past analytics.
+  - Recommended minimum warning (Rule S5, AC-22): Manual targets $< 1500$ kcal are allowed only with a prominent warning flag (`below_recommended_minimum = True`).
+- **Dietary Preferences & Allergens (`backend/app/schemas/nutrition.py`, `backend/app/api/nutrition.py`):**
+  - EU-14 allergen filters (Rule S9, AC-57), diet tags (`vegan`, `vegetarian`, `halal`, etc., AC-59), excluded ingredients (AC-59), and cuisine weightings (AC-61).
+- **Neutral Language Validation (Rule S6, AC-27):**
+  - Automated scanning verified across all endpoints guaranteeing zero shame or judgmental vocabulary (`cheat`, `clean eating`, `burn off`, `punishment`, `sinful`, `guilt`, `earn food`).
+- **Frontend Nutrition Hub (`frontend/src/components/NutritionPlanner.tsx`):**
+  - Three integrated views: Active Targets with macro breakdown visualizer, Transparent Mifflin-St Jeor Estimator, and Dietary Preferences & Allergen management.
+  - Non-stigmatizing error displays, adult confirmation modal, and calorie privacy toggles (Rule S7, AC-26).
+
+**Why it's designed this way:**
+- **Strict Clinical & Safety Guardrails (S1–S8):** Nutrition planning carries clinical and psychological risks (e.g. eating disorders, disordered exercise compensation, malnutrition). Hard guards (disallowing minors, preventing automated estimation for users under professional care, rejecting automated plans below 1500 kcal, neutral language) protect vulnerable users and adhere strictly to medical ethics.
+- **Versioned Targets vs In-Place Overwrites:** If a user bulks at 3200 kcal in March and cuts at 2200 kcal in July, in-place overwriting of a single user calorie column would retroactively distort performance and energy compliance analytics for their March logs. Versioning ensures chronological integrity.
+- **Middleware / Dependency Layering for Safety:** Checking `check_nutrition_access` as a FastAPI dependency guarantees that no developer can accidentally expose a nutrition or meal planning route that bypasses minor or adult checks.
+
+**What could go wrong:**
+- A client-side timezone offset might calculate a user's 18th birthday slightly differently than UTC. The dependency supports deterministic date extraction so birthday transitions are strictly evaluated.
+- If excluded ingredients are matched with naive case-sensitive matching, a user excluding "peanut" might still ingest "Peanuts". The filter normalizes strings to lowercase tokens.
+
+**Quiz questions:**
+1. Why does the system return HTTP 409 `manual_targets_required` when a user marked as `under_professional_guidance` attempts to generate automated Mifflin-St Jeor calorie estimates?
+2. How does the system handle an automated calorie estimate that falls below the 1500 kcal floor (Rule S5), versus how it handles a manual target set below 1500 kcal?
+3. Why are nutrition targets versioned chronologically with `created_at` timestamps instead of updating a single record on the user profile?
+
+
 

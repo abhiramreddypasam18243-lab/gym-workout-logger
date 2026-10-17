@@ -266,4 +266,35 @@ export const api = {
   async getExercisePrs(exerciseId: string): Promise<any[]> {
     return request<any[]>(`/api/analytics/prs/${exerciseId}`)
   },
+
+  // Nutrition & Targets (AC-17 to AC-28)
+  async estimateNutrition(params: any): Promise<any> {
+    return request<any>('/api/nutrition/goals/estimate', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    })
+  },
+
+  async createNutritionGoal(goal: any): Promise<any> {
+    return request<any>('/api/nutrition/goals', {
+      method: 'POST',
+      body: JSON.stringify(goal),
+    })
+  },
+
+  async getActiveNutritionGoal(onDate?: string): Promise<any> {
+    const qs = onDate ? `?on_date=${onDate}` : ''
+    return request<any>(`/api/nutrition/goals${qs}`)
+  },
+
+  async getNutritionPreferences(): Promise<any> {
+    return request<any>('/api/nutrition/preferences')
+  },
+
+  async updateNutritionPreferences(prefs: any): Promise<any> {
+    return request<any>('/api/nutrition/preferences', {
+      method: 'PATCH',
+      body: JSON.stringify(prefs),
+    })
+  },
 }

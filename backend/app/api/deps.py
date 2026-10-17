@@ -120,11 +120,8 @@ def verify_tls_for_login(request: Request) -> None:
         return
 
     # Non-localhost client: must be over HTTPS or valid proxy HTTPS
-    scheme = request.url.scheme
-    forwarded_proto = request.headers.get("X-Forwarded-Proto")
-
-    # In production with trusted reverse proxy, X-Forwarded-Proto is checked
     scheme = request.scope.get("scheme") or request.url.scheme
+    forwarded_proto = request.headers.get("X-Forwarded-Proto")
     is_tls = scheme == "https" or forwarded_proto == "https"
 
     if not is_tls:
@@ -135,3 +132,70 @@ def verify_tls_for_login(request: Request) -> None:
                 "message": "Credentials accepted only over TLS for remote clients",
             },
         )
+
+
+async def check_nutrition_access(
+    request: Request,
+    auth: Annotated[tuple[User, Session], Depends(get_current_session)],
+) -> tuple[User, Session]:
+    """Enforce nutrition safety safeguards S2 & S7 (AC-17, AC-25).
+
+    Rules:
+    - If nutrition is paused, return 403 nutrition_paused (S7, AC-25).
+    - If user birth date shows under 18 on current date, return 403 nutrition_not_available_for_minors (S2, AC-17).
+    - If user has not confirmed adult status, return 403 adult_confirmation_required (S2, AC-17).
+    """
+    user, session = auth
+    profile = user.profile
+
+    if not profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"code": "profile_not_found", "message": "User profile not found"},
+        )
+
+    # 1. Nutrition paused check (S7, AC-25)
+    if profile.nutrition_paused:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "code": "nutrition_paused",
+                "message": "Nutrition features are currently paused in your wellbeing settings",
+            },
+        )
+
+    # Date resolution: allow X-Current-Date header for deterministic clock injection in tests (spec §13, AC-17)
+    header_date = request.headers.get("X-Current-Date")
+    if header_date:
+        try:
+            today = datetime.strptime(header_date, "%Y-%m-%d").date()
+        except ValueError:
+            today = datetime.now(UTC).date()
+    else:
+        today = datetime.now(UTC).date()
+
+    # 2. Minor check (S2, AC-17)
+    if profile.birth_date:
+        bdate = profile.birth_date
+        age = today.year - bdate.year - ((today.month, today.day) < (bdate.month, bdate.day))
+        if age < 18:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail={
+                    "code": "nutrition_not_available_for_minors",
+                    "message": "Nutrition planning is not available for users under 18 years of age. Please consult a parent or guardian and a qualified professional.",
+                },
+            )
+
+    # 3. Adult confirmation check (S2, AC-17)
+    if not profile.adult_confirmed_at:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "code": "adult_confirmation_required",
+                "message": "Please confirm that you are 18 years or older before using nutrition planning features.",
+            },
+        )
+
+    return auth
+

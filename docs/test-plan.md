@@ -20,14 +20,14 @@ Maps every acceptance criterion to a test file/method or manual check.
 | AC-14 | Security | Manual: `pip-audit` + `npm audit` | CI | ⬜ Step 12 |
 | AC-15 | Profile | `tests/test_profile.py::test_ac_15_*` | API | ✅ Step 3 |
 | AC-16 | Units | `tests/test_domain_units.py::test_ac_16_*` | Unit | ✅ Step 2 |
-| AC-17 | Safety | `tests/test_safety.py::test_ac_17_*` | API | ⬜ Step 7 |
-| AC-18 | Safety | `tests/test_safety.py::test_ac_18_*` | API | ⬜ Step 7 |
+| AC-17 | Safety | `tests/test_safety.py::test_ac_17_*` | API | ✅ Step 7 |
+| AC-18 | Safety | `tests/test_safety.py::test_ac_18_*` | API | ✅ Step 7 |
 | AC-19 | Targets | `tests/test_domain_targets.py::test_ac_19_*` | Unit | ✅ Step 2 |
 | AC-20 | Targets | `tests/test_domain_targets.py::test_ac_20_*` | Unit | ✅ Step 2 |
 | AC-21 | Targets | `tests/test_domain_targets.py::test_ac_21_*` | Unit | ✅ Step 2 |
-| AC-22 | Safety | `tests/test_safety.py::test_ac_22_*` | API | ⬜ Step 7 |
-| AC-23 | Targets | `tests/test_targets.py::test_ac_23_*` | API | ⬜ Step 7 |
-| AC-24–28 | Safety | `tests/test_safety.py` | E2E | ⬜ Step 7 |
+| AC-22 | Safety | `tests/test_safety.py::test_ac_22_*` | API | ✅ Step 7 |
+| AC-23 | Targets | `tests/test_safety.py::test_ac_23_*` | API | ✅ Step 7 |
+| AC-24–28 | Safety | `tests/test_safety.py` | API+UI | ✅ Step 7 |
 | AC-29–30 | Exercises | `tests/test_catalogue.py` | API | ✅ Step 4, 5 |
 | AC-31–34 | Workouts | `tests/test_workouts.py` | API | ✅ Step 5 |
 | AC-35 | Routines | `tests/test_workouts.py` | API | ✅ Step 5 |
