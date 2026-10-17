@@ -35,7 +35,7 @@ Maps every acceptance criterion to a test file/method or manual check.
 | AC-39–41, 43 | Strength | `tests/test_domain_strength.py` | Unit | ✅ Step 2 |
 | AC-42, 44 | Strength | `tests/test_strength_service.py` | API | ⬜ Step 6 |
 | AC-45–47 | Nutrients | `tests/test_domain_nutrients.py` | Unit | ✅ Step 2 |
-| AC-48–55 | Catalogue | `tests/test_catalogue.py` | DB | ⬜ Step 4 |
+| AC-48–55 | Catalogue | `tests/test_catalogue.py` | DB+API | ✅ Step 4 |
 | AC-63–64 | Scoring | `tests/test_domain_scoring.py` | Unit | ✅ Step 2 |
 | AC-56–62, 65–72 | Plans | `tests/test_planner.py` | Unit+API | ⬜ Step 8 |
 | AC-73–76 | Substitutions | `tests/test_substitutions.py` | API | ⬜ Step 9 |

@@ -1,0 +1,982 @@
+[
+  {
+    "name": "Dal Tadka with Steamed Basmati Rice",
+    "cuisine_code": "indian",
+    "instructions": "Boil toor dal with turmeric and salt until tender. In a pan, temper ghee with onions and tomatoes. Combine with cooked dal and serve over steamed basmati rice.",
+    "prep_minutes": 15,
+    "cook_minutes": 25,
+    "servings": 2.0,
+    "cost_minor_per_serving": 8000,
+    "cost_currency": "INR",
+    "diet_tags": ["vegetarian", "gluten_free", "high_protein"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Yellow Lentils (Toor Dal, Boiled)",
+        "ingredient_name": "Cooked Toor Dal",
+        "quantity": 250.0,
+        "unit": "g",
+        "edible_weight_g": 250.0
+      },
+      {
+        "food_name": "White Basmati Rice (Raw)",
+        "ingredient_name": "Basmati Rice",
+        "quantity": 150.0,
+        "unit": "g",
+        "edible_weight_g": 150.0
+      },
+      {
+        "food_name": "Ghee (Clarified Butter)",
+        "ingredient_name": "Ghee for tempering",
+        "quantity": 14.0,
+        "unit": "g",
+        "edible_weight_g": 14.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Diced tomatoes",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 80.0,
+        "unit": "g",
+        "edible_weight_g": 80.0
+      }
+    ]
+  },
+  {
+    "name": "Paneer Bhurji with Whole Wheat Roti",
+    "cuisine_code": "indian",
+    "instructions": "Crumble paneer. Sauté onions and tomatoes in ghee with spices. Add crumbled paneer and toss for 3 minutes. Serve hot with fresh atta rotis.",
+    "prep_minutes": 10,
+    "cook_minutes": 15,
+    "servings": 1.0,
+    "cost_minor_per_serving": 12000,
+    "cost_currency": "INR",
+    "diet_tags": ["vegetarian", "high_protein"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Paneer (Indian Cottage Cheese)",
+        "ingredient_name": "Fresh paneer",
+        "quantity": 150.0,
+        "unit": "g",
+        "edible_weight_g": 150.0
+      },
+      {
+        "food_name": "Whole Wheat Flour (Atta)",
+        "ingredient_name": "Atta for rotis",
+        "quantity": 70.0,
+        "unit": "g",
+        "edible_weight_g": 70.0
+      },
+      {
+        "food_name": "Ghee (Clarified Butter)",
+        "ingredient_name": "Ghee",
+        "quantity": 7.0,
+        "unit": "g",
+        "edible_weight_g": 7.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Chopped tomato",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 50.0,
+        "unit": "g",
+        "edible_weight_g": 50.0
+      }
+    ]
+  },
+  {
+    "name": "High-Protein Chana Masala",
+    "cuisine_code": "indian",
+    "instructions": "Simmer boiled chickpeas in a spicy onion-tomato gravy with sautéed spinach. Serve as a nutrient-dense vegan meal.",
+    "prep_minutes": 15,
+    "cook_minutes": 20,
+    "servings": 2.0,
+    "cost_minor_per_serving": 7500,
+    "cost_currency": "INR",
+    "diet_tags": ["vegan", "vegetarian", "gluten_free", "high_protein", "dairy_free"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Chickpeas (Chana, Boiled)",
+        "ingredient_name": "Boiled chickpeas",
+        "quantity": 300.0,
+        "unit": "g",
+        "edible_weight_g": 300.0
+      },
+      {
+        "food_name": "Spinach (Raw)",
+        "ingredient_name": "Chopped fresh spinach",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Tomato puree",
+        "quantity": 150.0,
+        "unit": "g",
+        "edible_weight_g": 150.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Finely diced onion",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Olive Oil (Extra Virgin)",
+        "ingredient_name": "Olive oil",
+        "quantity": 14.0,
+        "unit": "g",
+        "edible_weight_g": 14.0
+      }
+    ]
+  },
+  {
+    "name": "Homestyle Egg Curry with Basmati Rice",
+    "cuisine_code": "indian",
+    "instructions": "Boil and lightly sear whole eggs. Sauté onions, garlic, and tomatoes into a rich masala gravy. Simmer eggs in curry and serve with basmati rice.",
+    "prep_minutes": 15,
+    "cook_minutes": 20,
+    "servings": 2.0,
+    "cost_minor_per_serving": 9000,
+    "cost_currency": "INR",
+    "diet_tags": ["gluten_free", "high_protein"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Whole Egg",
+        "ingredient_name": "Hard-boiled eggs",
+        "quantity": 200.0,
+        "unit": "g",
+        "edible_weight_g": 200.0
+      },
+      {
+        "food_name": "White Basmati Rice (Raw)",
+        "ingredient_name": "Basmati rice",
+        "quantity": 140.0,
+        "unit": "g",
+        "edible_weight_g": 140.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Diced tomatoes",
+        "quantity": 120.0,
+        "unit": "g",
+        "edible_weight_g": 120.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Diced onion",
+        "quantity": 80.0,
+        "unit": "g",
+        "edible_weight_g": 80.0
+      },
+      {
+        "food_name": "Olive Oil (Extra Virgin)",
+        "ingredient_name": "Cooking oil",
+        "quantity": 14.0,
+        "unit": "g",
+        "edible_weight_g": 14.0
+      }
+    ]
+  },
+  {
+    "name": "Tandoori-Spiced Chicken Tikka Bowl",
+    "cuisine_code": "indian",
+    "instructions": "Marinate diced chicken breast in spices and lemon. Pan-sear or grill until charred. Serve with basmati rice and sautéed peppers and onions.",
+    "prep_minutes": 20,
+    "cook_minutes": 15,
+    "servings": 1.0,
+    "cost_minor_per_serving": 15000,
+    "cost_currency": "INR",
+    "diet_tags": ["gluten_free", "dairy_free", "high_protein"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Chicken Breast (Raw)",
+        "ingredient_name": "Boneless chicken breast",
+        "quantity": 200.0,
+        "unit": "g",
+        "edible_weight_g": 200.0
+      },
+      {
+        "food_name": "White Basmati Rice (Raw)",
+        "ingredient_name": "Basmati rice",
+        "quantity": 75.0,
+        "unit": "g",
+        "edible_weight_g": 75.0
+      },
+      {
+        "food_name": "Bell Pepper (Red, Raw)",
+        "ingredient_name": "Sliced red bell pepper",
+        "quantity": 80.0,
+        "unit": "g",
+        "edible_weight_g": 80.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Sliced onion",
+        "quantity": 50.0,
+        "unit": "g",
+        "edible_weight_g": 50.0
+      },
+      {
+        "food_name": "Olive Oil (Extra Virgin)",
+        "ingredient_name": "Olive oil",
+        "quantity": 10.0,
+        "unit": "g",
+        "edible_weight_g": 10.0
+      }
+    ]
+  },
+  {
+    "name": "High-Protein Whole Wheat Bolognese",
+    "cuisine_code": "italian",
+    "instructions": "Brown lean ground beef with onion in olive oil. Add crushed tomatoes and simmer for 25 minutes. Toss with cooked whole wheat pasta.",
+    "prep_minutes": 15,
+    "cook_minutes": 30,
+    "servings": 2.0,
+    "cost_minor_per_serving": 25000,
+    "cost_currency": "INR",
+    "diet_tags": ["high_protein"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Lean Ground Beef (90/10)",
+        "ingredient_name": "Lean ground beef",
+        "quantity": 300.0,
+        "unit": "g",
+        "edible_weight_g": 300.0
+      },
+      {
+        "food_name": "Whole Wheat Pasta",
+        "ingredient_name": "Whole wheat pasta dry",
+        "quantity": 140.0,
+        "unit": "g",
+        "edible_weight_g": 140.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Crushed tomatoes",
+        "quantity": 200.0,
+        "unit": "g",
+        "edible_weight_g": 200.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Minced onion",
+        "quantity": 80.0,
+        "unit": "g",
+        "edible_weight_g": 80.0
+      },
+      {
+        "food_name": "Olive Oil (Extra Virgin)",
+        "ingredient_name": "Olive oil",
+        "quantity": 14.0,
+        "unit": "g",
+        "edible_weight_g": 14.0
+      }
+    ]
+  },
+  {
+    "name": "Chicken & Broccoli Penne with Parmesan",
+    "cuisine_code": "italian",
+    "instructions": "Sauté diced chicken breast and broccoli in olive oil. Toss with al dente whole wheat penne and finish with freshly grated parmesan cheese.",
+    "prep_minutes": 10,
+    "cook_minutes": 15,
+    "servings": 2.0,
+    "cost_minor_per_serving": 22000,
+    "cost_currency": "INR",
+    "diet_tags": ["high_protein"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Chicken Breast (Raw)",
+        "ingredient_name": "Chicken breast cubes",
+        "quantity": 250.0,
+        "unit": "g",
+        "edible_weight_g": 250.0
+      },
+      {
+        "food_name": "Whole Wheat Pasta",
+        "ingredient_name": "Whole wheat penne",
+        "quantity": 140.0,
+        "unit": "g",
+        "edible_weight_g": 140.0
+      },
+      {
+        "food_name": "Broccoli (Raw)",
+        "ingredient_name": "Broccoli florets",
+        "quantity": 150.0,
+        "unit": "g",
+        "edible_weight_g": 150.0
+      },
+      {
+        "food_name": "Olive Oil (Extra Virgin)",
+        "ingredient_name": "Extra virgin olive oil",
+        "quantity": 14.0,
+        "unit": "g",
+        "edible_weight_g": 14.0
+      },
+      {
+        "food_name": "Parmesan Cheese (Grated)",
+        "ingredient_name": "Grated parmesan",
+        "quantity": 20.0,
+        "unit": "g",
+        "edible_weight_g": 20.0
+      }
+    ]
+  },
+  {
+    "name": "Mediterranean Tuna & Pasta Salad",
+    "cuisine_code": "italian",
+    "instructions": "Boil whole wheat pasta and rinse in cool water. Toss with drained canned tuna, diced tomatoes, crisp bell peppers, and extra virgin olive oil.",
+    "prep_minutes": 10,
+    "cook_minutes": 10,
+    "servings": 1.0,
+    "cost_minor_per_serving": 18000,
+    "cost_currency": "INR",
+    "diet_tags": ["pescatarian", "high_protein", "dairy_free"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Canned Tuna in Water",
+        "ingredient_name": "Canned tuna drained",
+        "quantity": 130.0,
+        "unit": "g",
+        "edible_weight_g": 130.0
+      },
+      {
+        "food_name": "Whole Wheat Pasta",
+        "ingredient_name": "Cooked whole wheat pasta dry basis",
+        "quantity": 70.0,
+        "unit": "g",
+        "edible_weight_g": 70.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Diced tomato",
+        "quantity": 80.0,
+        "unit": "g",
+        "edible_weight_g": 80.0
+      },
+      {
+        "food_name": "Bell Pepper (Red, Raw)",
+        "ingredient_name": "Diced bell pepper",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Olive Oil (Extra Virgin)",
+        "ingredient_name": "Olive oil dressing",
+        "quantity": 10.0,
+        "unit": "g",
+        "edible_weight_g": 10.0
+      }
+    ]
+  },
+  {
+    "name": "Ricotta & Spinach Stuffed Chicken Breast",
+    "cuisine_code": "italian",
+    "instructions": "Cut a pocket in chicken breast. Stuff with part-skim ricotta, wilted spinach, and parmesan. Sear in olive oil and bake until cooked through.",
+    "prep_minutes": 15,
+    "cook_minutes": 25,
+    "servings": 1.0,
+    "cost_minor_per_serving": 24000,
+    "cost_currency": "INR",
+    "diet_tags": ["gluten_free", "high_protein"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Chicken Breast (Raw)",
+        "ingredient_name": "Chicken breast",
+        "quantity": 200.0,
+        "unit": "g",
+        "edible_weight_g": 200.0
+      },
+      {
+        "food_name": "Ricotta Cheese (Part Skim)",
+        "ingredient_name": "Part skim ricotta",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Spinach (Raw)",
+        "ingredient_name": "Fresh spinach leaves",
+        "quantity": 50.0,
+        "unit": "g",
+        "edible_weight_g": 50.0
+      },
+      {
+        "food_name": "Parmesan Cheese (Grated)",
+        "ingredient_name": "Grated parmesan",
+        "quantity": 10.0,
+        "unit": "g",
+        "edible_weight_g": 10.0
+      },
+      {
+        "food_name": "Olive Oil (Extra Virgin)",
+        "ingredient_name": "Olive oil",
+        "quantity": 10.0,
+        "unit": "g",
+        "edible_weight_g": 10.0
+      }
+    ]
+  },
+  {
+    "name": "Turkey Meatballs with Whole Wheat Spaghetti",
+    "cuisine_code": "italian",
+    "instructions": "Form ground turkey into meatballs. Brown in olive oil, then simmer in tomato sauce. Serve over whole wheat pasta.",
+    "prep_minutes": 15,
+    "cook_minutes": 20,
+    "servings": 2.0,
+    "cost_minor_per_serving": 21000,
+    "cost_currency": "INR",
+    "diet_tags": ["high_protein", "dairy_free"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Ground Turkey (93/7)",
+        "ingredient_name": "Ground turkey",
+        "quantity": 250.0,
+        "unit": "g",
+        "edible_weight_g": 250.0
+      },
+      {
+        "food_name": "Whole Wheat Pasta",
+        "ingredient_name": "Whole wheat pasta",
+        "quantity": 140.0,
+        "unit": "g",
+        "edible_weight_g": 140.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Pureed tomatoes",
+        "quantity": 180.0,
+        "unit": "g",
+        "edible_weight_g": 180.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Finely minced onion",
+        "quantity": 70.0,
+        "unit": "g",
+        "edible_weight_g": 70.0
+      },
+      {
+        "food_name": "Olive Oil (Extra Virgin)",
+        "ingredient_name": "Olive oil",
+        "quantity": 14.0,
+        "unit": "g",
+        "edible_weight_g": 14.0
+      }
+    ]
+  },
+  {
+    "name": "High-Protein Chicken Burrito Bowl",
+    "cuisine_code": "mexican",
+    "instructions": "Grill seasoned chicken breast. Assemble in a bowl with cooked brown rice, black beans, diced bell peppers, and a drizzle of olive oil.",
+    "prep_minutes": 15,
+    "cook_minutes": 20,
+    "servings": 1.0,
+    "cost_minor_per_serving": 17000,
+    "cost_currency": "INR",
+    "diet_tags": ["gluten_free", "dairy_free", "high_protein"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Chicken Breast (Raw)",
+        "ingredient_name": "Chicken breast",
+        "quantity": 180.0,
+        "unit": "g",
+        "edible_weight_g": 180.0
+      },
+      {
+        "food_name": "Brown Rice (Raw)",
+        "ingredient_name": "Brown rice",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Black Beans (Boiled)",
+        "ingredient_name": "Black beans",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Bell Pepper (Red, Raw)",
+        "ingredient_name": "Diced bell pepper",
+        "quantity": 80.0,
+        "unit": "g",
+        "edible_weight_g": 80.0
+      },
+      {
+        "food_name": "Olive Oil (Extra Virgin)",
+        "ingredient_name": "Olive oil",
+        "quantity": 10.0,
+        "unit": "g",
+        "edible_weight_g": 10.0
+      }
+    ]
+  },
+  {
+    "name": "Lean Beef & Black Bean Fajita Bowl",
+    "cuisine_code": "mexican",
+    "instructions": "Sear lean ground beef with sliced onions and bell peppers in olive oil. Serve over warm black beans with Mexican seasonings.",
+    "prep_minutes": 10,
+    "cook_minutes": 15,
+    "servings": 1.0,
+    "cost_minor_per_serving": 21000,
+    "cost_currency": "INR",
+    "diet_tags": ["gluten_free", "dairy_free", "high_protein"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Lean Ground Beef (90/10)",
+        "ingredient_name": "Lean ground beef",
+        "quantity": 180.0,
+        "unit": "g",
+        "edible_weight_g": 180.0
+      },
+      {
+        "food_name": "Black Beans (Boiled)",
+        "ingredient_name": "Cooked black beans",
+        "quantity": 120.0,
+        "unit": "g",
+        "edible_weight_g": 120.0
+      },
+      {
+        "food_name": "Bell Pepper (Red, Raw)",
+        "ingredient_name": "Sliced red bell pepper",
+        "quantity": 80.0,
+        "unit": "g",
+        "edible_weight_g": 80.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Sliced onion",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Olive Oil (Extra Virgin)",
+        "ingredient_name": "Olive oil",
+        "quantity": 10.0,
+        "unit": "g",
+        "edible_weight_g": 10.0
+      }
+    ]
+  },
+  {
+    "name": "Turkey & Black Bean Taco Salad",
+    "cuisine_code": "mexican",
+    "instructions": "Sauté ground turkey with taco spices. Mix with black beans, diced tomatoes, fresh bell peppers, and olive oil.",
+    "prep_minutes": 10,
+    "cook_minutes": 12,
+    "servings": 1.0,
+    "cost_minor_per_serving": 16000,
+    "cost_currency": "INR",
+    "diet_tags": ["gluten_free", "dairy_free", "high_protein"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Ground Turkey (93/7)",
+        "ingredient_name": "Ground turkey",
+        "quantity": 180.0,
+        "unit": "g",
+        "edible_weight_g": 180.0
+      },
+      {
+        "food_name": "Black Beans (Boiled)",
+        "ingredient_name": "Black beans",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Diced tomato",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Bell Pepper (Red, Raw)",
+        "ingredient_name": "Chopped bell pepper",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Olive Oil (Extra Virgin)",
+        "ingredient_name": "Olive oil dressing",
+        "quantity": 10.0,
+        "unit": "g",
+        "edible_weight_g": 10.0
+      }
+    ]
+  },
+  {
+    "name": "Black Bean & Egg White Breakfast Quesadilla",
+    "cuisine_code": "mexican",
+    "instructions": "Scramble egg whites with bell peppers. Layer inside warm corn tortillas with black beans and toast on skillet until crispy.",
+    "prep_minutes": 8,
+    "cook_minutes": 10,
+    "servings": 1.0,
+    "cost_minor_per_serving": 9500,
+    "cost_currency": "INR",
+    "diet_tags": ["vegetarian", "gluten_free", "high_protein", "dairy_free"],
+    "meal_types": ["breakfast", "snack"],
+    "ingredients": [
+      {
+        "food_name": "Egg White",
+        "ingredient_name": "Liquid egg whites",
+        "quantity": 150.0,
+        "unit": "g",
+        "edible_weight_g": 150.0
+      },
+      {
+        "food_name": "Corn Tortilla",
+        "ingredient_name": "Corn tortillas",
+        "quantity": 56.0,
+        "unit": "g",
+        "edible_weight_g": 56.0
+      },
+      {
+        "food_name": "Black Beans (Boiled)",
+        "ingredient_name": "Black beans",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Bell Pepper (Red, Raw)",
+        "ingredient_name": "Diced pepper",
+        "quantity": 40.0,
+        "unit": "g",
+        "edible_weight_g": 40.0
+      },
+      {
+        "food_name": "Olive Oil (Extra Virgin)",
+        "ingredient_name": "Olive oil",
+        "quantity": 7.0,
+        "unit": "g",
+        "edible_weight_g": 7.0
+      }
+    ]
+  },
+  {
+    "name": "Chipotle Grilled Shrimp & Brown Rice Bowl",
+    "cuisine_code": "mexican",
+    "instructions": "Pan-sear shrimp with chipotle spices in olive oil. Serve over warm brown rice with black beans and diced peppers.",
+    "prep_minutes": 10,
+    "cook_minutes": 12,
+    "servings": 1.0,
+    "cost_minor_per_serving": 23000,
+    "cost_currency": "INR",
+    "diet_tags": ["pescatarian", "gluten_free", "dairy_free", "high_protein"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Shrimp (Raw)",
+        "ingredient_name": "Peeled raw shrimp",
+        "quantity": 180.0,
+        "unit": "g",
+        "edible_weight_g": 180.0
+      },
+      {
+        "food_name": "Brown Rice (Raw)",
+        "ingredient_name": "Brown rice",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Black Beans (Boiled)",
+        "ingredient_name": "Black beans",
+        "quantity": 80.0,
+        "unit": "g",
+        "edible_weight_g": 80.0
+      },
+      {
+        "food_name": "Bell Pepper (Red, Raw)",
+        "ingredient_name": "Diced bell pepper",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Olive Oil (Extra Virgin)",
+        "ingredient_name": "Olive oil",
+        "quantity": 10.0,
+        "unit": "g",
+        "edible_weight_g": 10.0
+      }
+    ]
+  },
+  {
+    "name": "Classic Grilled Chicken with Sweet Potato & Broccoli",
+    "cuisine_code": "american",
+    "instructions": "Season chicken breast and grill. Roast cubed sweet potato and steam broccoli florets. Serve drizzled with olive oil.",
+    "prep_minutes": 15,
+    "cook_minutes": 25,
+    "servings": 1.0,
+    "cost_minor_per_serving": 18000,
+    "cost_currency": "INR",
+    "diet_tags": ["gluten_free", "dairy_free", "high_protein"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Chicken Breast (Raw)",
+        "ingredient_name": "Chicken breast",
+        "quantity": 200.0,
+        "unit": "g",
+        "edible_weight_g": 200.0
+      },
+      {
+        "food_name": "Sweet Potato (Raw)",
+        "ingredient_name": "Cubed sweet potato",
+        "quantity": 150.0,
+        "unit": "g",
+        "edible_weight_g": 150.0
+      },
+      {
+        "food_name": "Broccoli (Raw)",
+        "ingredient_name": "Fresh broccoli florets",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Olive Oil (Extra Virgin)",
+        "ingredient_name": "Olive oil",
+        "quantity": 10.0,
+        "unit": "g",
+        "edible_weight_g": 10.0
+      }
+    ]
+  },
+  {
+    "name": "Salmon Teriyaki with Brown Rice & Asparagus",
+    "cuisine_code": "east_asian",
+    "instructions": "Pan-sear salmon fillet with soy sauce tamari. Steam fresh asparagus spears and serve alongside cooked brown rice.",
+    "prep_minutes": 10,
+    "cook_minutes": 15,
+    "servings": 1.0,
+    "cost_minor_per_serving": 28000,
+    "cost_currency": "INR",
+    "diet_tags": ["pescatarian", "high_protein"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Atlantic Salmon (Raw)",
+        "ingredient_name": "Salmon fillet",
+        "quantity": 180.0,
+        "unit": "g",
+        "edible_weight_g": 180.0
+      },
+      {
+        "food_name": "Brown Rice (Raw)",
+        "ingredient_name": "Brown rice",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Asparagus (Raw)",
+        "ingredient_name": "Asparagus spears",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Soy Sauce (Tamari)",
+        "ingredient_name": "Soy sauce tamari",
+        "quantity": 15.0,
+        "unit": "g",
+        "edible_weight_g": 15.0
+      },
+      {
+        "food_name": "Olive Oil (Extra Virgin)",
+        "ingredient_name": "Olive oil",
+        "quantity": 7.0,
+        "unit": "g",
+        "edible_weight_g": 7.0
+      }
+    ]
+  },
+  {
+    "name": "Tofu & Veggie Stir-Fry with Quinoa",
+    "cuisine_code": "east_asian",
+    "instructions": "Press and cube firm tofu. Stir-fry with broccoli and bell peppers in soy sauce tamari. Serve over cooked protein-rich quinoa.",
+    "prep_minutes": 15,
+    "cook_minutes": 15,
+    "servings": 2.0,
+    "cost_minor_per_serving": 14000,
+    "cost_currency": "INR",
+    "diet_tags": ["vegan", "vegetarian", "gluten_free", "high_protein", "dairy_free"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Firm Tofu",
+        "ingredient_name": "Firm tofu cubed",
+        "quantity": 250.0,
+        "unit": "g",
+        "edible_weight_g": 250.0
+      },
+      {
+        "food_name": "Quinoa (Raw)",
+        "ingredient_name": "Quinoa",
+        "quantity": 120.0,
+        "unit": "g",
+        "edible_weight_g": 120.0
+      },
+      {
+        "food_name": "Broccoli (Raw)",
+        "ingredient_name": "Broccoli florets",
+        "quantity": 120.0,
+        "unit": "g",
+        "edible_weight_g": 120.0
+      },
+      {
+        "food_name": "Bell Pepper (Red, Raw)",
+        "ingredient_name": "Sliced red pepper",
+        "quantity": 80.0,
+        "unit": "g",
+        "edible_weight_g": 80.0
+      },
+      {
+        "food_name": "Soy Sauce (Tamari)",
+        "ingredient_name": "Soy sauce tamari",
+        "quantity": 20.0,
+        "unit": "g",
+        "edible_weight_g": 20.0
+      }
+    ]
+  },
+  {
+    "name": "Lean Beef & Broccoli Stir-Fry with Brown Rice",
+    "cuisine_code": "east_asian",
+    "instructions": "Stir-fry lean ground beef and broccoli florets in olive oil and tamari soy sauce. Serve hot over steamed brown rice.",
+    "prep_minutes": 10,
+    "cook_minutes": 15,
+    "servings": 1.0,
+    "cost_minor_per_serving": 22000,
+    "cost_currency": "INR",
+    "diet_tags": ["dairy_free", "high_protein"],
+    "meal_types": ["lunch", "dinner"],
+    "ingredients": [
+      {
+        "food_name": "Lean Ground Beef (90/10)",
+        "ingredient_name": "Lean ground beef",
+        "quantity": 180.0,
+        "unit": "g",
+        "edible_weight_g": 180.0
+      },
+      {
+        "food_name": "Brown Rice (Raw)",
+        "ingredient_name": "Brown rice",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Broccoli (Raw)",
+        "ingredient_name": "Broccoli florets",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Soy Sauce (Tamari)",
+        "ingredient_name": "Soy sauce tamari",
+        "quantity": 15.0,
+        "unit": "g",
+        "edible_weight_g": 15.0
+      },
+      {
+        "food_name": "Olive Oil (Extra Virgin)",
+        "ingredient_name": "Olive oil",
+        "quantity": 7.0,
+        "unit": "g",
+        "edible_weight_g": 7.0
+      }
+    ]
+  },
+  {
+    "name": "Post-Workout Greek Yogurt Oatmeal Power Bowl",
+    "cuisine_code": "american",
+    "instructions": "Cook rolled oats in water. Top with thick Greek yogurt, sliced banana, fresh blueberries, chia seeds, and optional text-only garnish.",
+    "prep_minutes": 5,
+    "cook_minutes": 5,
+    "servings": 1.0,
+    "cost_minor_per_serving": 12000,
+    "cost_currency": "INR",
+    "diet_tags": ["vegetarian", "high_protein"],
+    "meal_types": ["breakfast", "snack"],
+    "ingredients": [
+      {
+        "food_name": "Rolled Oats",
+        "ingredient_name": "Rolled oats",
+        "quantity": 50.0,
+        "unit": "g",
+        "edible_weight_g": 50.0
+      },
+      {
+        "food_name": "Greek Yogurt (Nonfat, Plain)",
+        "ingredient_name": "Greek yogurt",
+        "quantity": 150.0,
+        "unit": "g",
+        "edible_weight_g": 150.0
+      },
+      {
+        "food_name": "Banana (Raw)",
+        "ingredient_name": "Sliced banana",
+        "quantity": 80.0,
+        "unit": "g",
+        "edible_weight_g": 80.0
+      },
+      {
+        "food_name": "Blueberries (Raw)",
+        "ingredient_name": "Fresh blueberries",
+        "quantity": 50.0,
+        "unit": "g",
+        "edible_weight_g": 50.0
+      },
+      {
+        "food_name": "Chia Seeds",
+        "ingredient_name": "Chia seeds",
+        "quantity": 12.0,
+        "unit": "g",
+        "edible_weight_g": 12.0
+      },
+      {
+        "food_name": null,
+        "ingredient_name": "Artisanal crushed spiced seeds (unverified)",
+        "quantity": 5.0,
+        "unit": "g",
+        "edible_weight_g": 5.0
+      }
+    ]
+  }
+]

@@ -56,6 +56,35 @@ async def get_current_user(
     return auth[0]
 
 
+get_current_user_required = get_current_user
+
+
+async def get_current_user_optional(
+    request: Request,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> User | None:
+    """Optional user authentication dependency."""
+    raw_token = request.cookies.get("session_id")
+    if not raw_token:
+        return None
+    token_hash = hash_token(raw_token)
+    now = datetime.now(UTC)
+    stmt = (
+        select(Session)
+        .options(selectinload(Session.user).selectinload(User.profile))
+        .where(
+            Session.token_hash == token_hash,
+            Session.revoked_at.is_(None),
+            Session.expires_at > now,
+        )
+    )
+    result = await db.execute(stmt)
+    session = result.scalar_one_or_none()
+    if not session or not session.user or not session.user.is_active:
+        return None
+    return session.user
+
+
 async def verify_csrf(
     request: Request,
     auth: Annotated[tuple[User, Session], Depends(get_current_session)],

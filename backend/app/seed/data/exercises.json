@@ -1,0 +1,247 @@
+[
+  {
+    "name": "Barbell Bench Press",
+    "primary_muscle": "chest",
+    "equipment": "barbell",
+    "movement_pattern": "horizontal_push",
+    "instructions": "Lie on bench, grip barbell slightly wider than shoulder width, lower to mid-chest, press upward with control."
+  },
+  {
+    "name": "Incline Dumbbell Bench Press",
+    "primary_muscle": "chest",
+    "equipment": "dumbbell",
+    "movement_pattern": "horizontal_push",
+    "instructions": "Set bench to 30-45 degrees, press dumbbells overhead keeping elbows at 45 degrees, lower smoothly."
+  },
+  {
+    "name": "Flat Dumbbell Press",
+    "primary_muscle": "chest",
+    "equipment": "dumbbell",
+    "movement_pattern": "horizontal_push",
+    "instructions": "Lie flat with dumbbells at chest level, press up until arms are extended, lower under control."
+  },
+  {
+    "name": "Cable Chest Fly",
+    "primary_muscle": "chest",
+    "equipment": "cable",
+    "movement_pattern": "isolation",
+    "instructions": "Stand between cable towers, bring handles together in an arc hugging motion, squeeze chest at peak."
+  },
+  {
+    "name": "Push-up",
+    "primary_muscle": "chest",
+    "equipment": "bodyweight",
+    "movement_pattern": "horizontal_push",
+    "instructions": "Maintain rigid plank posture, lower chest to floor, push through palms to lockout."
+  },
+  {
+    "name": "Chest Dips",
+    "primary_muscle": "chest",
+    "equipment": "bodyweight",
+    "movement_pattern": "vertical_push",
+    "instructions": "Grip parallel bars, lean forward slightly, lower body until upper arms are parallel to floor, press back up."
+  },
+  {
+    "name": "Barbell Deadlift",
+    "primary_muscle": "back",
+    "equipment": "barbell",
+    "movement_pattern": "hinge",
+    "instructions": "Feet hip-width, grip bar outside shins, keep neutral spine, drive through floor by extending hips and knees."
+  },
+  {
+    "name": "Barbell Bent-Over Row",
+    "primary_muscle": "back",
+    "equipment": "barbell",
+    "movement_pattern": "horizontal_pull",
+    "instructions": "Hinge at hips with flat back, pull barbell to lower ribcage pulling elbows back, lower under control."
+  },
+  {
+    "name": "Lat Pulldown",
+    "primary_muscle": "back",
+    "equipment": "cable",
+    "movement_pattern": "vertical_pull",
+    "instructions": "Sit with thighs secured, pull wide bar down to upper chest, retract shoulder blades, return under control."
+  },
+  {
+    "name": "Pull-up",
+    "primary_muscle": "back",
+    "equipment": "bodyweight",
+    "movement_pattern": "vertical_pull",
+    "instructions": "Overhand grip wider than shoulders, pull chest toward bar until chin clears bar, lower with full control."
+  },
+  {
+    "name": "Seated Cable Row",
+    "primary_muscle": "back",
+    "equipment": "cable",
+    "movement_pattern": "horizontal_pull",
+    "instructions": "Sit upright with feet on plates, pull handle to abdomen keeping spine neutral, squeeze lats and rhomboids."
+  },
+  {
+    "name": "Single-Arm Dumbbell Row",
+    "primary_muscle": "back",
+    "equipment": "dumbbell",
+    "movement_pattern": "horizontal_pull",
+    "instructions": "Place one knee and hand on bench, pull dumbbell up to hip with elbow driving high, lower fully."
+  },
+  {
+    "name": "Face Pull",
+    "primary_muscle": "shoulders",
+    "equipment": "cable",
+    "movement_pattern": "isolation",
+    "instructions": "Attach rope to high pulley, pull toward face with thumbs back, externally rotate shoulders at finish."
+  },
+  {
+    "name": "Overhead Barbell Press",
+    "primary_muscle": "shoulders",
+    "equipment": "barbell",
+    "movement_pattern": "vertical_push",
+    "instructions": "Stand with feet shoulder-width, press barbell from clavicle straight overhead to full lockout."
+  },
+  {
+    "name": "Seated Dumbbell Shoulder Press",
+    "primary_muscle": "shoulders",
+    "equipment": "dumbbell",
+    "movement_pattern": "vertical_push",
+    "instructions": "Sit upright on supported bench, press dumbbells upward overhead until arms extend, lower to ears."
+  },
+  {
+    "name": "Dumbbell Lateral Raise",
+    "primary_muscle": "shoulders",
+    "equipment": "dumbbell",
+    "movement_pattern": "isolation",
+    "instructions": "Stand with dumbbells at sides, raise arms laterally to shoulder height with slight forward angle, lower slow."
+  },
+  {
+    "name": "Cable Lateral Raise",
+    "primary_muscle": "shoulders",
+    "equipment": "cable",
+    "movement_pattern": "isolation",
+    "instructions": "Use low pulley, raise handle across body up to shoulder level, keep tension throughout movement."
+  },
+  {
+    "name": "Reverse Pec Deck Fly",
+    "primary_muscle": "shoulders",
+    "equipment": "machine",
+    "movement_pattern": "isolation",
+    "instructions": "Sit facing machine pads, push handles backward using rear deltoids and upper back, control return."
+  },
+  {
+    "name": "Barbell Back Squat",
+    "primary_muscle": "quads",
+    "equipment": "barbell",
+    "movement_pattern": "squat",
+    "instructions": "Bar rested across upper traps, descent until thighs reach parallel, drive upward through mid-foot."
+  },
+  {
+    "name": "Front Squat",
+    "primary_muscle": "quads",
+    "equipment": "barbell",
+    "movement_pattern": "squat",
+    "instructions": "Clean grip resting bar on front deltoids, keep torso upright, squat deep and drive up through heels."
+  },
+  {
+    "name": "Leg Press",
+    "primary_muscle": "quads",
+    "equipment": "machine",
+    "movement_pattern": "squat",
+    "instructions": "Place feet hip-width on sled, lower platform until knees reach 90 degrees, press without locking knees."
+  },
+  {
+    "name": "Goblet Squat",
+    "primary_muscle": "quads",
+    "equipment": "dumbbell",
+    "movement_pattern": "squat",
+    "instructions": "Hold dumbbell vertically against chest, squat deep keeping chest proud, push floor away to stand."
+  },
+  {
+    "name": "Walking Lunge",
+    "primary_muscle": "quads",
+    "equipment": "dumbbell",
+    "movement_pattern": "lunge",
+    "instructions": "Step forward into a lunge, back knee nearly touching floor, step through into next repetition."
+  },
+  {
+    "name": "Leg Extension",
+    "primary_muscle": "quads",
+    "equipment": "machine",
+    "movement_pattern": "isolation",
+    "instructions": "Sit in machine with pad over lower shins, extend legs until straight, squeeze quads, lower slowly."
+  },
+  {
+    "name": "Romanian Deadlift",
+    "primary_muscle": "hamstrings",
+    "equipment": "barbell",
+    "movement_pattern": "hinge",
+    "instructions": "Slight knee bend, push hips backward lowering bar along shins until hamstring stretch, drive hips forward."
+  },
+  {
+    "name": "Lying Leg Curl",
+    "primary_muscle": "hamstrings",
+    "equipment": "machine",
+    "movement_pattern": "isolation",
+    "instructions": "Lie facedown with pad behind ankles, curl heels toward glutes, squeeze at top, lower with control."
+  },
+  {
+    "name": "Barbell Hip Thrust",
+    "primary_muscle": "glutes",
+    "equipment": "barbell",
+    "movement_pattern": "hinge",
+    "instructions": "Upper back against bench, pad over hips, drive hips up to full lockout squeezing glutes, lower under control."
+  },
+  {
+    "name": "Bulgarian Split Squat",
+    "primary_muscle": "glutes",
+    "equipment": "dumbbell",
+    "movement_pattern": "lunge",
+    "instructions": "Rear foot elevated on bench, lower front thigh parallel to floor, drive through front heel."
+  },
+  {
+    "name": "Barbell Bicep Curl",
+    "primary_muscle": "biceps",
+    "equipment": "barbell",
+    "movement_pattern": "isolation",
+    "instructions": "Supinated grip, keep elbows pinned to sides, curl barbell up to shoulders, lower with full extension."
+  },
+  {
+    "name": "Incline Dumbbell Curl",
+    "primary_muscle": "biceps",
+    "equipment": "dumbbell",
+    "movement_pattern": "isolation",
+    "instructions": "Sit on incline bench, let arms hang, curl dumbbells while supinating wrists, slow eccentric."
+  },
+  {
+    "name": "Hammer Curl",
+    "primary_muscle": "biceps",
+    "equipment": "dumbbell",
+    "movement_pattern": "isolation",
+    "instructions": "Neutral grip with palms facing each other, curl dumbbells upward, emphasizing brachioradialis."
+  },
+  {
+    "name": "Tricep Rope Pushdown",
+    "primary_muscle": "triceps",
+    "equipment": "cable",
+    "movement_pattern": "isolation",
+    "instructions": "Grip rope attachment, keep elbows at sides, push down and flare rope outward at lockout."
+  },
+  {
+    "name": "Skull Crusher",
+    "primary_muscle": "triceps",
+    "equipment": "barbell",
+    "movement_pattern": "isolation",
+    "instructions": "Lie flat holding EZ-bar above shoulders, bend elbows lowering bar to forehead, extend triceps back up."
+  },
+  {
+    "name": "Close-Grip Bench Press",
+    "primary_muscle": "triceps",
+    "equipment": "barbell",
+    "movement_pattern": "horizontal_push",
+    "instructions": "Hands shoulder-width apart, lower bar to sternum keeping elbows close to torso, press up to lockout."
+  },
+  {
+    "name": "Hanging Leg Raise",
+    "primary_muscle": "core",
+    "equipment": "bodyweight",
+    "movement_pattern": "isolation",
+    "instructions": "Hang from pull-up bar, raise toes toward bar without swinging, lower slowly with core tension."
+  }
+]

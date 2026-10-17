@@ -112,3 +112,19 @@ def calculate_recipe_nutrients(
         total=running_total,
         per_serving=per_serving,
     )
+
+
+def check_atwater_consistency(
+    energy_kcal: Decimal,
+    protein_g: Decimal,
+    carbs_g: Decimal,
+    fat_g: Decimal,
+) -> bool:
+    """Validate 4-4-9 Atwater energy balance rule (spec §4, DL1, AC-50).
+
+    Condition: |kcal - (4*P + 4*C + 9*F)| <= max(20, 0.15 * kcal).
+    """
+    macro_energy = Decimal("4") * protein_g + Decimal("4") * carbs_g + Decimal("9") * fat_g
+    diff = abs(energy_kcal - macro_energy)
+    max_tolerance = max(Decimal("20"), Decimal("0.15") * energy_kcal)
+    return diff <= max_tolerance

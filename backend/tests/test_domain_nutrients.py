@@ -89,3 +89,24 @@ def test_ac_47_fixture_recipe():
     assert result.per_serving.protein_g == Decimal("29")
     assert result.per_serving.carbs_g == Decimal("37.5")
     assert result.per_serving.fat_g == Decimal("5.5")
+
+
+def test_ac_50_atwater_check_formula():
+    from app.domain.nutrients import check_atwater_consistency
+
+    # Chicken breast: 165 kcal, 31g P, 0g C, 3.6g F -> 4*31 + 4*0 + 9*3.6 = 124 + 32.4 = 156.4
+    # diff = |165 - 156.4| = 8.6 kcal <= max(20, 0.15*165=24.75) -> True
+    assert check_atwater_consistency(
+        energy_kcal=Decimal("165"),
+        protein_g=Decimal("31"),
+        carbs_g=Decimal("0"),
+        fat_g=Decimal("3.6"),
+    )
+
+    # Inconsistent food: claims 500 kcal, but macros 0g P, 0g C, 0g F (diff = 500 > max(20, 75)) -> False
+    assert not check_atwater_consistency(
+        energy_kcal=Decimal("500"),
+        protein_g=Decimal("0"),
+        carbs_g=Decimal("0"),
+        fat_g=Decimal("0"),
+    )

@@ -78,3 +78,39 @@ Each step adds an entry: what was built, why it's designed that way, one risk, a
 3. Why must ownership checks return 404 Not Found rather than 403 Forbidden when a user accesses a resource belonging to someone else?
 
 
+## Step 4 — Catalogue Data, Provenance Validation, Atwater Checks, Idempotent Seeding, and Catalogue APIs (AC-48 to AC-55)
+
+**What was built:**
+- Curated seed catalogues in `backend/app/seed/data/`:
+  - `exercises.json`: 35 exercises spanning all 7 primary movement patterns and muscle groups (chest, back, shoulders, quads, hamstrings, glutes, biceps, triceps, core).
+  - `foods.json`: 48 whole and staple foods with full provenance (USDA FoodData Central FDC IDs, Indian IFCT codes), serving descriptions, raw/cooked states, and verification dates.
+  - `recipes.json`: 20 high-protein recipes spanning 4 distinct cuisines (Indian, Italian, Mexican, American/East Asian), with at least 2 ingredients each, positive servings, and prep/cook times.
+- Idempotent seed loader in `backend/app/seed/loader.py`:
+  - Provenance validation checking `data_source`, `serving_description`, `state`, and `verified_at` (DL1, AC-49).
+  - Pure domain Atwater 4-4-9 energy balance validation: $| \text{kcal} - (4P + 4C + 9F) | \le \max(20, 0.15 \times \text{kcal})$ (AC-50).
+  - Recipe allergen union computation and incomplete allergen flagging on text-only ingredients (S9, AC-52).
+  - Idempotent database loading: re-running the seed command produces 0 new inserts and preserves all counts (AC-51).
+  - CLI runner `python -m app.seed` (D4, AC-106).
+- Catalogue API endpoints in `backend/app/api/catalogue.py`:
+  - `GET /api/exercises`: substring search (`q`), muscle and equipment filters, and pagination (AC-29).
+  - `POST /api/exercises`: custom exercise creation with per-user case-insensitive uniqueness check (AC-30).
+  - `GET /api/foods`: search by name and category with clear `is_approximate` labelling (AC-49, AC-53).
+  - `DELETE /api/foods/{id}`: returns 409 Conflict if food is referenced in recipes, plans, or intake history (AC-55).
+  - `GET /api/recipes`: filtering by cuisine, diet tag, meal type, and max total time, with per-serving nutrition dynamically computed using domain functions and complete allergen unions (AC-53).
+- Database check constraints verifying non-negative nutrient amounts, positive servings, and positive ingredient quantities (AC-48).
+- Immutable historical snapshots: `nutrient_snapshot` JSON preservation in `PlannedMealItem` and `NutritionLogItem` (AC-54).
+
+**Why it's designed this way:**
+- **Atwater Energy Consistency:** Bogus nutritional numbers (e.g., claiming 500 kcal for 10g protein and 0g carbs/fat) break target fit scoring in the diet planner. Validating energy against macronutrients ensures catalogue integrity.
+- **Strict Allergen Unions:** A recipe's allergen list is computed directly from its resolved ingredient foods. When an ingredient is text-only (not mapped to a verified food item), the recipe is explicitly flagged with `has_incomplete_allergen_data = true`, enabling the planner's safety filters (S9) to exclude unverified meals for allergic users.
+- **Historical Snapshot Invariance:** In nutrition logging, if a catalogue food's nutritional profile is updated months later, historical logs must reflect what was recorded on that day. Storing a frozen `nutrient_snapshot` prevents retroactive data drift.
+- **Referential Integrity on Deletes:** Foreign keys configured with `ondelete="RESTRICT"` and API-level pre-checks ensure that deleting a catalogue item never cascades into destroying historical workout logs, meal plans, or recipes.
+
+**What could go wrong:**
+- If an ingredient in a recipe is deleted or renamed without maintaining foreign key restrictions, the recipe's nutrient calculations could crash with null references.
+- If Atwater tolerances are set too stringently without accounting for dietary fiber or natural analytical variance, genuine whole foods from official tables (like legumes with 8g+ fiber per 100g) could be rejected during seeding.
+
+**Quiz questions:**
+1. What is the 4-4-9 Atwater energy balance equation, and why is an absolute and percentage tolerance ($\max(20\text{ kcal}, 15\%)$) necessary when validating real food composition data?
+2. Why do historical intake logs and meal plans store a frozen JSON `nutrient_snapshot` rather than simply joining against the `foods` table on every query?
+3. How does the system handle allergen safety when a recipe contains text-only ingredients (i.e. ingredients not linked to a verified food item)?
