@@ -8,6 +8,7 @@ from app.api.analytics import router as analytics_router
 from app.api.auth import router as auth_router
 from app.api.catalogue import router as catalogue_router
 from app.api.dashboard import router as dashboard_router
+from app.api.data_controls import router as data_controls_router
 from app.api.health import router as health_router
 from app.api.meal_plans import router as meal_plans_router
 from app.api.nutrition import router as nutrition_router
@@ -72,4 +73,5 @@ app.include_router(nutrition_router)
 app.include_router(meal_plans_router)
 app.include_router(nutrition_logs_router)
 app.include_router(dashboard_router)
+app.include_router(data_controls_router)
 

@@ -365,6 +365,50 @@ Each step adds an entry: what was built, why it's designed that way, one risk, a
 2. How does the dashboard enforce non-causal language (AC-87), and why is an explicit limitations disclaimer mandatory on every insight card?
 3. When a user logs a food or recipe intake, why does the system create an immutable `nutrient_snapshot` rather than simply storing a foreign key reference to the food's current nutrients (AC-82)?
 
+---
+
+## Step 11: Data Controls & Account Deletion (AC-88, AC-89)
+
+**What was built:**
+- **Comprehensive User Data Export (`backend/app/schemas/data_export.py`, `backend/app/schemas/export_schema.json`, AC-88):**
+  - Defines complete Pydantic export schema mapping all 16 user-owned database tables:
+    - User account & security: `users`, `sessions`.
+    - Profile & settings: `user_profiles`, `user_food_constraints`, `user_cuisine_preferences`, `nutrition_goals`.
+    - Workout tracking: `workout_routines`, `routine_exercises`, `workout_sessions`, `workout_exercises`, `workout_sets`.
+    - Nutrition & planning: `meal_plans`, `planned_meals`, `planned_meal_items`, `nutrition_logs`, `nutrition_log_items`.
+  - Generates and publishes the official JSON Schema at `backend/app/schemas/export_schema.json`.
+  - Every exported file generated via `GET /api/export` is programmatically validated against `export_schema.json` using `jsonschema.validate` before returning to the caller.
+- **Permanent, Verified Account Deletion (`backend/app/services/data_controls.py`, `backend/app/api/data_controls.py`, AC-89):**
+  - Requires explicit password re-authentication (`verify_password`) and CSRF validation before initiating deletion.
+  - Wrong password returns HTTP 403 Forbidden with clear error message.
+  - Cascades through all 16 user tables in strict dependency order (child records like `workout_sets` and `nutrition_log_items` first, up to `users`), ensuring zero orphaned user data.
+  - Revokes all active user sessions and clears session cookies.
+  - Verifies that the shared food and exercise catalogue (`foods`, `food_nutrients`, `recipes`, system `exercises`) remains 100% intact.
+- **Frontend Data Sovereignty & Privacy Controls (`frontend/src/components/ProfileSettings.tsx`, AC-88, AC-89):**
+  - Added "Data Controls & Privacy Rights" section to Profile Settings.
+  - Direct JSON archive download button with activity record summary and schema verification badge.
+  - Red-glowing "Danger Zone" account deletion card with confirmation modal and password input field.
+  - Automatic session cleanup and redirect upon account erasure.
+- **Automated Test Suite (`backend/tests/test_data_controls.py`):**
+  - Full end-to-end test verifying export schema conformance with `jsonschema.validate`.
+  - Security test verifying incorrect password rejection.
+  - Completeness test verifying all 16 tables are wiped while shared catalogue persists. Total backend tests passing: 107.
+
+**Why it's designed this way:**
+- **Re-Authentication for Irreversible Operations (AC-89):** Session cookies can be vulnerable to local terminal abandonment or session hijacking. Requiring password verification ensures only the authenticated owner can trigger permanent account deletion.
+- **Published JSON Schema Validation (AC-88):** Data portability standards (GDPR Article 20, CCPA) require personal data to be provided in a structured, commonly used, and machine-readable format. Validating against a published, static JSON Schema ensures automated interoperability and contract adherence.
+- **Preservation of Shared Catalogue:** Recipes and foods created by the system or shared across users form the community knowledge base. Deleting a user must never cascade to delete communal recipe definitions or nutritional reference items.
+
+**What could go wrong:**
+- **Foreign Key Constraint Errors During Deletion:** Deleting a `users` row before removing child rows from `workout_sessions` or `meal_plans` could trigger foreign key constraint violations if cascade rules are missing or restricted. `DataControlsService` guarantees an explicit, ordered deletion sequence starting with leaf tables and ending with `User`.
+- **Large Data Export Timeout:** A user with years of workout logs could produce a sizable JSON payload. Streaming serialization or pagination can be implemented if payload sizes exceed standard HTTP thresholds.
+
+**Quiz questions:**
+1. Why does account deletion require password re-authentication even if the user already has an active authenticated session (AC-89)?
+2. How does the user data export verify compliance with data portability requirements (AC-88)?
+3. What distinguishes user-owned tables from shared catalogue tables during account deletion, and why must the shared catalogue remain intact?
+
+
 
 
 

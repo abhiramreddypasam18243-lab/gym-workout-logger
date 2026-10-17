@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { Settings, Shield, Check, AlertCircle, Heart } from 'lucide-react'
+import {
+  Settings,
+  Shield,
+  Check,
+  AlertCircle,
+  Heart,
+  Download,
+  Trash2,
+  AlertTriangle,
+  FileJson,
+  Lock,
+} from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { api } from '../api/client'
 
@@ -17,7 +28,7 @@ const TIMEZONES = [
 ]
 
 export const ProfileSettings: React.FC = () => {
-  const { profile, units, refreshProfile, confirmAdult, updateUnits } = useAuth()
+  const { profile, units, refreshProfile, confirmAdult, updateUnits, logout } = useAuth()
 
   const [displayName, setDisplayName] = useState('')
   const [selectedTimezone, setSelectedTimezone] = useState('UTC')
@@ -34,6 +45,14 @@ export const ProfileSettings: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  // Data Controls state (AC-88, AC-89)
+  const [isExporting, setIsExporting] = useState(false)
+  const [exportSuccess, setExportSuccess] = useState<string | null>(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deletePassword, setDeletePassword] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   useEffect(() => {
     if (profile) {
@@ -83,14 +102,53 @@ export const ProfileSettings: React.FC = () => {
     }
   }
 
+  const handleExportData = async () => {
+    setIsExporting(true)
+    setExportSuccess(null)
+    setErrorMessage(null)
+    try {
+      const data = await api.exportData()
+      const totalRecords =
+        (data.workout_routines?.length || 0) +
+        (data.workout_sessions?.length || 0) +
+        (data.meal_plans?.length || 0) +
+        (data.nutrition_logs?.length || 0)
+      setExportSuccess(
+        `Export complete! Downloaded JSON archive with ${totalRecords} primary activity records across all 16 domains.`
+      )
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to export user data.')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const handleDeleteAccount = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!deletePassword) {
+      setDeleteError('Please enter your password to confirm account deletion.')
+      return
+    }
+    setIsDeleting(true)
+    setDeleteError(null)
+    try {
+      await api.deleteAccount(deletePassword)
+      setShowDeleteModal(false)
+      await logout()
+    } catch (err: any) {
+      setDeleteError(err.message || 'Failed to delete account. Please verify your password.')
+      setIsDeleting(false)
+    }
+  }
+
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '1.5rem 1rem' }}>
+    <div style={{ maxWidth: '840px', margin: '0 auto', padding: '1.5rem 1rem' }}>
       <div style={{ marginBottom: '1.5rem' }}>
         <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
           <Settings style={{ color: 'var(--accent-primary)' }} />
           Profile & Wellbeing Settings
         </h1>
-        <p style={{ marginTop: '0.25rem' }}>Manage account preferences, units, and safety safeguards</p>
+        <p style={{ marginTop: '0.25rem' }}>Manage account preferences, units, safety safeguards, and data ownership</p>
       </div>
 
       {successMessage && (
@@ -104,6 +162,13 @@ export const ProfileSettings: React.FC = () => {
         <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
           <AlertCircle size={18} />
           <span>{errorMessage}</span>
+        </div>
+      )}
+
+      {exportSuccess && (
+        <div style={{ background: 'var(--accent-cyan-bg, rgba(6,182,212,0.1))', border: '1px solid var(--accent-cyan-border, rgba(6,182,212,0.3))', color: '#38bdf8', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="status">
+          <FileJson size={18} />
+          <span>{exportSuccess}</span>
         </div>
       )}
 
@@ -300,6 +365,220 @@ export const ProfileSettings: React.FC = () => {
           </button>
         </div>
       </form>
+
+      {/* Data Controls & Privacy (AC-88, AC-89) */}
+      <div style={{ marginTop: '2.5rem' }}>
+        <h2 style={{ fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#fff', marginBottom: '0.5rem' }}>
+          <FileJson style={{ color: 'var(--accent-cyan, #06b6d4)' }} />
+          Data Controls & Privacy Rights
+        </h2>
+        <p style={{ fontSize: '0.875rem', color: 'var(--text-dim)', marginBottom: '1.25rem' }}>
+          Complete data sovereignty under GDPR / CCPA. Export your full personal history in schema-validated JSON or permanently delete your account.
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
+          {/* Export Personal Data Card (AC-88) */}
+          <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem' }}>
+                <div style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)', background: 'rgba(6, 182, 212, 0.15)', color: '#38bdf8' }}>
+                  <Download size={20} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1rem', color: '#fff', margin: 0 }}>Export All Personal Data (AC-88)</h3>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Validated against published JSON Schema</span>
+                </div>
+              </div>
+              <p style={{ fontSize: '0.8125rem', color: 'var(--text-dim)', lineHeight: 1.5, marginBottom: '1rem' }}>
+                Downloads a single comprehensive JSON archive containing all 16 user-owned domains: workout routines, completed sessions, logged sets, meal plans, items, nutrition logs, preferences, and goals.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={handleExportData}
+              disabled={isExporting}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', width: '100%' }}
+            >
+              {isExporting ? <span className="spinner" style={{ width: '16px', height: '16px' }} /> : <Download size={16} />}
+              <span>{isExporting ? 'Generating JSON Export...' : 'Download My Data (JSON)'}</span>
+            </button>
+          </div>
+
+          {/* Danger Zone: Account Deletion Card (AC-89) */}
+          <div
+            className="card"
+            style={{
+              borderColor: 'rgba(239, 68, 68, 0.3)',
+              background: 'linear-gradient(180deg, rgba(239, 68, 68, 0.04) 0%, rgba(20, 24, 33, 0.6) 100%)',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem' }}>
+                <div style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)', background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}>
+                  <Trash2 size={20} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1rem', color: '#f87171', margin: 0 }}>Delete Account (AC-89)</h3>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Permanent & Irreversible</span>
+                </div>
+              </div>
+              <p style={{ fontSize: '0.8125rem', color: 'var(--text-dim)', lineHeight: 1.5, marginBottom: '1rem' }}>
+                Permanently purges all your data across all 16 user tables (sessions, routines, workouts, meal plans, nutrition logs). Requires your password to prevent unauthorized erasure. Shared food and exercise catalogue remains untouched.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                setShowDeleteModal(true)
+                setDeleteError(null)
+                setDeletePassword('')
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                width: '100%',
+                background: 'rgba(239, 68, 68, 0.15)',
+                color: '#f87171',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+              }}
+            >
+              <Trash2 size={16} />
+              <span>Delete My Account</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Delete Confirmation Modal (AC-89) */}
+      {showDeleteModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem',
+            zIndex: 1000,
+          }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-dialog-title"
+        >
+          <div
+            className="card"
+            style={{
+              maxWidth: '460px',
+              width: '100%',
+              border: '1px solid rgba(239, 68, 68, 0.4)',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(239, 68, 68, 0.2)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+              <div style={{ padding: '0.625rem', borderRadius: '50%', background: 'rgba(239, 68, 68, 0.2)', color: '#f87171' }}>
+                <AlertTriangle size={24} />
+              </div>
+              <div>
+                <h3 id="delete-dialog-title" style={{ fontSize: '1.15rem', color: '#fff', margin: 0 }}>
+                  Confirm Permanent Deletion
+                </h3>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Action cannot be undone</span>
+              </div>
+            </div>
+
+            <p style={{ fontSize: '0.875rem', color: 'var(--text-dim)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+              This will permanently erase all your personal data, workouts, routine templates, meal plans, and logs. Please enter your account password to authorize this action:
+            </p>
+
+            {deleteError && (
+              <div
+                style={{
+                  background: 'var(--accent-rose-bg)',
+                  border: '1px solid var(--accent-rose-border)',
+                  color: 'var(--accent-rose)',
+                  padding: '0.625rem 0.875rem',
+                  borderRadius: 'var(--radius-sm)',
+                  marginBottom: '1rem',
+                  fontSize: '0.8125rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
+                <AlertCircle size={16} />
+                <span>{deleteError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleDeleteAccount}>
+              <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                <label className="form-label" htmlFor="delete-account-password">
+                  Account Password
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    id="delete-account-password"
+                    type="password"
+                    className="form-input"
+                    placeholder="Enter your current password"
+                    value={deletePassword}
+                    onChange={(e) => setDeletePassword(e.target.value)}
+                    autoFocus
+                    required
+                    style={{ paddingLeft: '2.5rem' }}
+                  />
+                  <Lock
+                    size={16}
+                    style={{
+                      position: 'absolute',
+                      left: '0.875rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: 'var(--text-muted)',
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={isDeleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn"
+                  disabled={isDeleting}
+                  style={{
+                    background: '#ef4444',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                >
+                  {isDeleting ? <span className="spinner" style={{ width: '16px', height: '16px' }} /> : <Trash2 size={16} />}
+                  <span>{isDeleting ? 'Deleting Everything...' : 'Permanently Delete'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
+

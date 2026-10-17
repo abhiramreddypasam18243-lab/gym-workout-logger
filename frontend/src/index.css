@@ -1,19 +1,19 @@
 /* Gym Workout Logger & Strength Diet Planner - Dark Titanium Design System */
 :root {
-  --bg-main: #090d16;
-  --bg-surface: #0f172a;
-  --bg-surface-elevated: #162036;
-  --bg-card: rgba(15, 23, 42, 0.85);
-  --border-subtle: #1e293b;
+  --bg-main: #070a12;
+  --bg-surface: #0e1526;
+  --bg-surface-elevated: #151f38;
+  --bg-card: rgba(14, 21, 38, 0.78);
+  --border-subtle: rgba(255, 255, 255, 0.08);
   --border-focus: #38bdf8;
-  --border-active: #334155;
+  --border-active: rgba(56, 189, 248, 0.35);
 
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --text-dim: #64748b;
 
   --accent-primary: #38bdf8;
-  --accent-primary-hover: #0284c7;
+  --accent-primary-hover: #0ea5e9;
   --accent-primary-glow: rgba(56, 189, 248, 0.25);
 
   --accent-emerald: #10b981;
@@ -28,18 +28,37 @@
   --accent-rose-bg: rgba(244, 63, 94, 0.12);
   --accent-rose-border: rgba(244, 63, 94, 0.3);
 
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --accent-cyan: #06b6d4;
+  --accent-indigo: #6366f1;
 
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 20px var(--accent-primary-glow);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 24px rgba(56, 189, 248, 0.2);
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #070a12;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
 }
 
 *, *::before, *::after {
@@ -179,15 +198,18 @@ p, span, label {
 /* Card & Glass container */
 .card {
   background: var(--bg-card);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: 1.25rem;
   box-shadow: var(--shadow-md);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card:hover {
-  border-color: var(--border-active);
+  border-color: rgba(56, 189, 248, 0.25);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(56, 189, 248, 0.05);
 }
 
 /* Forms & Inputs */
@@ -340,3 +362,22 @@ p, span, label {
     grid-template-columns: 1fr;
   }
 }
+
+/* Nav scrolling container for mobile responsiveness (AC-94) */
+.nav-scroll {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  overflow-x: auto;
+  max-width: 100%;
+  padding: 0.25rem 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.nav-scroll::-webkit-scrollbar {
+  display: none;
+}
+.nav-scroll .btn {
+  flex-shrink: 0;
+}
+

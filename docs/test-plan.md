@@ -43,7 +43,7 @@ Maps every acceptance criterion to a test file/method or manual check.
 | AC-80–81 | Grocery | `tests/test_substitutions.py` | API | ✅ Step 9 |
 | AC-82–84 | Logging | `tests/test_nutrition_logs.py` | API | ✅ Step 10 |
 | AC-85–87 | Dashboard | `tests/test_dashboard.py` | API | ✅ Step 10 |
-| AC-88–89 | Data | `tests/test_data_controls.py` | API | ⬜ Step 11 |
+| AC-88–89 | Data | `tests/test_data_controls.py` | API | ✅ Step 11 |
 | AC-90–96 | UI | `frontend/src/` | UI/E2E | ✅ Step 5 |
 | AC-97 | Quality | `alembic upgrade/downgrade/check` | DB | ✅ Step 1 |
 | AC-98 | Quality | `tests/test_layering.py` | Unit | ✅ Step 3 |

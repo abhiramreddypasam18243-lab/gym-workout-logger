@@ -44,7 +44,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, onSelectTab }) => {
         </div>
 
         {/* Navigation Tabs */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', overflowX: 'auto', maxWidth: '100%', padding: '0.25rem 0' }} aria-label="Main Navigation">
+        <nav className="nav-scroll" aria-label="Main Navigation">
           <button
             type="button"
             className={`btn btn-sm ${activeTab === 'dashboard' ? 'btn-primary' : 'btn-ghost'}`}

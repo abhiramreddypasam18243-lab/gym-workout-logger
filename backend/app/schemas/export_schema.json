@@ -1,0 +1,962 @@
+{
+  "$defs": {
+    "CuisinePreferenceExportData": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "cuisine_code": {
+          "title": "Cuisine Code",
+          "type": "string"
+        },
+        "preference_level": {
+          "title": "Preference Level",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "cuisine_code",
+        "preference_level"
+      ],
+      "title": "CuisinePreferenceExportData",
+      "type": "object"
+    },
+    "CustomExerciseExportData": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "primary_muscle": {
+          "title": "Primary Muscle",
+          "type": "string"
+        },
+        "equipment": {
+          "title": "Equipment",
+          "type": "string"
+        },
+        "movement_pattern": {
+          "default": "",
+          "title": "Movement Pattern",
+          "type": "string"
+        },
+        "instructions": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Instructions"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "primary_muscle",
+        "equipment"
+      ],
+      "title": "CustomExerciseExportData",
+      "type": "object"
+    },
+    "ExportMetadata": {
+      "properties": {
+        "export_version": {
+          "default": "1.0",
+          "title": "Export Version",
+          "type": "string"
+        },
+        "user_id": {
+          "title": "User Id",
+          "type": "string"
+        },
+        "exported_at": {
+          "title": "Exported At",
+          "type": "string"
+        },
+        "record_counts": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Record Counts",
+          "type": "object"
+        }
+      },
+      "required": [
+        "user_id",
+        "exported_at",
+        "record_counts"
+      ],
+      "title": "ExportMetadata",
+      "type": "object"
+    },
+    "FoodConstraintExportData": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "constraint_type": {
+          "title": "Constraint Type",
+          "type": "string"
+        },
+        "constraint_value": {
+          "title": "Constraint Value",
+          "type": "string"
+        },
+        "is_hard_constraint": {
+          "title": "Is Hard Constraint",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "constraint_type",
+        "constraint_value",
+        "is_hard_constraint"
+      ],
+      "title": "FoodConstraintExportData",
+      "type": "object"
+    },
+    "MealPlanExportData": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "start_date": {
+          "title": "Start Date",
+          "type": "string"
+        },
+        "end_date": {
+          "title": "End Date",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "planned_meals": {
+          "items": {
+            "$ref": "#/$defs/PlannedMealExportData"
+          },
+          "title": "Planned Meals",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "start_date",
+        "end_date",
+        "status",
+        "created_at"
+      ],
+      "title": "MealPlanExportData",
+      "type": "object"
+    },
+    "NutritionGoalExportData": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "effective_from": {
+          "title": "Effective From",
+          "type": "string"
+        },
+        "calorie_target_kcal": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Calorie Target Kcal"
+        },
+        "protein_target_g": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Protein Target G"
+        },
+        "carbs_target_g": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Carbs Target G"
+        },
+        "fat_target_g": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fat Target G"
+        },
+        "rationale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rationale"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "effective_from",
+        "created_at"
+      ],
+      "title": "NutritionGoalExportData",
+      "type": "object"
+    },
+    "NutritionLogExportData": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "consumed_at": {
+          "title": "Consumed At",
+          "type": "string"
+        },
+        "meal_type": {
+          "title": "Meal Type",
+          "type": "string"
+        },
+        "source_type": {
+          "default": "food",
+          "title": "Source Type",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/NutritionLogItemExportData"
+          },
+          "title": "Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "consumed_at",
+        "meal_type"
+      ],
+      "title": "NutritionLogExportData",
+      "type": "object"
+    },
+    "NutritionLogItemExportData": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "food_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Food Id"
+        },
+        "recipe_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recipe Id"
+        },
+        "quantity": {
+          "title": "Quantity",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "nutrient_snapshot": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Nutrient Snapshot"
+        }
+      },
+      "required": [
+        "id",
+        "quantity",
+        "unit"
+      ],
+      "title": "NutritionLogItemExportData",
+      "type": "object"
+    },
+    "PlannedMealExportData": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "plan_date": {
+          "title": "Plan Date",
+          "type": "string"
+        },
+        "meal_type": {
+          "title": "Meal Type",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "recipe_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recipe Id"
+        },
+        "servings": {
+          "title": "Servings",
+          "type": "string"
+        },
+        "sort_order": {
+          "default": 0,
+          "title": "Sort Order",
+          "type": "integer"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/PlannedMealItemExportData"
+          },
+          "title": "Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "plan_date",
+        "meal_type",
+        "title",
+        "servings"
+      ],
+      "title": "PlannedMealExportData",
+      "type": "object"
+    },
+    "PlannedMealItemExportData": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "food_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Food Id"
+        },
+        "recipe_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recipe Id"
+        },
+        "quantity": {
+          "title": "Quantity",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "nutrient_snapshot": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Nutrient Snapshot"
+        }
+      },
+      "required": [
+        "id",
+        "quantity",
+        "unit"
+      ],
+      "title": "PlannedMealItemExportData",
+      "type": "object"
+    },
+    "ProfileExportData": {
+      "properties": {
+        "user_id": {
+          "title": "User Id",
+          "type": "string"
+        },
+        "display_name": {
+          "title": "Display Name",
+          "type": "string"
+        },
+        "birth_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Birth Date"
+        },
+        "height_cm": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Height Cm"
+        },
+        "body_weight_kg": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Body Weight Kg"
+        },
+        "timezone": {
+          "title": "Timezone",
+          "type": "string"
+        },
+        "units": {
+          "title": "Units",
+          "type": "string"
+        },
+        "sex_for_estimate": {
+          "title": "Sex For Estimate",
+          "type": "string"
+        },
+        "adult_confirmed_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Adult Confirmed At"
+        },
+        "needs_professional_guidance": {
+          "title": "Needs Professional Guidance",
+          "type": "boolean"
+        },
+        "calories_hidden": {
+          "title": "Calories Hidden",
+          "type": "boolean"
+        },
+        "nutrition_paused": {
+          "title": "Nutrition Paused",
+          "type": "boolean"
+        },
+        "track_body_weight": {
+          "title": "Track Body Weight",
+          "type": "boolean"
+        },
+        "weekly_session_target": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Weekly Session Target"
+        },
+        "currency_code": {
+          "title": "Currency Code",
+          "type": "string"
+        },
+        "goal": {
+          "title": "Goal",
+          "type": "string"
+        },
+        "activity_level": {
+          "title": "Activity Level",
+          "type": "string"
+        }
+      },
+      "required": [
+        "user_id",
+        "display_name",
+        "timezone",
+        "units",
+        "sex_for_estimate",
+        "needs_professional_guidance",
+        "calories_hidden",
+        "nutrition_paused",
+        "track_body_weight",
+        "currency_code",
+        "goal",
+        "activity_level"
+      ],
+      "title": "ProfileExportData",
+      "type": "object"
+    },
+    "RoutineExerciseExportData": {
+      "properties": {
+        "exercise_id": {
+          "title": "Exercise Id",
+          "type": "string"
+        },
+        "order_index": {
+          "title": "Order Index",
+          "type": "integer"
+        },
+        "target_sets": {
+          "title": "Target Sets",
+          "type": "integer"
+        },
+        "rep_min": {
+          "title": "Rep Min",
+          "type": "integer"
+        },
+        "rep_max": {
+          "title": "Rep Max",
+          "type": "integer"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        }
+      },
+      "required": [
+        "exercise_id",
+        "order_index",
+        "target_sets",
+        "rep_min",
+        "rep_max"
+      ],
+      "title": "RoutineExerciseExportData",
+      "type": "object"
+    },
+    "RoutineExportData": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "exercises": {
+          "items": {
+            "$ref": "#/$defs/RoutineExerciseExportData"
+          },
+          "title": "Exercises",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "created_at"
+      ],
+      "title": "RoutineExportData",
+      "type": "object"
+    },
+    "UserExportData": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "email": {
+          "title": "Email",
+          "type": "string"
+        },
+        "display_name": {
+          "title": "Display Name",
+          "type": "string"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "display_name",
+        "created_at"
+      ],
+      "title": "UserExportData",
+      "type": "object"
+    },
+    "WorkoutExerciseExportData": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "exercise_id": {
+          "title": "Exercise Id",
+          "type": "string"
+        },
+        "order_index": {
+          "title": "Order Index",
+          "type": "integer"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "sets": {
+          "items": {
+            "$ref": "#/$defs/WorkoutSetExportData"
+          },
+          "title": "Sets",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "exercise_id",
+        "order_index"
+      ],
+      "title": "WorkoutExerciseExportData",
+      "type": "object"
+    },
+    "WorkoutSessionExportData": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "routine_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Routine Id"
+        },
+        "started_at": {
+          "title": "Started At",
+          "type": "string"
+        },
+        "completed_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Completed At"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "exercises": {
+          "items": {
+            "$ref": "#/$defs/WorkoutExerciseExportData"
+          },
+          "title": "Exercises",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "started_at"
+      ],
+      "title": "WorkoutSessionExportData",
+      "type": "object"
+    },
+    "WorkoutSetExportData": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "set_number": {
+          "title": "Set Number",
+          "type": "integer"
+        },
+        "reps": {
+          "title": "Reps",
+          "type": "integer"
+        },
+        "load_kg": {
+          "title": "Load Kg",
+          "type": "string"
+        },
+        "rpe": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rpe"
+        },
+        "is_warmup": {
+          "title": "Is Warmup",
+          "type": "boolean"
+        },
+        "completed_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Completed At"
+        }
+      },
+      "required": [
+        "id",
+        "set_number",
+        "reps",
+        "load_kg",
+        "is_warmup"
+      ],
+      "title": "WorkoutSetExportData",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "metadata": {
+      "$ref": "#/$defs/ExportMetadata"
+    },
+    "user": {
+      "$ref": "#/$defs/UserExportData"
+    },
+    "profile": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ProfileExportData"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "food_constraints": {
+      "items": {
+        "$ref": "#/$defs/FoodConstraintExportData"
+      },
+      "title": "Food Constraints",
+      "type": "array"
+    },
+    "cuisine_preferences": {
+      "items": {
+        "$ref": "#/$defs/CuisinePreferenceExportData"
+      },
+      "title": "Cuisine Preferences",
+      "type": "array"
+    },
+    "nutrition_goals": {
+      "items": {
+        "$ref": "#/$defs/NutritionGoalExportData"
+      },
+      "title": "Nutrition Goals",
+      "type": "array"
+    },
+    "routines": {
+      "items": {
+        "$ref": "#/$defs/RoutineExportData"
+      },
+      "title": "Routines",
+      "type": "array"
+    },
+    "workout_sessions": {
+      "items": {
+        "$ref": "#/$defs/WorkoutSessionExportData"
+      },
+      "title": "Workout Sessions",
+      "type": "array"
+    },
+    "custom_exercises": {
+      "items": {
+        "$ref": "#/$defs/CustomExerciseExportData"
+      },
+      "title": "Custom Exercises",
+      "type": "array"
+    },
+    "meal_plans": {
+      "items": {
+        "$ref": "#/$defs/MealPlanExportData"
+      },
+      "title": "Meal Plans",
+      "type": "array"
+    },
+    "nutrition_logs": {
+      "items": {
+        "$ref": "#/$defs/NutritionLogExportData"
+      },
+      "title": "Nutrition Logs",
+      "type": "array"
+    }
+  },
+  "required": [
+    "metadata",
+    "user"
+  ],
+  "title": "CompleteUserDataExport",
+  "type": "object"
+}
