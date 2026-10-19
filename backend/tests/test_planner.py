@@ -9,12 +9,11 @@ import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy.orm import selectinload
 
 from app.api.deps import get_db
 from app.main import app
-from app.models.base import Base
 from app.models.nutrition import (
     Food,
     MealPlan,
@@ -25,13 +24,14 @@ from app.models.nutrition import (
 from app.models.user import Session, User, UserCuisinePreference, UserFoodConstraint, UserProfile
 from app.seed.loader import run_seed
 from app.services.security import generate_csrf_token, generate_session_token, hash_token
+from tests.db import create_test_engine, reset_schema
 
 
 @pytest_asyncio.fixture
 async def seeded_planner_client():
-    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+    engine = create_test_engine()
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(reset_schema)
 
     session_factory = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     async with session_factory() as session:

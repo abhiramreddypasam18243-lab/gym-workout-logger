@@ -56,24 +56,19 @@ async def security_and_limits_middleware(request: Request, call_next):
     return response
 
 
-# CORS (SEC9, AC-11) — configured origins
-allowed_origins = list({settings.allowed_origin, "http://localhost:5173", "http://localhost:8080", "http://127.0.0.1:5173"})
-if settings.allowed_origin == "*" or "*" in settings.allowed_origin:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origin_regex=r".*",
-        allow_credentials=True,
-        allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-        allow_headers=["Content-Type", "X-CSRF-Token"],
-    )
-else:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=allowed_origins,
-        allow_credentials=True,
-        allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-        allow_headers=["Content-Type", "X-CSRF-Token"],
-    )
+# CORS (SEC9, AC-11) — explicit origins only; a wildcard is never combined with credentials.
+if "*" in settings.allowed_origin:
+    raise RuntimeError("ALLOWED_ORIGIN must be an explicit origin, not '*' (spec SEC9)")
+allowed_origins = {settings.allowed_origin}
+if settings.environment == "development":
+    allowed_origins |= {"http://localhost:5173", "http://localhost:8080", "http://127.0.0.1:5173"}
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=sorted(allowed_origins),
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "X-CSRF-Token"],
+)
 
 # Register routers
 app.include_router(health_router)

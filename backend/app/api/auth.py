@@ -8,7 +8,13 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.api.deps import get_current_session, verify_csrf, verify_tls_for_login
+from app.api.deps import (
+    client_host,
+    get_current_session,
+    request_is_tls,
+    verify_csrf,
+    verify_tls_for_login,
+)
 from app.config import get_settings
 from app.database import get_db
 from app.models.user import Session, User, UserProfile
@@ -105,7 +111,7 @@ async def login(
     verify_tls_for_login(request)
 
     normalized_email = payload.email.lower()
-    client_ip = request.client.host if request.client else "unknown"
+    client_ip = client_host(request)
     rate_limit_key = f"{normalized_email}:{client_ip}"
 
     # Rate limiting check (AC-04: max 5 failed attempts per 15 min)
@@ -160,7 +166,7 @@ async def login(
     db.add(session)
     await db.commit()
 
-    is_secure = request.url.scheme == "https" or request.headers.get("X-Forwarded-Proto") == "https"
+    is_secure = request_is_tls(request)
 
     # Set HttpOnly, SameSite=Lax session cookie
     response.set_cookie(

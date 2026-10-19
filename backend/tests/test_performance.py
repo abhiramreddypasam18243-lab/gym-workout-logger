@@ -9,12 +9,12 @@ import time
 
 import pytest
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.database import get_db
 from app.demo_user import DEMO_EMAIL, DEMO_PASS, create_demo_user
 from app.main import app
-from app.models.base import Base
+from tests.db import create_test_engine, reset_schema
 
 
 @pytest.mark.asyncio
@@ -23,9 +23,9 @@ async def test_ac_103_performance_benchmarks():
 
     and dashboard (<= 500ms p95) under a realistic synthetic dataset.
     """
-    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+    engine = create_test_engine()
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(reset_schema)
 
     session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 

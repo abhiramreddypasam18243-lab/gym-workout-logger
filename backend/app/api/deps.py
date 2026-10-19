@@ -1,16 +1,24 @@
 """FastAPI authentication, session, CSRF, and TLS dependencies (spec §7, §10, AC-03–07)."""
 
+import ipaddress
 from datetime import UTC, datetime
 from typing import Annotated
+from zoneinfo import ZoneInfo
 
 from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.config import settings
 from app.database import get_db
 from app.models.user import Session, User
 from app.services.security import hash_token
+
+
+def get_now() -> datetime:
+    """Injectable clock (UTC). Tests override it via app.dependency_overrides."""
+    return datetime.now(UTC)
 
 
 async def get_current_session(
@@ -111,20 +119,46 @@ async def verify_csrf(
         )
 
 
+def _is_trusted_proxy(host: str) -> bool:
+    """True if `host` matches TRUSTED_PROXY_IP (comma-separated IPs/CIDRs, or "*")."""
+    for entry in settings.TRUSTED_PROXY_IP.split(","):
+        entry = entry.strip()
+        if entry == "*":
+            return True
+        try:
+            if ipaddress.ip_address(host) in ipaddress.ip_network(entry, strict=False):
+                return True
+        except ValueError:
+            continue
+    return False
+
+
+def client_host(request: Request) -> str:
+    """Client address; X-Forwarded-For is honoured only when sent by a trusted proxy."""
+    peer = request.client.host if request.client else "127.0.0.1"
+    forwarded_for = request.headers.get("X-Forwarded-For")
+    if forwarded_for and _is_trusted_proxy(peer):
+        # Rightmost entry is the one our proxy appended; earlier entries are client-controlled.
+        return forwarded_for.split(",")[-1].strip()
+    return peer
+
+
+def request_is_tls(request: Request) -> bool:
+    """HTTPS directly, or X-Forwarded-Proto: https from a trusted proxy (spec SEC7)."""
+    if request.scope.get("scheme") == "https":
+        return True
+    peer = request.client.host if request.client else "127.0.0.1"
+    return _is_trusted_proxy(peer) and request.headers.get("X-Forwarded-Proto") == "https"
+
+
 def verify_tls_for_login(request: Request) -> None:
     """Enforce TLS for non-localhost clients on credential endpoints (spec SEC7, AC-07)."""
-    client_host = request.client.host if request.client else "127.0.0.1"
     localhost_hosts = {"127.0.0.1", "::1", "localhost", "testclient"}
 
-    if client_host in localhost_hosts:
+    if client_host(request) in localhost_hosts:
         return
 
-    # Non-localhost client: must be over HTTPS or valid proxy HTTPS
-    scheme = request.scope.get("scheme") or request.url.scheme
-    forwarded_proto = request.headers.get("X-Forwarded-Proto")
-    is_tls = scheme == "https" or forwarded_proto == "https"
-
-    if not is_tls:
+    if not request_is_tls(request):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail={
@@ -135,8 +169,8 @@ def verify_tls_for_login(request: Request) -> None:
 
 
 async def check_nutrition_access(
-    request: Request,
     auth: Annotated[tuple[User, Session], Depends(get_current_session)],
+    now: Annotated[datetime, Depends(get_now)],
 ) -> tuple[User, Session]:
     """Enforce nutrition safety safeguards S2 & S7 (AC-17, AC-25).
 
@@ -164,15 +198,9 @@ async def check_nutrition_access(
             },
         )
 
-    # Date resolution: allow X-Current-Date header for deterministic clock injection in tests (spec §13, AC-17)
-    header_date = request.headers.get("X-Current-Date")
-    if header_date:
-        try:
-            today = datetime.strptime(header_date, "%Y-%m-%d").date()
-        except ValueError:
-            today = datetime.now(UTC).date()
-    else:
-        today = datetime.now(UTC).date()
+    # Today in the user's timezone, from the injected clock (never from a client header).
+    tz = ZoneInfo(profile.timezone or "UTC")
+    today = now.astimezone(tz).date()
 
     # 2. Minor check (S2, AC-17)
     if profile.birth_date:

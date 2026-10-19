@@ -7,11 +7,10 @@ import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.api.deps import get_db
 from app.main import app
-from app.models.base import Base
 from app.models.user import Session, User, UserProfile
 from app.models.workout import (
     Exercise,
@@ -21,13 +20,14 @@ from app.models.workout import (
 )
 from app.seed.loader import run_seed
 from app.services.security import generate_csrf_token, generate_session_token, hash_token
+from tests.db import create_test_engine, reset_schema
 
 
 @pytest_asyncio.fixture
 async def test_db():
-    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+    engine = create_test_engine()
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(reset_schema)
 
     session_factory = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     async with session_factory() as session:
@@ -576,19 +576,38 @@ async def test_ac_37_history_keyset_pagination(auth_client):
 
 @pytest.mark.asyncio
 async def test_ac_38_history_query_plan_uses_index(test_db: AsyncSession):
-    """AC-38 (NFR): History query plan uses the (user_id, started_at) index."""
-    import uuid
-
+    """AC-38 (NFR): With 10,000 sessions, the history query plan uses the (user_id, started_at) index."""
     from sqlalchemy import text
 
-    user_id = str(uuid.uuid4())
-    sql = text(
-        "EXPLAIN QUERY PLAN "
-        "SELECT id, started_at FROM workout_sessions "
-        "WHERE user_id = :uid "
-        "ORDER BY started_at DESC, id DESC"
+    # 20 users x 500 sessions = 10,000 sessions
+    users = [
+        User(email=f"plan_user_{i}@example.com", password_hash="$argon2id$dummy")
+        for i in range(20)
+    ]
+    test_db.add_all(users)
+    await test_db.flush()
+    for u in users:
+        await test_db.execute(
+            text(
+                "INSERT INTO workout_sessions (id, user_id, started_at) "
+                "SELECT gen_random_uuid(), :uid, now() - make_interval(days => g) "
+                "FROM generate_series(1, 500) AS g"
+            ),
+            {"uid": u.id},
+        )
+    await test_db.commit()
+    await test_db.execute(text("ANALYZE workout_sessions"))
+
+    count = (await test_db.execute(text("SELECT count(*) FROM workout_sessions"))).scalar()
+    assert count == 10_000
+
+    result = await test_db.execute(
+        text(
+            "EXPLAIN SELECT id, started_at FROM workout_sessions "
+            "WHERE user_id = :uid "
+            "ORDER BY started_at DESC, id DESC LIMIT 20"
+        ),
+        {"uid": users[0].id},
     )
-    result = await test_db.execute(sql, {"uid": user_id})
-    plan_rows = [str(row) for row in result.all()]
-    plan_text = " ".join(plan_rows)
-    assert "idx_workout_sessions_user_started" in plan_text or "INDEX" in plan_text
+    plan_text = " ".join(row[0] for row in result.all())
+    assert "idx_workout_sessions_user_started" in plan_text

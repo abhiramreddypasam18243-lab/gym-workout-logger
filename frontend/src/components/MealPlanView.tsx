@@ -500,7 +500,7 @@ export const MealPlanView: React.FC = () => {
           <ChefHat size={48} style={{ color: 'var(--text-muted)', margin: '0 auto 1rem' }} />
           <h2>No Meal Plans Generated Yet</h2>
           <p style={{ color: 'var(--text-secondary)', maxWidth: '500px', margin: '0.5rem auto 1.5rem' }}>
-            Generate a full 7-day meal plan tailored to your strength calorie and protein targets with zero hallucinated foods.
+            Generate a full 7-day meal plan tailored to your strength and protein targets with zero hallucinated foods.
           </p>
           <button className="btn btn-primary" onClick={() => setShowGeneratorModal(true)}>
             <Sparkles size={16} />
@@ -1180,16 +1180,18 @@ export const MealPlanView: React.FC = () => {
                 justifyContent: 'space-between',
               }}
             >
-              <span>
-                Calories:{' '}
-                <strong>
-                  {Math.round(
-                    (Number(activeMealForServings.nutrients.calories) * editServingsValue) /
-                      Number(activeMealForServings.servings)
-                  )}
-                </strong>{' '}
-                kcal
-              </span>
+              {!isCaloriesHidden && (
+                <span>
+                  Calories:{' '}
+                  <strong>
+                    {Math.round(
+                      (Number(activeMealForServings.nutrients.calories) * editServingsValue) /
+                        Number(activeMealForServings.servings)
+                    )}
+                  </strong>{' '}
+                  kcal
+                </span>
+              )}
               <span>
                 Protein:{' '}
                 <strong style={{ color: 'var(--accent-primary)' }}>

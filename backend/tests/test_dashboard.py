@@ -6,25 +6,25 @@ from decimal import Decimal
 
 import pytest
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.api.deps import get_db
 from app.domain.insights import verify_non_causal_wording
 from app.main import app
-from app.models.base import Base
 from app.models.user import Session, User, UserProfile
 from app.models.workout import Exercise, WorkoutExercise, WorkoutSession, WorkoutSet
 from app.services.security import generate_csrf_token, generate_session_token, hash_token
+from tests.db import create_test_engine, reset_schema
 
 
 @pytest.fixture
 async def seeded_dashboard_client():
     """Setup test database with user, exercises, and workouts."""
-    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+    engine = create_test_engine()
     async_session = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(reset_schema)
 
     async with async_session() as session:
         # 1. Create user

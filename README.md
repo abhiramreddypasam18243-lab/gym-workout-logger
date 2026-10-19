@@ -1,7 +1,7 @@
 # Titan — Elite Gym Workout Logger & Strength-Focused Diet Planner
 
 [![CI Pipeline](https://github.com/abhiramreddypasam18243-lab/gym-workout-logger/actions/workflows/ci.yml/badge.svg)](https://github.com/abhiramreddypasam18243-lab/gym-workout-logger/actions/workflows/ci.yml)
-![Tests](https://img.shields.io/badge/tests-109%20passed-10b981?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-118%20passed-10b981?style=flat-square)
 ![Security](https://img.shields.io/badge/pip--audit-0%20vulnerabilities-10b981?style=flat-square)
 ![Frontend](https://img.shields.io/badge/frontend-React%2019%20%7C%20Vite%20%7C%20TypeScript-38bdf8?style=flat-square)
 ![Backend](https://img.shields.io/badge/backend-FastAPI%20%7C%20SQLAlchemy%202%20%7C%20PostgreSQL%2016-38bdf8?style=flat-square)
@@ -31,7 +31,7 @@ The interface features a state-of-the-art dark titanium design system inspired b
 
 - **Backend:** Python 3.12, FastAPI, SQLAlchemy 2 (async), Alembic, PostgreSQL 16 / SQLite (aiosqlite)
 - **Frontend:** React 19, TypeScript, Vite, Web Audio API, Vanilla CSS Design System
-- **Security & Quality:** Argon2id password hashing, HttpOnly session cookies, SameSite=Lax, CSRF token validation, non-root Docker container (`appuser`), 100% automated test coverage (109 pytest cases), zero pip-audit vulnerabilities.
+- **Security & Quality:** Argon2id password hashing, HttpOnly session cookies, SameSite=Lax, CSRF token validation, non-root Docker container (`appuser`), 118 pytest cases run against PostgreSQL 16, zero pip-audit vulnerabilities.
 - **Infrastructure:** Docker Compose, Render single-container full-stack deployment, GitHub Actions CI.
 
 ---
@@ -80,7 +80,10 @@ cd backend
 python -m venv .venv
 .\.venv\Scripts\activate          # Windows (or source .venv/bin/activate on Linux/macOS)
 pip install -e ".[dev]"
-pytest -q                         # Run full 109 test suite
+# Tests need a disposable PostgreSQL database (its schema is wiped per test):
+#   docker run -d --name gymlogger-testdb -e POSTGRES_USER=gymlogger -e POSTGRES_PASSWORD=test_password_1234 -e POSTGRES_DB=gymlogger -p 55432:5432 postgres:16.4-alpine
+#   export TEST_DATABASE_URL=postgresql+asyncpg://gymlogger:test_password_1234@localhost:55432/gymlogger
+pytest -q                         # Run full 118 test suite
 uvicorn app.main:app --reload --port 8000
 
 # Frontend Setup (in separate terminal)

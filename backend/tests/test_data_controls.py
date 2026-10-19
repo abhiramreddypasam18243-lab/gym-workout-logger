@@ -9,11 +9,10 @@ import jsonschema
 import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.api.deps import get_db
 from app.main import app
-from app.models.base import Base
 from app.models.nutrition import (
     Food,
     FoodNutrient,
@@ -42,16 +41,17 @@ from app.services.security import (
     hash_password,
     hash_token,
 )
+from tests.db import create_test_engine, reset_schema
 
 
 @pytest.fixture
 async def data_controls_client():
     """Setup test database with full user data, second tenant, and shared catalogue."""
-    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+    engine = create_test_engine()
     async_session = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(reset_schema)
 
     async def override_get_db():
         async with async_session() as session:
