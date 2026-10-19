@@ -60,3 +60,19 @@ def test_ac_111_dotenv_example_lists_all_required_settings():
     ]
     for var in required_vars:
         assert var in content, f"{var} is missing from .env.example"
+
+
+def test_hosted_postgres_url_with_sslmode_is_converted_for_asyncpg():
+    """Neon-style URLs: libpq-only options are removed and sslmode becomes asyncpg's ssl arg."""
+    from app.config import Settings
+
+    s = Settings(
+        DATABASE_URL="postgresql://user:pw@ep-x.neon.tech/neondb?sslmode=require&channel_binding=require",
+        ENVIRONMENT="test",
+    )
+    assert s.database_url == "postgresql+asyncpg://user:pw@ep-x.neon.tech/neondb"
+    assert s.database_connect_args == {"ssl": "require"}
+
+    plain = Settings(DATABASE_URL="postgres://user:pw@db:5432/app", ENVIRONMENT="test")
+    assert plain.database_url == "postgresql+asyncpg://user:pw@db:5432/app"
+    assert plain.database_connect_args == {}

@@ -7,6 +7,8 @@ All numeric values marked 'initial' in the spec are placeholders for review.
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+_LIBPQ_ONLY_PARAMS = {"sslmode", "channel_binding"}
+
 
 class Settings(BaseSettings):
     """Application settings from environment variables."""
@@ -45,12 +47,26 @@ class Settings(BaseSettings):
     # Compatibility properties
     @property
     def database_url(self) -> str:
+        """Async driver URL. libpq-only options (sslmode, channel_binding), which hosted
+        providers such as Neon add, are removed; SSL goes through database_connect_args."""
         url = (self.DATABASE_URL or "").strip()
         if url.startswith("postgres://"):
             url = "postgresql+asyncpg://" + url[len("postgres://") :]
         elif url.startswith("postgresql://") and not url.startswith("postgresql+asyncpg://"):
             url = "postgresql+asyncpg://" + url[len("postgresql://") :]
-        return url
+        base, _, query = url.partition("?")
+        kept = [p for p in query.split("&") if p and p.split("=", 1)[0] not in _LIBPQ_ONLY_PARAMS]
+        return base + ("?" + "&".join(kept) if kept else "")
+
+    @property
+    def database_connect_args(self) -> dict[str, str]:
+        """asyncpg's equivalent of the URL's sslmode (e.g. Neon requires TLS)."""
+        _, _, query = (self.DATABASE_URL or "").partition("?")
+        params = dict(p.split("=", 1) for p in query.split("&") if "=" in p)
+        sslmode = params.get("sslmode")
+        if sslmode in ("require", "verify-ca", "verify-full", "prefer"):
+            return {"ssl": sslmode}
+        return {}
 
     @property
     def allowed_origin(self) -> str:
