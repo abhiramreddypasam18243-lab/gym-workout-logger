@@ -135,7 +135,14 @@ async def test_ac_85_dashboard_metrics_and_new_user_empty_states(seeded_dashboar
 
     assert data_active["weekly_sessions"] == 1
     assert Decimal(str(data_active["weekly_volume_kg"])) == Decimal("800")
-    assert data_active["pr_count"] == 1
+    # First working set is the baseline and an equal set is not a PR (AC-41) -> 0 PRs
+    assert data_active["pr_count"] == 0
+
+    # A heavier set later this week beats the 80 kg x 5 baseline -> 1 PR
+    later = now + timedelta(minutes=30)
+    session.add(WorkoutSet(workout_exercise_id=we1.id, set_number=4, reps=5, load_kg=Decimal("85.0"), is_warmup=False, completed_at=later))
+    await session.commit()
+    assert (await client.get("/api/dashboard")).json()["pr_count"] == 1
 
 
 # ---------------------------------------------------------------------------

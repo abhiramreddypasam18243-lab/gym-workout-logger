@@ -5,6 +5,14 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.demo_user import DEMO_EMAIL, create_demo_user
+from app.models.nutrition import (
+    FoodNutrient,
+    MealPlan,
+    NutritionLog,
+    NutritionLogItem,
+    PlannedMeal,
+    PlannedMealItem,
+)
 from app.models.user import User, UserProfile
 from app.models.workout import WorkoutSession
 from tests.db import create_test_engine, reset_schema
@@ -52,5 +60,37 @@ async def test_ac_106_create_synthetic_demo_account():
         assert len(sessions) == 60
         for s in sessions:
             assert "Synthetic" in (s.notes or "")
+
+        # Demo nutrition values come from the reviewed catalogue, never invented (ag.md)
+        plan = (
+            await session.execute(select(MealPlan).where(MealPlan.user_id == user.id))
+        ).scalar_one()
+        items = (
+            await session.execute(
+                select(PlannedMealItem)
+                .join(PlannedMeal, PlannedMealItem.planned_meal_id == PlannedMeal.id)
+                .where(PlannedMeal.meal_plan_id == plan.id)
+            )
+        ).scalars().all()
+        assert items
+        for item in items:
+            if item.food_id is None:
+                assert item.nutrient_snapshot == {}  # text-only ingredient
+                continue
+            rows = (
+                await session.execute(select(FoodNutrient).where(FoodNutrient.food_id == item.food_id))
+            ).scalars().all()
+            assert item.nutrient_snapshot == {r.nutrient_code: str(r.amount_per_100g) for r in rows}
+
+        log_items = (
+            await session.execute(
+                select(NutritionLogItem)
+                .join(NutritionLog, NutritionLogItem.nutrition_log_id == NutritionLog.id)
+                .where(NutritionLog.user_id == user.id)
+            )
+        ).scalars().all()
+        assert len(log_items) == 42
+        assert all(li.recipe_id is not None for li in log_items)
+        assert all(li.nutrient_snapshot["is_recipe_per_serving"] == "true" for li in log_items)
 
     await engine.dispose()

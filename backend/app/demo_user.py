@@ -21,9 +21,6 @@ from app.models.nutrition import (
     MealPlan,
     NutritionGoal,
     NutritionLog,
-    NutritionLogItem,
-    PlannedMeal,
-    PlannedMealItem,
     Recipe,
 )
 from app.models.user import User, UserProfile
@@ -35,7 +32,11 @@ from app.models.workout import (
     WorkoutSession,
     WorkoutSet,
 )
+from app.schemas.meal_plan import MealPlanGenerateRequest, MealPlanResponse
+from app.schemas.nutrition_log import NutritionLogItemCreate
 from app.seed.loader import run_seed
+from app.services.nutrition_logs import NutritionLogService
+from app.services.planner import DietPlannerService
 from app.services.security import hash_password
 
 DEMO_EMAIL = "demo@titanstrength.test"
@@ -167,8 +168,18 @@ async def create_demo_user(
     primary_exs = catalogue_exercises[:4]
     secondary_exs = catalogue_exercises[4:8] if len(catalogue_exercises) >= 8 else primary_exs
 
+    # Most sessions are spread over the two years; the last few fall in the past four
+    # weeks (ending yesterday) so the dashboard's weekly figures have recent data.
+    recent = min(12, sessions_to_create // 4)
+    older = sessions_to_create - recent
+    yesterday_evening = (now_utc - timedelta(days=1)).replace(hour=17, minute=0, second=0, microsecond=0)
+
     for i in range(sessions_to_create):
-        session_time = start_date + timedelta(days=(i * 730 // sessions_to_create), hours=17)
+        if i < older:
+            session_time = start_date + timedelta(days=(i * 700 // max(older, 1)), hours=17)
+        else:
+            k = i - older  # 0 .. recent-1, oldest first
+            session_time = yesterday_evening - timedelta(days=((recent - 1 - k) * 27 // max(recent - 1, 1)))
         routine_choice = routine_upper if i % 2 == 0 else routine_lower
         chosen_exs = primary_exs if i % 2 == 0 else secondary_exs
 
@@ -229,78 +240,32 @@ async def create_demo_user(
         session.add_all(workout_sets[c : c + chunk_size])
         await session.flush()
 
-    # 9. Create 7-Day Meal Plan
-    recipes_res = await session.execute(select(Recipe).order_by(Recipe.name))
-    catalogue_recipes = list(recipes_res.scalars().all())
-
+    # 9. Create the 7-day meal plan with the real planner, so every value comes from the
+    #    reviewed catalogue (no invented nutrient data)
+    await session.commit()
     today = date.today()
-    meal_plan = MealPlan(
-        id=uuid.uuid4(),
-        user_id=demo_user_id,
-        name="7-Day Strength Plan (Synthetic)",
-        start_date=today - timedelta(days=3),
-        end_date=today + timedelta(days=3),
-        status="ok",
-        generation_version="1.0",
-        target_snapshot={
-            "calorie_target_kcal": 2800,
-            "protein_target_g": 160,
-            "carbs_target_g": 350,
-            "fat_target_g": 80,
-        },
+    plan = await DietPlannerService(session).generate_plan(
+        demo_user_id,
+        MealPlanGenerateRequest(start_date=today - timedelta(days=3), days=7),
     )
-    session.add(meal_plan)
-    await session.flush()
+    if not isinstance(plan, MealPlanResponse):
+        raise RuntimeError("Planner could not build the synthetic demo plan from the catalogue")
+    meal_plan = await session.get(MealPlan, plan.id)
+    assert meal_plan is not None
+    meal_plan.name = "7-Day Strength Plan (Synthetic)"
+    planned_meal_count = len(plan.meals)
 
-    meal_types = ["breakfast", "lunch", "dinner", "snack"]
-    planned_meals = []
-    planned_meal_items = []
-
-    for day_offset in range(7):
-        pdate = today - timedelta(days=3) + timedelta(days=day_offset)
-        for m_idx, mt in enumerate(meal_types):
-            rec = catalogue_recipes[(day_offset + m_idx) % len(catalogue_recipes)]
-            pm = PlannedMeal(
-                id=uuid.uuid4(),
-                meal_plan_id=meal_plan.id,
-                plan_date=pdate,
-                meal_type=mt,
-                recipe_id=rec.id,
-                title=rec.name,
-                servings=Decimal("1.0"),
-                sort_order=m_idx,
-            )
-            planned_meals.append(pm)
-
-            pmi = PlannedMealItem(
-                id=uuid.uuid4(),
-                planned_meal_id=pm.id,
-                recipe_id=rec.id,
-                quantity=Decimal("1.0"),
-                unit="serving",
-                nutrient_snapshot={
-                    "energy_kcal": 650 if mt in ["lunch", "dinner"] else 450,
-                    "protein_g": 40 if mt in ["lunch", "dinner"] else 25,
-                    "carbs_g": 80 if mt in ["lunch", "dinner"] else 50,
-                    "fat_g": 18 if mt in ["lunch", "dinner"] else 12,
-                },
-            )
-            planned_meal_items.append(pmi)
-
-    session.add_all(planned_meals)
-    await session.flush()
-    session.add_all(planned_meal_items)
-    await session.flush()
-
-    # 10. Create 14 Days of Nutrition Intake Logs
-    nutrition_logs = []
-    nutrition_log_items = []
+    # 10. Create 14 days of intake logs: one serving of a catalogue recipe per meal,
+    #     snapshotted by the same code path the logging API uses
+    recipes_res = await session.execute(select(Recipe.id).order_by(Recipe.name))
+    recipe_ids = list(recipes_res.scalars().all())
+    log_service = NutritionLogService(session)
+    nutrition_log_count = 0
 
     for d in range(14):
         log_date = today - timedelta(days=14 - d)
-        for mt in ["breakfast", "lunch", "dinner"]:
-            rec = catalogue_recipes[(d + len(mt)) % len(catalogue_recipes)]
-            log_time = datetime(log_date.year, log_date.month, log_date.day, 12, 30, tzinfo=UTC)
+        for m_idx, mt in enumerate(["breakfast", "lunch", "dinner"]):
+            log_time = datetime(log_date.year, log_date.month, log_date.day, 8 + 5 * m_idx, 30, tzinfo=UTC)
             nl = NutritionLog(
                 id=uuid.uuid4(),
                 user_id=demo_user_id,
@@ -309,34 +274,29 @@ async def create_demo_user(
                 source_type="recipe",
                 notes="Synthetic intake record (AC-106)",
             )
-            nutrition_logs.append(nl)
-
-            nli = NutritionLogItem(
-                id=uuid.uuid4(),
-                nutrition_log_id=nl.id,
-                recipe_id=rec.id,
-                quantity=Decimal("1.0"),
-                unit="serving",
-                nutrient_snapshot={
-                    "energy_kcal": 670,
-                    "protein_g": 42.0,
-                    "carbs_g": 78.0,
-                    "fat_g": 19.0,
-                },
+            session.add(nl)
+            await session.flush()
+            items = await log_service._build_log_items(
+                nl.id,
+                [
+                    NutritionLogItemCreate(
+                        recipe_id=recipe_ids[(d * 3 + m_idx) % len(recipe_ids)],
+                        quantity=Decimal("1"),
+                        unit="serving",
+                    )
+                ],
             )
-            nutrition_log_items.append(nli)
+            session.add_all(items)
+            nutrition_log_count += 1
 
-    session.add_all(nutrition_logs)
-    await session.flush()
-    session.add_all(nutrition_log_items)
     await session.commit()
 
     return {
         "sessions": len(workout_sessions),
         "sets": len(workout_sets),
         "meal_plans": 1,
-        "planned_meals": len(planned_meals),
-        "nutrition_logs": len(nutrition_logs),
+        "planned_meals": planned_meal_count,
+        "nutrition_logs": nutrition_log_count,
     }
 
 

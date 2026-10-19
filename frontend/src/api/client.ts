@@ -456,8 +456,8 @@ export const api = {
     return request<any>('/api/dashboard')
   },
 
-  async getInsights(minSessions: number = 5): Promise<any> {
-    return request<any>(`/api/dashboard/insights?min_sessions=${minSessions}`)
+  async getInsights(window: 'last_4_weeks' | 'last_12_weeks' = 'last_4_weeks'): Promise<any> {
+    return request<any>(`/api/insights?window=${window}`)
   },
 
   // Data Controls & Privacy (AC-88, AC-89)
