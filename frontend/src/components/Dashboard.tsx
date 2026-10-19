@@ -21,6 +21,13 @@ import { useAuth } from '../context/AuthContext'
 import { kgToLb } from '../utils/units'
 import { MotivationalQuoteCard } from './MotivationalQuoteCard'
 
+// A log item's snapshot is per serving for recipes and per 100 g for foods (as in the API)
+function logItemAmount(it: any, key: string): number {
+  const value = Number(it.nutrient_snapshot?.[key]) || 0
+  const qty = Number(it.quantity) || 0
+  return it.nutrient_snapshot?.is_recipe_per_serving === 'true' ? value * qty : (value * qty) / 100
+}
+
 export const Dashboard: React.FC<{
   onNavigateToLogger?: () => void
   onNavigateToMealPlan?: () => void
@@ -62,7 +69,7 @@ export const Dashboard: React.FC<{
 
       const [dash, insights, analytics, logs, foods, recipes] = await Promise.all([
         apiClient.getDashboard(),
-        apiClient.getInsights(5),
+        apiClient.getInsights('last_12_weeks'),
         apiClient.getNutritionAnalytics(sevenDaysAgo, today),
         apiClient.listNutritionLogs(sevenDaysAgo, today),
         apiClient.searchFoods({ page: 1, page_size: 100 }),
@@ -187,17 +194,24 @@ export const Dashboard: React.FC<{
     )
   }
 
-  const workoutCount = dashboardData?.weekly_workout_count || 0
-  const workoutTarget = dashboardData?.weekly_session_target || profile?.weekly_session_target || 4
+  // Fields as returned by GET /api/dashboard (DashboardSummaryResponse)
+  const workoutCount = dashboardData?.weekly_sessions || 0
+  const workoutTarget = profile?.weekly_session_target || 4
   const workoutProgressPct = Math.min(100, Math.round((workoutCount / (workoutTarget || 1)) * 100))
-  const volumeKg = dashboardData?.weekly_volume_kg || 0
-  const prCount = dashboardData?.weekly_pr_count || 0
-  const loggedDaysCount = dashboardData?.logged_days_count || 0
-  const adherencePct = dashboardData?.weekly_adherence_percentage ?? 0
-  const avgProtein = dashboardData?.avg_daily_protein_g ?? 0
-  const targetProtein = dashboardData?.target_daily_protein_g ?? 0
-  const avgCalories = dashboardData?.avg_daily_calories_kcal ?? 0
-  const targetCalories = dashboardData?.target_daily_calories_kcal ?? 0
+  const volumeKg = Number(dashboardData?.weekly_volume_kg) || 0
+  const prCount = dashboardData?.pr_count || 0
+  // Nutrition averages come from this week's planned-vs-logged days; unlogged days are excluded
+  const loggedDays: any[] = (dashboardData?.planned_vs_logged || []).filter((d: any) => d.is_logged)
+  const loggedDaysCount = loggedDays.length
+  const average = (key: string) =>
+    loggedDaysCount ? Math.round(loggedDays.reduce((acc, d) => acc + (Number(d[key]) || 0), 0) / loggedDaysCount) : 0
+  const adherencePct = loggedDaysCount
+    ? (loggedDays.filter((d) => d.is_within_range).length / loggedDaysCount) * 100
+    : 0
+  const avgProtein = average('logged_protein_g')
+  const targetProtein = dashboardData?.active_goal_protein ?? 0
+  const avgCalories = average('logged_calories')
+  const targetCalories = dashboardData?.active_goal_calories ?? 0
   const isCaloriesHidden = profile?.calories_hidden || false
 
   // Dynamic greeting based on current local hour
@@ -661,81 +675,20 @@ export const Dashboard: React.FC<{
           </div>
         </div>
 
-        {/* Progress toward unlocking insights (AC-86c) */}
-        {!insightsData?.is_unlocked ? (
-          <div style={{ padding: '1.25rem', background: 'var(--bg-surface)', borderRadius: 'var(--radius-sm)', border: '1px dashed var(--border-subtle)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'color-mix(in srgb, var(--accent-primary) 15%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)' }}>
-                <Clock size={16} />
-              </div>
-              <div>
-                <h3 style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-main)' }}>
-                  Insights Progress Indicator (AC-86c)
-                </h3>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  {insightsData?.progress?.message || 'Minimum 5 workout sessions and 5 nutrition logging days required before insights unlock.'}
-                </p>
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
-              {/* Workout Sessions Progress */}
-              <div style={{ background: 'rgba(0, 0, 0, 0.2)', padding: '0.75rem', borderRadius: 'var(--radius-sm)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.25rem' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>Workout Sessions</span>
-                  <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>
-                    {insightsData?.progress?.completed_sessions || 0} / {insightsData?.progress?.required_sessions || 5}
-                  </span>
-                </div>
-                <div style={{ width: '100%', height: '6px', background: 'var(--border-subtle)', borderRadius: '2px', overflow: 'hidden' }}>
-                  <div
-                    style={{
-                      width: `${Math.min(100, (((insightsData?.progress?.completed_sessions || 0) / (insightsData?.progress?.required_sessions || 5)) * 100))}%`,
-                      height: '100%',
-                      background: 'var(--accent-primary)',
-                      borderRadius: '2px',
-                    }}
-                  />
-                </div>
-                <div style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', marginTop: '0.25rem' }}>
-                  {(insightsData?.progress?.sessions_needed || 0) > 0
-                    ? `${insightsData.progress.sessions_needed} more session(s) needed`
-                    : '✓ Session threshold reached'}
-                </div>
-              </div>
-
-              {/* Nutrition Days Progress */}
-              <div style={{ background: 'rgba(0, 0, 0, 0.2)', padding: '0.75rem', borderRadius: 'var(--radius-sm)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.25rem' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>Nutrition Logged Days</span>
-                  <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>
-                    {insightsData?.progress?.completed_nutrition_days || 0} / {insightsData?.progress?.required_nutrition_days || 5}
-                  </span>
-                </div>
-                <div style={{ width: '100%', height: '6px', background: 'var(--border-subtle)', borderRadius: '2px', overflow: 'hidden' }}>
-                  <div
-                    style={{
-                      width: `${Math.min(100, (((insightsData?.progress?.completed_nutrition_days || 0) / (insightsData?.progress?.required_nutrition_days || 5)) * 100))}%`,
-                      height: '100%',
-                      background: 'var(--accent-emerald)',
-                      borderRadius: '2px',
-                    }}
-                  />
-                </div>
-                <div style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', marginTop: '0.25rem' }}>
-                  {(insightsData?.progress?.nutrition_days_needed || 0) > 0
-                    ? `${insightsData.progress.nutrition_days_needed} more day(s) needed`
-                    : '✓ Nutrition threshold reached'}
-                </div>
-              </div>
-            </div>
+        {/* Insights need at least 3 sessions of an exercise in the window (AC-86) */}
+        {!insightsData?.has_enough_data ? (
+          <div style={{ padding: '1.25rem', background: 'var(--bg-surface)', borderRadius: 'var(--radius-sm)', border: '1px dashed var(--border-card)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <Clock size={18} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+            <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+              {insightsData?.message || 'Not enough data yet. Log at least 3 sessions of an exercise in the last 12 weeks to see its trend.'}
+            </p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
-            {/* Insight Cards (AC-86a, b, AC-87) */}
-            {insightsData.insights?.map((ins: any, idx: number) => (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '1rem' }}>
+            {/* Insight Cards (AC-86, AC-87) */}
+            {insightsData.insights?.map((ins: any) => (
               <div
-                key={idx}
+                key={ins.id}
                 style={{
                   background: 'var(--bg-surface)',
                   border: '1px solid var(--border-subtle)',
@@ -744,34 +697,35 @@ export const Dashboard: React.FC<{
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
+                  gap: '0.75rem',
                 }}
               >
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                    <span style={{ fontSize: '0.6875rem', textTransform: 'uppercase', fontWeight: 700, color: 'var(--accent-primary)', letterSpacing: '0.05em' }}>
-                      {ins.category.replace('_', ' ')}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '0.6875rem', textTransform: 'uppercase', fontWeight: 700, color: 'var(--accent-primary)', letterSpacing: '0.08em' }}>
+                      Strength trend
                     </span>
                     <span style={{ fontSize: '0.6875rem', color: 'var(--text-dim)' }}>
-                      Window: {ins.window} (n={ins.sample_size})
+                      {String(ins.window).replace(/_/g, ' ')} · n = {ins.n}
                     </span>
                   </div>
 
-                  <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.5rem' }}>
+                  <h3 style={{ fontSize: '1rem', color: 'var(--text-main)', marginBottom: '0.5rem' }}>
                     {ins.title}
                   </h3>
 
-                  <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', lineHeight: '1.5', marginBottom: '0.75rem' }}>
-                    {ins.observation}
+                  <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                    {ins.statement}
                   </p>
                 </div>
 
-                {/* Explicit Limitations Box (AC-87) */}
-                <div style={{ padding: '0.625rem', background: 'rgba(0, 0, 0, 0.25)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--accent-primary)' }}>
+                {/* Limitations are always shown with the insight (AC-86) */}
+                <div style={{ padding: '0.625rem', background: 'var(--bg-main)', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--accent-primary)' }}>
                   <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                     <Info size={12} style={{ color: 'var(--accent-primary)' }} />
-                    Limitations Note (AC-87)
+                    Limitations
                   </div>
-                  <div style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', marginTop: '0.125rem' }}>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: '0.125rem' }}>
                     {ins.limitations}
                   </div>
                 </div>
@@ -837,7 +791,7 @@ export const Dashboard: React.FC<{
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.125rem' }}>
                       {log.items?.map((it: any, i: number) => (
                         <span key={it.id || i}>
-                          {it.food?.name || it.recipe?.name || 'Custom item'} ({it.quantity}{it.unit})
+                          {it.food_name || it.recipe_title || 'Custom item'} ({Number(it.quantity)} {it.unit})
                           {i < log.items.length - 1 ? ', ' : ''}
                         </span>
                       ))}
@@ -850,11 +804,11 @@ export const Dashboard: React.FC<{
                   <div style={{ textAlign: 'right', fontSize: '0.75rem' }}>
                     {!isCaloriesHidden && (
                       <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>
-                        {log.items?.reduce((acc: number, it: any) => acc + (Number(it.nutrient_snapshot?.energy_kcal) || 0), 0)} kcal
+                        {Math.round(log.items?.reduce((acc: number, it: any) => acc + logItemAmount(it, 'energy_kcal'), 0))} kcal
                       </div>
                     )}
                     <div style={{ color: 'var(--text-dim)', fontSize: '0.6875rem' }}>
-                      P: {Math.round(log.items?.reduce((acc: number, it: any) => acc + (Number(it.nutrient_snapshot?.protein_g) || 0), 0))}g
+                      P: {Math.round(log.items?.reduce((acc: number, it: any) => acc + logItemAmount(it, 'protein_g'), 0))}g
                     </div>
                   </div>
 

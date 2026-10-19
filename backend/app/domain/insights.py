@@ -77,17 +77,17 @@ def generate_strength_trend_insight(
 
     if diff > Decimal("0"):
         statement = (
-            f"Over the {window} across {n} logged sessions of {exercise_name}, estimated 1RM differed by "
+            f"Over the {window.replace('_', ' ')} across {n} logged sessions of {exercise_name}, estimated 1RM differed by "
             f"+{diff:.1f} kg between the first session ({first_e1rm:.1f} kg) and the latest session ({last_e1rm:.1f} kg)."
         )
     elif diff < Decimal("0"):
         statement = (
-            f"Over the {window} across {n} logged sessions of {exercise_name}, estimated 1RM differed by "
+            f"Over the {window.replace('_', ' ')} across {n} logged sessions of {exercise_name}, estimated 1RM differed by "
             f"{diff:.1f} kg between the first session ({first_e1rm:.1f} kg) and the latest session ({last_e1rm:.1f} kg)."
         )
     else:
         statement = (
-            f"Over the {window} across {n} logged sessions of {exercise_name}, estimated 1RM remained steady "
+            f"Over the {window.replace('_', ' ')} across {n} logged sessions of {exercise_name}, estimated 1RM remained steady "
             f"at {first_e1rm:.1f} kg across the observed period."
         )
 
@@ -126,7 +126,7 @@ def generate_volume_nutrition_association_insight(
     vol_diff = avg_vol_protein_met - avg_vol_protein_not_met
 
     statement = (
-        f"During the {window}, days with logged protein intake at or above target coincided with an average session volume "
+        f"During the {window.replace('_', ' ')}, days with logged protein intake at or above target coincided with an average session volume "
         f"of {avg_vol_protein_met:.0f} kg across {days_protein_met} sessions, compared to an average of "
         f"{avg_vol_protein_not_met:.0f} kg across {days_protein_not_met} sessions on other logged days."
     )

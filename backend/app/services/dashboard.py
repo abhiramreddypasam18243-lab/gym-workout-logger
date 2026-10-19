@@ -12,10 +12,10 @@ from sqlalchemy.orm import selectinload
 from app.domain.insights import (
     generate_strength_trend_insight,
 )
-from app.domain.strength import calculate_epley_e1rm
+from app.domain.strength import StrengthSetInput, calculate_epley_e1rm, detect_personal_records
 from app.models.nutrition import MealPlan, NutritionGoal
 from app.models.user import UserProfile
-from app.models.workout import Exercise, WorkoutExercise, WorkoutSession
+from app.models.workout import Exercise, WorkoutExercise, WorkoutSession, WorkoutSet
 from app.schemas.dashboard import (
     DashboardSummaryResponse,
     InsightItemResponse,
@@ -72,14 +72,36 @@ class DashboardService:
                     if not s.is_warmup and s.load_kg and s.reps:
                         weekly_volume += s.load_kg * Decimal(str(s.reps))
 
-        # 3. All-time PR count
-        # In this context, count exercises with recorded workout history
-        pr_stmt = (
-            select(func.count(func.distinct(WorkoutExercise.exercise_id)))
-            .join(WorkoutSession, WorkoutExercise.session_id == WorkoutSession.id)
-            .where(WorkoutSession.user_id == user_id)
+        # 3. PRs set this week (spec 5.2 / AC-41 rules, judged against all earlier history)
+        week_start_dt = datetime.combine(start_of_week, datetime.min.time(), tzinfo=tz)
+        set_rows = (
+            await self.db.execute(
+                select(
+                    WorkoutExercise.exercise_id,
+                    WorkoutSet.load_kg,
+                    WorkoutSet.reps,
+                    WorkoutSet.is_warmup,
+                    WorkoutSet.set_number,
+                    func.coalesce(WorkoutSet.completed_at, WorkoutSession.started_at),
+                )
+                .join(WorkoutExercise, WorkoutSet.workout_exercise_id == WorkoutExercise.id)
+                .join(WorkoutSession, WorkoutExercise.session_id == WorkoutSession.id)
+                .where(WorkoutSession.user_id == user_id)
+            )
+        ).all()
+        sets_by_exercise: dict[UUID, list[StrengthSetInput]] = {}
+        for ex_id, load, reps, warm, set_no, done_at in set_rows:
+            if done_at is not None and done_at.tzinfo is None:
+                done_at = done_at.replace(tzinfo=UTC)  # SQLite returns naive UTC
+            sets_by_exercise.setdefault(ex_id, []).append(
+                StrengthSetInput(load_kg=load, reps=reps, is_warmup=warm, set_number=set_no, completed_at=done_at)
+            )
+        pr_count = sum(
+            1
+            for ex_sets in sets_by_exercise.values()
+            for r in detect_personal_records(ex_sets)
+            if r.is_pr and r.set_input.completed_at is not None and r.set_input.completed_at >= week_start_dt
         )
-        pr_count = (await self.db.execute(pr_stmt)).scalar() or 0
 
         # 4. Active meal plan and nutrition goal
         p_stmt = (

@@ -512,3 +512,20 @@ Each step adds an entry: what was built, why it's designed that way, one risk, a
 
 **One thing that could go wrong**
 - With Docker Compose, nginx reaches the backend from a Docker network address, so remote-login rules depend on `TRUSTED_PROXY_IP` matching that network and on TLS being in front (D-16/D-26, not yet set up).
+
+---
+
+## Dashboard and demo-data fixes (2026-10-19)
+
+**What was fixed**
+- **Insights:** the dashboard called `/api/dashboard/insights`, but the route (spec §7) is `/api/insights`. It also expected a made-up "5 sessions + 5 nutrition days" unlock rule. The dashboard now renders the real response: `has_enough_data`, `message`, and insights with `window`, `n`, `statement` and `limitations` (AC-86).
+- **Dashboard cards:** the frontend read fields the API never sends (`weekly_workout_count`, `weekly_pr_count`, …). They now map to `weekly_sessions`, `pr_count`, `active_goal_*`, and the averages come from this week's `planned_vs_logged` days.
+- **PR count:** `pr_count` counted distinct exercises ever trained. It now counts PRs set this week, using `detect_personal_records` (spec 5.2 / AC-41) against all earlier sets.
+- **Demo data:** the demo plan and logs used invented nutrient numbers (450–670 kcal per item, saved as if per 100 g, so they showed as ~5 kcal). The demo plan is now built by the real planner and the logs by the logging service, so every value traces to the catalogue. A test checks this.
+- **Intake log totals:** a food snapshot is per 100 g and a recipe snapshot is per serving; the dashboard now scales by quantity, as the API does.
+
+**Test value changed (AC-85)**
+- `test_ac_85` expected `pr_count == 1` after a user's first session (two sets of 80 kg × 5). By AC-41, the first set is the baseline and an equal set is not a PR, so the correct value is 0. The old value was copied from the buggy output. The test now expects 0, then adds an 85 kg × 5 set and expects 1.
+
+**One thing that could go wrong**
+- "This week" runs Monday to Sunday in the user's timezone, so on a Monday morning the weekly cards correctly show 0.
