@@ -226,7 +226,7 @@ async def test_ac_51_seed_idempotency_and_counts(test_db: AsyncSession):
     first_res = await run_seed(test_db)
     assert 30 <= first_res["exercises_inserted"] <= 50
     assert 40 <= first_res["foods_inserted"] <= 60
-    assert 15 <= first_res["recipes_inserted"] <= 25
+    assert 15 <= first_res["recipes_inserted"] <= 40  # AC-51 range widened by D-28
 
     # Count database rows
     ex_count_1 = (await test_db.execute(select(Exercise))).scalars().all()

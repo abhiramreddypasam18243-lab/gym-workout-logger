@@ -2,7 +2,7 @@
 
 Ensures:
 1. Database tables are migrated to the latest Alembic revision; a failed migration stops startup.
-2. Exercise and food catalogues are seeded if not present.
+2. The catalogue is seeded; entries already present are skipped, new ones are added.
 3. The synthetic demo account exists, only when DEMO_MODE is true.
 """
 
@@ -17,7 +17,6 @@ from app.config import settings
 from app.database import async_session_factory
 from app.demo_user import DEMO_EMAIL, create_demo_user
 from app.models.user import User
-from app.models.workout import Exercise
 from app.seed.loader import run_seed
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -34,16 +33,10 @@ def run_migrations() -> None:
 async def seed_data() -> None:
     """Ensure schema exists, seed exercises/foods, and initialize demo user."""
     async with async_session_factory() as session:
-        # Check if catalogue is already seeded
-        res = await session.execute(select(Exercise).limit(1))
-        has_exercises = res.scalar_one_or_none() is not None
-
-        if not has_exercises:
-            logger.info("Seeding catalogue with standard exercises and USDA food dataset...")
-            await run_seed(session)
-            logger.info("Catalogue seed complete.")
-        else:
-            logger.info("Catalogue already populated.")
+        # The seed is idempotent (existing entries are skipped by name), so it runs on every
+        # start: catalogue additions such as new recipes reach existing databases too.
+        counts = await run_seed(session)
+        logger.info("Catalogue seed complete: %s", counts)
 
         if not settings.DEMO_MODE:
             logger.info("DEMO_MODE is off; skipping synthetic demo user.")

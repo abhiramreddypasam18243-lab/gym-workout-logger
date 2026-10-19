@@ -21,6 +21,12 @@ Every food nutrient value in the seed catalogue must come from a source whose li
 - **Access date:** TBD
 - **Note:** If IFCT licence does not clearly permit reuse, we will use USDA values for similar foods and document the substitution.
 
+### 3. Recipe costs (estimates)
+
+- **What:** `cost_minor_per_serving` on each recipe, in INR paise.
+- **Source:** estimated Indian retail prices, not a published dataset. Assumptions and the per-recipe breakdown for the budget recipes are in `docs/budget-recipe-costs.md`.
+- **Used for:** the optional daily-budget cap and budget ranking in the planner (spec 5.5). Not nutrient data.
+
 ## Rules
 
 - Every food in the seed catalogue has `data_source` and `source_reference` fields (DL1).

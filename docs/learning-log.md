@@ -529,3 +529,18 @@ Each step adds an entry: what was built, why it's designed that way, one risk, a
 
 **One thing that could go wrong**
 - "This week" runs Monday to Sunday in the user's timezone, so on a Monday morning the weekly cards correctly show 0.
+
+---
+
+## Budget recipes (2026-10-19, D-28)
+
+**What was built**
+- Ten Indian recipes at ≤ ₹50 per serving (₹11–38), tagged `budget_friendly`, covering breakfast, lunch, dinner and snacks. They use only foods already in the catalogue, so no nutrient value is new.
+- Costs come from documented price estimates (`docs/budget-recipe-costs.md`), not a dataset; `DATA_LICENCES.md` now says so.
+- Startup runs the idempotent seed every time, so recipes added to `recipes.json` reach an existing database (e.g. the live Neon one). Before, the seed only ran on an empty database.
+
+**Why it is designed this way**
+- The budget cap is a hard filter: a recipe stays only if half a serving fits the slot's share of the daily budget. Example: at ₹150/day, breakfast's share is 25% = ₹37.50, so a recipe needs cost ≤ ₹75/serving. The old catalogue had no breakfast that cheap, so a ₹150/day plan was `infeasible`; now it is `ok`.
+
+**One thing that could go wrong**
+- Prices drift. If they change, update `cost_minor_per_serving` together with the breakdown in `docs/budget-recipe-costs.md`.
