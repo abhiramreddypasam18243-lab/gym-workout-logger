@@ -414,7 +414,7 @@ export const MealPlanView: React.FC = () => {
           style={{
             background: 'var(--accent-danger-bg)',
             border: '1px solid var(--accent-danger-border)',
-            borderRadius: 'var(--radius-md)',
+            borderRadius: 'var(--radius-sm)',
             padding: '1rem',
             marginBottom: '1.5rem',
             display: 'flex',
@@ -475,7 +475,7 @@ export const MealPlanView: React.FC = () => {
           </div>
 
           {infeasibleData.relaxable && infeasibleData.relaxable.length > 0 && (
-            <div style={{ background: 'var(--bg-surface)', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
+            <div style={{ background: 'var(--bg-surface)', padding: '1rem', borderRadius: 'var(--radius-sm)' }}>
               <div style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.25rem' }}>
                 Suggested Soft Constraints to Relax:
               </div>
@@ -526,11 +526,11 @@ export const MealPlanView: React.FC = () => {
                 {currentPlan.status === 'edited' && (
                   <span
                     style={{
-                      background: 'var(--accent-cyan-bg, rgba(6,182,212,0.15))',
-                      color: 'var(--accent-cyan, #06b6d4)',
+                      background: 'var(--accent-cyan-bg, color-mix(in srgb, var(--accent-primary) 15%, transparent))',
+                      color: 'var(--accent-cyan, var(--accent-primary))',
                       fontSize: '0.75rem',
                       padding: '0.125rem 0.5rem',
-                      borderRadius: '12px',
+                      borderRadius: 'var(--radius-sm)',
                       fontWeight: 600,
                     }}
                   >
@@ -615,7 +615,7 @@ export const MealPlanView: React.FC = () => {
               style={{
                 background: 'var(--accent-amber-bg)',
                 border: '1px solid var(--accent-amber-border)',
-                borderRadius: 'var(--radius-md)',
+                borderRadius: 'var(--radius-sm)',
                 padding: '0.75rem 1rem',
                 marginBottom: '1.5rem',
               }}
@@ -681,7 +681,7 @@ export const MealPlanView: React.FC = () => {
                                 color: 'var(--accent-amber)',
                                 fontSize: '0.75rem',
                                 padding: '0.125rem 0.5rem',
-                                borderRadius: '12px',
+                                borderRadius: 'var(--radius-sm)',
                                 fontWeight: 500,
                               }}
                             >
@@ -762,7 +762,7 @@ export const MealPlanView: React.FC = () => {
                           key={meal.id}
                           style={{
                             background: 'var(--bg-surface-elevated)',
-                            borderRadius: 'var(--radius-md)',
+                            borderRadius: 'var(--radius-sm)',
                             border: '1px solid var(--border-subtle)',
                             padding: '0.875rem 1rem',
                             display: 'flex',
@@ -811,7 +811,7 @@ export const MealPlanView: React.FC = () => {
                                   style={{
                                     background: 'var(--bg-surface)',
                                     padding: '0.125rem 0.375rem',
-                                    borderRadius: '4px',
+                                    borderRadius: '2px',
                                     textTransform: 'capitalize',
                                   }}
                                 >
@@ -898,7 +898,7 @@ export const MealPlanView: React.FC = () => {
               padding: '1rem',
               background: 'var(--bg-surface-elevated)',
               border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-md)',
+              borderRadius: 'var(--radius-sm)',
               fontSize: '0.8125rem',
               color: 'var(--text-secondary)',
               lineHeight: 1.4,
@@ -977,7 +977,7 @@ export const MealPlanView: React.FC = () => {
                       style={{
                         background: 'var(--bg-surface)',
                         border: '1px solid var(--border-subtle)',
-                        borderRadius: 'var(--radius-md)',
+                        borderRadius: 'var(--radius-sm)',
                         padding: '1rem',
                         display: 'flex',
                         flexDirection: 'column',
@@ -1036,7 +1036,7 @@ export const MealPlanView: React.FC = () => {
                             style={{
                               background: 'var(--bg-surface-elevated)',
                               padding: '0.125rem 0.375rem',
-                              borderRadius: '4px',
+                              borderRadius: '2px',
                             }}
                           >
                             Cal: {Math.round(Number(s.nutrients.calories))} (
@@ -1050,7 +1050,7 @@ export const MealPlanView: React.FC = () => {
                           style={{
                             background: 'var(--bg-surface-elevated)',
                             padding: '0.125rem 0.375rem',
-                            borderRadius: '4px',
+                            borderRadius: '2px',
                           }}
                         >
                           Protein: {Math.round(Number(s.nutrients.protein_g))}g (
@@ -1063,7 +1063,7 @@ export const MealPlanView: React.FC = () => {
                           style={{
                             background: 'var(--bg-surface-elevated)',
                             padding: '0.125rem 0.375rem',
-                            borderRadius: '4px',
+                            borderRadius: '2px',
                           }}
                         >
                           Carbs: {Math.round(Number(s.nutrients.carbs_g))}g (
@@ -1076,7 +1076,7 @@ export const MealPlanView: React.FC = () => {
                           style={{
                             background: 'var(--bg-surface-elevated)',
                             padding: '0.125rem 0.375rem',
-                            borderRadius: '4px',
+                            borderRadius: '2px',
                           }}
                         >
                           Fat: {Math.round(Number(s.nutrients.fat_g))}g (
@@ -1173,7 +1173,7 @@ export const MealPlanView: React.FC = () => {
               style={{
                 background: 'var(--bg-surface)',
                 padding: '0.75rem 1rem',
-                borderRadius: 'var(--radius-md)',
+                borderRadius: 'var(--radius-sm)',
                 marginBottom: '1.25rem',
                 fontSize: '0.875rem',
                 display: 'flex',
@@ -1264,7 +1264,7 @@ export const MealPlanView: React.FC = () => {
                 flexWrap: 'wrap',
                 background: 'var(--bg-surface)',
                 padding: '0.75rem 1rem',
-                borderRadius: 'var(--radius-md)',
+                borderRadius: 'var(--radius-sm)',
                 marginBottom: '1rem',
               }}
             >

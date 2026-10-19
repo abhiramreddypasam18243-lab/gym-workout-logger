@@ -133,17 +133,16 @@ export const RestTimerHud: React.FC = () => {
             gap: '0.625rem',
             padding: '0.625rem 1rem',
             background: isRunning
-              ? 'linear-gradient(135deg, rgba(14, 21, 38, 0.95), rgba(56, 189, 248, 0.25))'
-              : 'rgba(14, 21, 38, 0.92)',
-            backdropFilter: 'blur(16px)',
+              ? 'var(--accent-primary-soft)'
+              : 'var(--bg-surface)',
             border: isRunning
-              ? '1px solid rgba(56, 189, 248, 0.6)'
+              ? '1px solid color-mix(in srgb, var(--accent-primary) 60%, transparent)'
               : '1px solid rgba(255, 255, 255, 0.12)',
-            borderRadius: '9999px',
-            color: '#fff',
+            borderRadius: 'var(--radius-sm)',
+            color: 'var(--text-main)',
             cursor: 'pointer',
             boxShadow: isRunning
-              ? '0 8px 24px rgba(56, 189, 248, 0.35), 0 0 12px rgba(56, 189, 248, 0.2)'
+              ? '0 8px 24px color-mix(in srgb, var(--accent-primary) 35%, transparent), 0 0 12px color-mix(in srgb, var(--accent-primary) 20%, transparent)'
               : '0 8px 20px rgba(0, 0, 0, 0.4)',
             transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
             transform: isRunning ? 'scale(1.02)' : 'none',
@@ -154,18 +153,18 @@ export const RestTimerHud: React.FC = () => {
               width: '10px',
               height: '10px',
               borderRadius: '50%',
-              background: isRunning ? '#38bdf8' : justFinished ? '#10b981' : '#64748b',
-              boxShadow: isRunning ? '0 0 8px #38bdf8' : 'none',
+              background: isRunning ? 'var(--accent-primary)' : justFinished ? 'var(--accent-emerald)' : 'var(--text-dim)',
+              boxShadow: isRunning ? 'none' : 'none',
               animation: isRunning ? 'pulseDot 1.5s infinite' : 'none',
             }}
           />
-          <Timer size={16} style={{ color: isRunning ? '#38bdf8' : '#94a3b8' }} />
+          <Timer size={16} style={{ color: isRunning ? 'var(--accent-primary)' : 'var(--text-muted)' }} />
           <span
             style={{
               fontFamily: 'var(--font-mono)',
               fontWeight: 700,
               fontSize: '0.9375rem',
-              color: isRunning ? '#38bdf8' : '#f8fafc',
+              color: isRunning ? 'var(--accent-primary)' : 'var(--text-main)',
               letterSpacing: '-0.02em',
             }}
           >
@@ -183,17 +182,16 @@ export const RestTimerHud: React.FC = () => {
           style={{
             width: '320px',
             padding: '1.25rem',
-            background: 'rgba(10, 15, 28, 0.95)',
-            backdropFilter: 'blur(20px)',
+            background: 'var(--bg-surface)',
             border: justFinished
-              ? '1px solid rgba(16, 185, 129, 0.7)'
+              ? '1px solid color-mix(in srgb, var(--accent-emerald) 70%, transparent)'
               : isRunning
-              ? '1px solid rgba(56, 189, 248, 0.5)'
+              ? '1px solid color-mix(in srgb, var(--accent-primary) 50%, transparent)'
               : '1px solid rgba(255, 255, 255, 0.12)',
             boxShadow: justFinished
-              ? '0 16px 40px rgba(16, 185, 129, 0.25), 0 0 20px rgba(16, 185, 129, 0.2)'
-              : '0 20px 48px rgba(0, 0, 0, 0.7), 0 0 24px rgba(56, 189, 248, 0.15)',
-            borderRadius: '20px',
+              ? '0 16px 40px color-mix(in srgb, var(--accent-emerald) 25%, transparent), 0 0 20px color-mix(in srgb, var(--accent-emerald) 20%, transparent)'
+              : '0 20px 48px rgba(0, 0, 0, 0.7), 0 0 24px color-mix(in srgb, var(--accent-primary) 15%, transparent)',
+            borderRadius: 'var(--radius-sm)',
             animation: 'fadeInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
         >
@@ -211,12 +209,12 @@ export const RestTimerHud: React.FC = () => {
                 style={{
                   width: '28px',
                   height: '28px',
-                  borderRadius: '8px',
-                  background: isRunning ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.06)',
+                  borderRadius: 'var(--radius-sm)',
+                  background: isRunning ? 'color-mix(in srgb, var(--accent-primary) 20%, transparent)' : 'rgba(255, 255, 255, 0.06)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: isRunning ? '#38bdf8' : '#94a3b8',
+                  color: isRunning ? 'var(--accent-primary)' : 'var(--text-muted)',
                 }}
               >
                 <Timer size={16} />
@@ -227,7 +225,7 @@ export const RestTimerHud: React.FC = () => {
                   fontSize: '0.875rem',
                   letterSpacing: '0.04em',
                   textTransform: 'uppercase',
-                  color: '#fff',
+                  color: 'var(--text-main)',
                 }}
               >
                 Rest Interval Timer
@@ -245,7 +243,7 @@ export const RestTimerHud: React.FC = () => {
                   color: soundOn ? 'var(--accent-primary)' : 'var(--text-dim)',
                   cursor: 'pointer',
                   padding: '4px',
-                  borderRadius: '6px',
+                  borderRadius: 'var(--radius-sm)',
                 }}
               >
                 {soundOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
@@ -263,7 +261,7 @@ export const RestTimerHud: React.FC = () => {
                   color: 'var(--text-dim)',
                   cursor: 'pointer',
                   padding: '4px',
-                  borderRadius: '6px',
+                  borderRadius: 'var(--radius-sm)',
                 }}
               >
                 <ChevronDown size={18} />
@@ -297,7 +295,7 @@ export const RestTimerHud: React.FC = () => {
                 cx="64"
                 cy="64"
                 r={radius}
-                stroke={justFinished ? '#10b981' : isRunning ? '#38bdf8' : '#64748b'}
+                stroke={justFinished ? 'var(--accent-emerald)' : isRunning ? 'var(--accent-primary)' : 'var(--text-dim)'}
                 strokeWidth="7"
                 fill="none"
                 strokeDasharray={circumference}
@@ -305,7 +303,7 @@ export const RestTimerHud: React.FC = () => {
                 strokeLinecap="round"
                 style={{
                   transition: 'stroke-dashoffset 0.8s linear, stroke 0.3s ease',
-                  filter: isRunning ? 'drop-shadow(0 0 6px rgba(56, 189, 248, 0.6))' : 'none',
+                  filter: isRunning ? 'drop-shadow(0 0 6px color-mix(in srgb, var(--accent-primary) 60%, transparent))' : 'none',
                 }}
               />
             </svg>
@@ -325,7 +323,7 @@ export const RestTimerHud: React.FC = () => {
                   fontFamily: 'var(--font-mono)',
                   fontSize: '1.875rem',
                   fontWeight: 800,
-                  color: justFinished ? '#10b981' : '#fff',
+                  color: justFinished ? 'var(--accent-emerald)' : 'var(--text-main)',
                   lineHeight: 1,
                   letterSpacing: '-0.04em',
                 }}
@@ -337,7 +335,7 @@ export const RestTimerHud: React.FC = () => {
                   fontSize: '0.6875rem',
                   fontWeight: 700,
                   letterSpacing: '0.08em',
-                  color: justFinished ? '#10b981' : isRunning ? '#38bdf8' : 'var(--text-dim)',
+                  color: justFinished ? 'var(--accent-emerald)' : isRunning ? 'var(--accent-primary)' : 'var(--text-dim)',
                   marginTop: '4px',
                   textTransform: 'uppercase',
                 }}
@@ -372,7 +370,7 @@ export const RestTimerHud: React.FC = () => {
                 type="button"
                 className="btn btn-secondary btn-sm"
                 onClick={handlePause}
-                style={{ minWidth: '90px', borderColor: 'rgba(56, 189, 248, 0.4)' }}
+                style={{ minWidth: '90px', borderColor: 'color-mix(in srgb, var(--accent-primary) 40%, transparent)' }}
               >
                 <Pause size={14} />
                 <span>Pause</span>
@@ -428,16 +426,16 @@ export const RestTimerHud: React.FC = () => {
                 style={{
                   background:
                     totalSeconds === sec && (isRunning || remainingSeconds === sec)
-                      ? 'rgba(56, 189, 248, 0.25)'
+                      ? 'color-mix(in srgb, var(--accent-primary) 25%, transparent)'
                       : 'rgba(255, 255, 255, 0.04)',
                   border:
                     totalSeconds === sec && (isRunning || remainingSeconds === sec)
-                      ? '1px solid rgba(56, 189, 248, 0.5)'
+                      ? '1px solid color-mix(in srgb, var(--accent-primary) 50%, transparent)'
                       : '1px solid rgba(255, 255, 255, 0.06)',
-                  borderRadius: '6px',
+                  borderRadius: 'var(--radius-sm)',
                   color:
                     totalSeconds === sec && (isRunning || remainingSeconds === sec)
-                      ? '#38bdf8'
+                      ? 'var(--accent-primary)'
                       : 'var(--text-muted)',
                   fontSize: '0.6875rem',
                   fontWeight: 700,

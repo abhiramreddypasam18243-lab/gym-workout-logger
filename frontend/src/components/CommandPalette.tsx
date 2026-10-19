@@ -209,8 +209,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         position: 'fixed',
         inset: 0,
         zIndex: 100,
-        background: 'rgba(3, 7, 18, 0.75)',
-        backdropFilter: 'blur(16px)',
+        background: 'var(--bg-surface)',
         display: 'flex',
         alignItems: 'flex-start',
         justifyContent: 'center',
@@ -225,10 +224,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           width: '100%',
           maxWidth: '580px',
           padding: 0,
-          background: 'rgba(10, 15, 29, 0.96)',
-          border: '1px solid rgba(56, 189, 248, 0.3)',
-          boxShadow: '0 24px 60px rgba(0, 0, 0, 0.8), 0 0 32px rgba(56, 189, 248, 0.15)',
-          borderRadius: '18px',
+          background: 'var(--bg-surface)',
+          border: '1px solid color-mix(in srgb, var(--accent-primary) 30%, transparent)',
+          boxShadow: 'none',
+          borderRadius: 'var(--radius-sm)',
           overflow: 'hidden',
         }}
         onClick={(e) => e.stopPropagation()}
@@ -258,7 +257,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               background: 'none',
               border: 'none',
               outline: 'none',
-              color: '#fff',
+              color: 'var(--text-main)',
               fontSize: '1rem',
               fontFamily: 'inherit',
             }}
@@ -278,7 +277,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               color: 'var(--text-dim)',
               background: 'rgba(255, 255, 255, 0.06)',
               padding: '2px 6px',
-              borderRadius: '4px',
+              borderRadius: '2px',
               fontWeight: 600,
             }}
           >
@@ -308,9 +307,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '0.625rem 0.875rem',
-                    borderRadius: '10px',
-                    background: isSelected ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
-                    border: isSelected ? '1px solid rgba(56, 189, 248, 0.25)' : '1px solid transparent',
+                    borderRadius: 'var(--radius-sm)',
+                    background: isSelected ? 'color-mix(in srgb, var(--accent-primary) 12%, transparent)' : 'transparent',
+                    border: isSelected ? '1px solid color-mix(in srgb, var(--accent-primary) 25%, transparent)' : '1px solid transparent',
                     cursor: 'pointer',
                     transition: 'all 0.1s ease',
                   }}
@@ -320,8 +319,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                       style={{
                         width: '32px',
                         height: '32px',
-                        borderRadius: '8px',
-                        background: isSelected ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                        borderRadius: 'var(--radius-sm)',
+                        background: isSelected ? 'color-mix(in srgb, var(--accent-primary) 20%, transparent)' : 'rgba(255, 255, 255, 0.05)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -335,7 +334,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                         style={{
                           fontSize: '0.875rem',
                           fontWeight: 600,
-                          color: isSelected ? '#fff' : 'var(--text-main)',
+                          color: isSelected ? 'var(--text-main)' : 'var(--text-main)',
                           whiteSpace: 'nowrap',
                           textOverflow: 'ellipsis',
                           overflow: 'hidden',
@@ -364,7 +363,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                         color: 'var(--text-dim)',
                         background: 'rgba(255, 255, 255, 0.04)',
                         padding: '2px 6px',
-                        borderRadius: '4px',
+                        borderRadius: '2px',
                         textTransform: 'uppercase',
                         letterSpacing: '0.04em',
                       }}

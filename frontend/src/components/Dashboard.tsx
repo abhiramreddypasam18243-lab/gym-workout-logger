@@ -153,27 +153,27 @@ export const Dashboard: React.FC<{
     switch (label) {
       case 'Within target range':
         return {
-          background: 'rgba(16, 185, 129, 0.15)',
-          color: '#10b981',
-          border: '1px solid rgba(16, 185, 129, 0.3)',
+          background: 'color-mix(in srgb, var(--accent-emerald) 15%, transparent)',
+          color: 'var(--accent-emerald)',
+          border: '1px solid color-mix(in srgb, var(--accent-emerald) 30%, transparent)',
         }
       case 'Above target':
         return {
-          background: 'rgba(245, 158, 11, 0.15)',
-          color: '#f59e0b',
-          border: '1px solid rgba(245, 158, 11, 0.3)',
+          background: 'color-mix(in srgb, var(--accent-amber) 15%, transparent)',
+          color: 'var(--accent-amber)',
+          border: '1px solid color-mix(in srgb, var(--accent-amber) 30%, transparent)',
         }
       case 'Below target':
         return {
-          background: 'rgba(56, 189, 248, 0.15)',
-          color: '#38bdf8',
-          border: '1px solid rgba(56, 189, 248, 0.3)',
+          background: 'color-mix(in srgb, var(--accent-primary) 15%, transparent)',
+          color: 'var(--accent-primary)',
+          border: '1px solid color-mix(in srgb, var(--accent-primary) 30%, transparent)',
         }
       default:
         return {
-          background: 'rgba(100, 116, 139, 0.15)',
-          color: '#94a3b8',
-          border: '1px solid rgba(100, 116, 139, 0.3)',
+          background: 'rgba(255, 255, 255, 0.075)',
+          color: 'var(--text-muted)',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
         }
     }
   }
@@ -213,8 +213,8 @@ export const Dashboard: React.FC<{
         style={{
           marginBottom: '1.75rem',
           padding: '1.75rem',
-          background: 'linear-gradient(135deg, rgba(14, 21, 38, 0.85), rgba(7, 12, 26, 0.95))',
-          border: '1px solid rgba(56, 189, 248, 0.25)',
+          background: 'var(--bg-surface)',
+          border: '1px solid color-mix(in srgb, var(--accent-primary) 25%, transparent)',
           boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 20px 48px -10px rgba(0, 0, 0, 0.7)',
         }}
       >
@@ -245,7 +245,7 @@ export const Dashboard: React.FC<{
                 className="btn btn-primary"
                 onClick={onNavigateToLogger}
                 id="dash-start-workout-btn"
-                style={{ boxShadow: '0 4px 20px rgba(56, 189, 248, 0.45)' }}
+                style={{ boxShadow: 'none' }}
               >
                 <Dumbbell size={17} strokeWidth={2.5} />
                 <span>Start Session</span>
@@ -294,14 +294,14 @@ export const Dashboard: React.FC<{
       </div>
 
       {logSuccessMessage && (
-        <div style={{ marginBottom: '1.25rem', padding: '0.85rem 1.15rem', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.35)', borderRadius: 'var(--radius-md)', color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.625rem', fontWeight: 600 }}>
+        <div style={{ marginBottom: '1.25rem', padding: '0.85rem 1.15rem', background: 'color-mix(in srgb, var(--accent-emerald) 15%, transparent)', border: '1px solid color-mix(in srgb, var(--accent-emerald) 35%, transparent)', borderRadius: 'var(--radius-sm)', color: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', gap: '0.625rem', fontWeight: 600 }}>
           <CheckCircle size={18} />
           <span>{logSuccessMessage}</span>
         </div>
       )}
 
       {error && (
-        <div style={{ marginBottom: '1.25rem', padding: '0.85rem 1.15rem', background: 'rgba(244, 63, 94, 0.15)', border: '1px solid rgba(244, 63, 94, 0.35)', borderRadius: 'var(--radius-md)', color: '#f43f5e', display: 'flex', alignItems: 'center', gap: '0.625rem', fontWeight: 600 }}>
+        <div style={{ marginBottom: '1.25rem', padding: '0.85rem 1.15rem', background: 'color-mix(in srgb, var(--accent-rose) 15%, transparent)', border: '1px solid color-mix(in srgb, var(--accent-rose) 35%, transparent)', borderRadius: 'var(--radius-sm)', color: 'var(--accent-rose)', display: 'flex', alignItems: 'center', gap: '0.625rem', fontWeight: 600 }}>
           <AlertCircle size={18} />
           <span>{error}</span>
         </div>
@@ -316,7 +316,7 @@ export const Dashboard: React.FC<{
               <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 Weekly Workouts
               </span>
-              <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(56, 189, 248, 0.15)', border: '1px solid rgba(56, 189, 248, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: 'var(--radius-sm)', background: 'color-mix(in srgb, var(--accent-primary) 15%, transparent)', border: '1px solid color-mix(in srgb, var(--accent-primary) 30%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)' }}>
                 <Activity size={18} />
               </div>
             </div>
@@ -324,14 +324,14 @@ export const Dashboard: React.FC<{
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem' }}>
-                  <span className="mono-stat" style={{ fontSize: '2.25rem', color: '#fff', lineHeight: 1 }}>
+                  <span className="mono-stat" style={{ fontSize: '2.25rem', color: 'var(--text-main)', lineHeight: 1 }}>
                     {workoutCount}
                   </span>
                   <span style={{ color: 'var(--text-dim)', fontSize: '1rem', fontWeight: 700 }}>
                     / {workoutTarget} target
                   </span>
                 </div>
-                <p style={{ fontSize: '0.75rem', color: workoutCount >= workoutTarget ? '#10b981' : 'var(--text-dim)', marginTop: '0.5rem', fontWeight: 600 }}>
+                <p style={{ fontSize: '0.75rem', color: workoutCount >= workoutTarget ? 'var(--accent-emerald)' : 'var(--text-dim)', marginTop: '0.5rem', fontWeight: 600 }}>
                   {workoutCount >= workoutTarget ? '✓ Target completed this week' : `${workoutTarget - workoutCount} more session to hit target`}
                 </p>
               </div>
@@ -344,7 +344,7 @@ export const Dashboard: React.FC<{
                     cx="28"
                     cy="28"
                     r="22"
-                    stroke={workoutCount >= workoutTarget ? '#10b981' : '#38bdf8'}
+                    stroke={workoutCount >= workoutTarget ? 'var(--accent-emerald)' : 'var(--accent-primary)'}
                     strokeWidth="5"
                     fill="none"
                     strokeDasharray={2 * Math.PI * 22}
@@ -353,7 +353,7 @@ export const Dashboard: React.FC<{
                     style={{ transition: 'stroke-dashoffset 0.8s ease' }}
                   />
                 </svg>
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6875rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#fff' }}>
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6875rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--text-main)' }}>
                   {Math.round(workoutProgressPct)}%
                 </div>
               </div>
@@ -367,12 +367,12 @@ export const Dashboard: React.FC<{
             <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               Weekly Work Tonnage
             </span>
-            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: 'var(--radius-sm)', background: 'color-mix(in srgb, var(--accent-emerald) 15%, transparent)', border: '1px solid color-mix(in srgb, var(--accent-emerald) 30%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-emerald)' }}>
               <TrendingUp size={18} />
             </div>
           </div>
           <div>
-            <div className="mono-stat" style={{ fontSize: '2.1rem', color: '#fff', lineHeight: 1 }}>
+            <div className="mono-stat" style={{ fontSize: '2.1rem', color: 'var(--text-main)', lineHeight: 1 }}>
               {formatVolume(volumeKg)}
             </div>
             <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: '0.5rem', fontWeight: 600 }}>
@@ -387,7 +387,7 @@ export const Dashboard: React.FC<{
             <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               Personal Records
             </span>
-            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(245, 158, 11, 0.15)', border: '1px solid rgba(245, 158, 11, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: 'var(--radius-sm)', background: 'color-mix(in srgb, var(--accent-amber) 15%, transparent)', border: '1px solid color-mix(in srgb, var(--accent-amber) 30%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-amber)' }}>
               <Award size={18} />
             </div>
           </div>
@@ -412,7 +412,7 @@ export const Dashboard: React.FC<{
             <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               Nutrition Adherence
             </span>
-            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(168, 85, 247, 0.15)', border: '1px solid rgba(168, 85, 247, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#c084fc' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: 'var(--radius-sm)', background: 'color-mix(in srgb, var(--accent-primary) 15%, transparent)', border: '1px solid color-mix(in srgb, var(--accent-primary) 30%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)' }}>
               <ShieldCheck size={18} />
             </div>
           </div>
@@ -449,7 +449,7 @@ export const Dashboard: React.FC<{
               {loggedDaysCount > 0 ? `${avgProtein}g` : 'No logs yet'}
             </span>
             {targetProtein > 0 && loggedDaysCount > 0 && (
-              <span style={{ fontSize: '0.8125rem', color: avgProtein >= targetProtein ? '#10b981' : '#f59e0b' }}>
+              <span style={{ fontSize: '0.8125rem', color: avgProtein >= targetProtein ? 'var(--accent-emerald)' : 'var(--accent-amber)' }}>
                 {avgProtein >= targetProtein ? '✓ Meets target' : `(${targetProtein - avgProtein}g below)`}
               </span>
             )}
@@ -471,7 +471,7 @@ export const Dashboard: React.FC<{
               </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-              <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f59e0b' }}>
+              <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent-amber)' }}>
                 {loggedDaysCount > 0 ? `${avgCalories} kcal` : 'No logs yet'}
               </span>
               {targetCalories > 0 && loggedDaysCount > 0 && (
@@ -480,8 +480,8 @@ export const Dashboard: React.FC<{
                     fontSize: '0.8125rem',
                     color:
                       Math.abs(avgCalories - targetCalories) / targetCalories <= 0.1
-                        ? '#10b981'
-                        : '#f59e0b',
+                        ? 'var(--accent-emerald)'
+                        : 'var(--accent-amber)',
                   }}
                 >
                   {Math.abs(avgCalories - targetCalories) / targetCalories <= 0.1
@@ -525,7 +525,7 @@ export const Dashboard: React.FC<{
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '4px', background: 'var(--border-subtle)', color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '2px', background: 'var(--border-subtle)', color: 'var(--text-muted)' }}>
               Excludes unlogged days (AC-84)
             </span>
           </div>
@@ -552,7 +552,7 @@ export const Dashboard: React.FC<{
                       key={d.date}
                       style={{
                         borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
-                        background: hasLogs ? 'transparent' : 'rgba(15, 23, 42, 0.3)',
+                        background: hasLogs ? 'transparent' : 'var(--bg-surface)',
                       }}
                     >
                       <td style={{ padding: '0.625rem 0.5rem', fontWeight: 600, color: 'var(--text-main)' }}>
@@ -574,7 +574,7 @@ export const Dashboard: React.FC<{
                                 style={{
                                   fontSize: '0.6875rem',
                                   marginLeft: '0.375rem',
-                                  color: d.comparison.delta_energy_kcal >= 0 ? '#f59e0b' : '#38bdf8',
+                                  color: d.comparison.delta_energy_kcal >= 0 ? 'var(--accent-amber)' : 'var(--accent-primary)',
                                 }}
                               >
                                 ({d.comparison.delta_energy_kcal > 0 ? '+' : ''}{d.comparison.delta_energy_kcal} kcal, {d.comparison.delta_energy_percentage > 0 ? '+' : ''}{d.comparison.delta_energy_percentage}%)
@@ -593,7 +593,7 @@ export const Dashboard: React.FC<{
                               style={{
                                 fontSize: '0.6875rem',
                                 marginLeft: '0.375rem',
-                                color: d.comparison.delta_protein_g >= 0 ? '#10b981' : '#f43f5e',
+                                color: d.comparison.delta_protein_g >= 0 ? 'var(--accent-emerald)' : 'var(--accent-rose)',
                               }}
                             >
                               ({d.comparison.delta_protein_g > 0 ? '+' : ''}{d.comparison.delta_protein_g}g, {d.comparison.delta_protein_percentage > 0 ? '+' : ''}{d.comparison.delta_protein_percentage}%)
@@ -614,7 +614,7 @@ export const Dashboard: React.FC<{
                           <span
                             style={{
                               padding: '0.2rem 0.5rem',
-                              borderRadius: '4px',
+                              borderRadius: '2px',
                               fontSize: '0.75rem',
                               fontWeight: 600,
                               ...getNeutralBadgeStyle(d.comparison.status_label),
@@ -642,7 +642,7 @@ export const Dashboard: React.FC<{
       </div>
 
       {/* Non-Causal Descriptive Insights Panel (AC-86, AC-87) */}
-      <div className="card" style={{ padding: '1.25rem', marginBottom: '1.5rem', border: '1px solid rgba(56, 189, 248, 0.25)' }}>
+      <div className="card" style={{ padding: '1.25rem', marginBottom: '1.5rem', border: '1px solid color-mix(in srgb, var(--accent-primary) 25%, transparent)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
           <div>
             <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -655,7 +655,7 @@ export const Dashboard: React.FC<{
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ fontSize: '0.6875rem', padding: '0.2rem 0.5rem', borderRadius: '4px', background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
+            <span style={{ fontSize: '0.6875rem', padding: '0.2rem 0.5rem', borderRadius: '2px', background: 'color-mix(in srgb, var(--accent-primary) 10%, transparent)', color: 'var(--accent-primary)', border: '1px solid color-mix(in srgb, var(--accent-primary) 20%, transparent)' }}>
               Rule S1 & AC-87 Compliant
             </span>
           </div>
@@ -663,9 +663,9 @@ export const Dashboard: React.FC<{
 
         {/* Progress toward unlocking insights (AC-86c) */}
         {!insightsData?.is_unlocked ? (
-          <div style={{ padding: '1.25rem', background: 'rgba(15, 23, 42, 0.7)', borderRadius: 'var(--radius-md)', border: '1px dashed var(--border-subtle)' }}>
+          <div style={{ padding: '1.25rem', background: 'var(--bg-surface)', borderRadius: 'var(--radius-sm)', border: '1px dashed var(--border-subtle)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(56, 189, 248, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'color-mix(in srgb, var(--accent-primary) 15%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)' }}>
                 <Clock size={16} />
               </div>
               <div>
@@ -687,13 +687,13 @@ export const Dashboard: React.FC<{
                     {insightsData?.progress?.completed_sessions || 0} / {insightsData?.progress?.required_sessions || 5}
                   </span>
                 </div>
-                <div style={{ width: '100%', height: '6px', background: 'var(--border-subtle)', borderRadius: '3px', overflow: 'hidden' }}>
+                <div style={{ width: '100%', height: '6px', background: 'var(--border-subtle)', borderRadius: '2px', overflow: 'hidden' }}>
                   <div
                     style={{
                       width: `${Math.min(100, (((insightsData?.progress?.completed_sessions || 0) / (insightsData?.progress?.required_sessions || 5)) * 100))}%`,
                       height: '100%',
                       background: 'var(--accent-primary)',
-                      borderRadius: '3px',
+                      borderRadius: '2px',
                     }}
                   />
                 </div>
@@ -712,13 +712,13 @@ export const Dashboard: React.FC<{
                     {insightsData?.progress?.completed_nutrition_days || 0} / {insightsData?.progress?.required_nutrition_days || 5}
                   </span>
                 </div>
-                <div style={{ width: '100%', height: '6px', background: 'var(--border-subtle)', borderRadius: '3px', overflow: 'hidden' }}>
+                <div style={{ width: '100%', height: '6px', background: 'var(--border-subtle)', borderRadius: '2px', overflow: 'hidden' }}>
                   <div
                     style={{
                       width: `${Math.min(100, (((insightsData?.progress?.completed_nutrition_days || 0) / (insightsData?.progress?.required_nutrition_days || 5)) * 100))}%`,
                       height: '100%',
-                      background: '#10b981',
-                      borderRadius: '3px',
+                      background: 'var(--accent-emerald)',
+                      borderRadius: '2px',
                     }}
                   />
                 </div>
@@ -737,9 +737,9 @@ export const Dashboard: React.FC<{
               <div
                 key={idx}
                 style={{
-                  background: 'rgba(15, 23, 42, 0.6)',
+                  background: 'var(--bg-surface)',
                   border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-md)',
+                  borderRadius: 'var(--radius-sm)',
                   padding: '1rem',
                   display: 'flex',
                   flexDirection: 'column',
@@ -811,7 +811,7 @@ export const Dashboard: React.FC<{
                 key={log.id}
                 style={{
                   padding: '0.875rem',
-                  background: 'rgba(15, 23, 42, 0.5)',
+                  background: 'var(--bg-surface)',
                   border: '1px solid var(--border-subtle)',
                   borderRadius: 'var(--radius-sm)',
                   display: 'flex',
@@ -822,7 +822,7 @@ export const Dashboard: React.FC<{
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'rgba(56, 189, 248, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: 'var(--radius-sm)', background: 'color-mix(in srgb, var(--accent-primary) 10%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)' }}>
                     <UtensilsCrossed size={18} />
                   </div>
                   <div>
@@ -863,7 +863,7 @@ export const Dashboard: React.FC<{
                     className="btn btn-ghost btn-sm"
                     onClick={() => handleDeleteLog(log.id)}
                     title="Delete meal log"
-                    style={{ color: '#f43f5e', padding: '0.375rem' }}
+                    style={{ color: 'var(--accent-rose)', padding: '0.375rem' }}
                   >
                     <Trash2 size={16} />
                   </button>
@@ -893,8 +893,7 @@ export const Dashboard: React.FC<{
             justifyContent: 'center',
             zIndex: 100,
             padding: '1rem',
-            backdropFilter: 'blur(4px)',
-          }}
+            }}
         >
           <div
             className="card"
@@ -1093,7 +1092,7 @@ export const Dashboard: React.FC<{
               </div>
 
               {/* Snapshot Notice (AC-82) */}
-              <div style={{ padding: '0.5rem 0.75rem', background: 'rgba(56, 189, 248, 0.08)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(56, 189, 248, 0.2)', fontSize: '0.6875rem', color: 'var(--accent-primary)' }}>
+              <div style={{ padding: '0.5rem 0.75rem', background: 'color-mix(in srgb, var(--accent-primary) 8%, transparent)', borderRadius: 'var(--radius-sm)', border: '1px solid color-mix(in srgb, var(--accent-primary) 20%, transparent)', fontSize: '0.6875rem', color: 'var(--accent-primary)' }}>
                 ℹ Historical nutrient snapshot will be permanently bound to this log to preserve historical reporting accuracy even if catalogue data changes.
               </div>
 

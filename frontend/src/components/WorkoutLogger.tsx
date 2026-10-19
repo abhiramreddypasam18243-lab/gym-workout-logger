@@ -313,9 +313,9 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', background: '#090e1a', padding: '0.5rem 0.875rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', background: 'var(--bg-surface)', padding: '0.5rem 0.875rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
               <Clock size={16} style={{ color: 'var(--accent-primary)' }} />
-              <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '1rem', color: '#fff' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '1rem', color: 'var(--text-main)' }}>
                 {formatTime(elapsedSeconds)}
               </span>
             </div>
@@ -334,14 +334,14 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
 
         {/* Status Banners (AC-90) */}
         {errorMessage && (
-          <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
+          <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
             <AlertCircle size={18} />
             <span>{errorMessage}</span>
           </div>
         )}
 
         {successMessage && (
-          <div style={{ background: 'var(--accent-emerald-bg)', border: '1px solid var(--accent-emerald-border)', color: 'var(--accent-emerald)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="status">
+          <div style={{ background: 'var(--accent-emerald-bg)', border: '1px solid var(--accent-emerald-border)', color: 'var(--accent-emerald)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="status">
             <Check size={18} />
             <span>{successMessage}</span>
           </div>
@@ -365,9 +365,9 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
             style={{
               marginTop: '1.25rem',
               padding: '1rem',
-              background: 'rgba(5, 10, 24, 0.7)',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid rgba(56, 189, 248, 0.2)',
+              background: 'var(--bg-surface)',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid color-mix(in srgb, var(--accent-primary) 20%, transparent)',
               display: 'flex',
               flexDirection: 'column',
               gap: '0.75rem',
@@ -393,7 +393,7 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
 
                 <div style={{ fontSize: '0.875rem' }}>
                   <span style={{ color: 'var(--text-dim)' }}>Sets: </span>
-                  <span className="mono-stat" style={{ color: '#10b981', fontSize: '1rem' }}>
+                  <span className="mono-stat" style={{ color: 'var(--accent-emerald)', fontSize: '1rem' }}>
                     {completedSetsCount}/{totalSetsCount} ({sessionCompletionPct}%)
                   </span>
                 </div>
@@ -412,13 +412,13 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
             </div>
 
             {/* Session set completion progress bar */}
-            <div style={{ width: '100%', height: '6px', background: 'rgba(255, 255, 255, 0.08)', borderRadius: '3px', overflow: 'hidden' }}>
+            <div style={{ width: '100%', height: '6px', background: 'rgba(255, 255, 255, 0.08)', borderRadius: '2px', overflow: 'hidden' }}>
               <div
                 style={{
                   width: `${sessionCompletionPct}%`,
                   height: '100%',
-                  background: 'linear-gradient(90deg, #38bdf8, #10b981)',
-                  borderRadius: '3px',
+                  background: 'var(--accent-primary)',
+                  borderRadius: '2px',
                   transition: 'width 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
               />
@@ -491,12 +491,12 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
                           className={s.completed ? 'set-row-completed' : ''}
                           style={{
                             borderBottom: '1px solid rgba(255,255,255,0.03)',
-                            background: s.completed ? 'rgba(16, 185, 129, 0.08)' : 'transparent',
+                            background: s.completed ? 'color-mix(in srgb, var(--accent-emerald) 8%, transparent)' : 'transparent',
                             transition: 'background 0.25s ease',
                           }}
                         >
                           <td style={{ padding: '0.5rem', fontWeight: 700 }}>
-                            <span style={{ color: s.completed ? '#10b981' : 'var(--text-main)' }}>
+                            <span style={{ color: s.completed ? 'var(--accent-emerald)' : 'var(--text-main)' }}>
                               {s.set_number}
                             </span>
                           </td>
@@ -574,16 +574,16 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
                               style={{
                                 width: '30px',
                                 height: '30px',
-                                borderRadius: '8px',
-                                border: s.completed ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.15)',
-                                background: s.completed ? '#10b981' : 'rgba(255, 255, 255, 0.05)',
-                                color: s.completed ? '#031120' : 'var(--text-dim)',
+                                borderRadius: 'var(--radius-sm)',
+                                border: s.completed ? '1px solid var(--accent-emerald)' : '1px solid rgba(255, 255, 255, 0.15)',
+                                background: s.completed ? 'var(--accent-emerald)' : 'rgba(255, 255, 255, 0.05)',
+                                color: s.completed ? 'var(--bg-surface)' : 'var(--text-dim)',
                                 display: 'inline-flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 cursor: 'pointer',
                                 transition: 'all 0.2s ease',
-                                boxShadow: s.completed ? '0 0 12px rgba(16, 185, 129, 0.45)' : 'none',
+                                boxShadow: s.completed ? 'none' : 'none',
                               }}
                               title={s.completed ? 'Mark incomplete' : 'Mark set done and start 90s recovery timer'}
                               aria-label={`Toggle set ${s.set_number} completion`}
@@ -643,7 +643,7 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
 
       {/* Add Exercise Modal / Drawer */}
       {isSearchingExercise && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '1rem' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '1rem' }}>
           <div className="card" style={{ width: '100%', maxWidth: '500px', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
               <h2>Select Exercise</h2>
@@ -682,7 +682,7 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
                     onClick={() => addExercise(ex)}
                   >
                     <div>
-                      <div style={{ fontWeight: 600, color: '#fff' }}>{ex.name}</div>
+                      <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>{ex.name}</div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
                         {ex.primary_muscle} • {ex.equipment}
                       </div>

@@ -1,4 +1,4 @@
-export type ThemeId = 'cyber-cyan' | 'hyper-violet' | 'volt-lime' | 'solar-amber'
+export type ThemeId = 'blaze' | 'race-red' | 'volt' | 'ice'
 
 export interface ThemeDefinition {
   id: ThemeId
@@ -9,34 +9,10 @@ export interface ThemeDefinition {
 }
 
 export const AVAILABLE_THEMES: ThemeDefinition[] = [
-  {
-    id: 'cyber-cyan',
-    name: 'Cyber Cyan',
-    label: 'Laser Cyan',
-    color: '#38bdf8',
-    gradient: 'linear-gradient(135deg, #38bdf8, #0284c7)',
-  },
-  {
-    id: 'hyper-violet',
-    name: 'Hyper Violet',
-    label: 'Electric Violet',
-    color: '#a855f7',
-    gradient: 'linear-gradient(135deg, #c084fc, #ec4899)',
-  },
-  {
-    id: 'volt-lime',
-    name: 'Volt Lime',
-    label: 'High-Voltage Green',
-    color: '#10b981',
-    gradient: 'linear-gradient(135deg, #34d399, #059669)',
-  },
-  {
-    id: 'solar-amber',
-    name: 'Solar Amber',
-    label: 'Olympic Gold',
-    color: '#f59e0b',
-    gradient: 'linear-gradient(135deg, #fbbf24, #ea580c)',
-  },
+  { id: 'blaze', name: 'Blaze', label: 'Blaze Orange', color: '#ff5a1f', gradient: '#ff5a1f' },
+  { id: 'race-red', name: 'Race Red', label: 'Race Red', color: '#e8112d', gradient: '#e8112d' },
+  { id: 'volt', name: 'Volt', label: 'Volt Green', color: '#c6f432', gradient: '#c6f432' },
+  { id: 'ice', name: 'Ice', label: 'Ice Blue', color: '#4cc3ff', gradient: '#4cc3ff' },
 ]
 
 const STORAGE_KEY = 'titan_theme_id'
@@ -50,7 +26,7 @@ export function getStoredTheme(): ThemeId {
   } catch (e) {
     console.warn('Could not read theme from storage', e)
   }
-  return 'cyber-cyan'
+  return 'blaze'
 }
 
 export function applyTheme(themeId: ThemeId): void {

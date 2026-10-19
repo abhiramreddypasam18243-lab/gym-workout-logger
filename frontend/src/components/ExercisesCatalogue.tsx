@@ -173,7 +173,7 @@ export const ExercisesCatalogue: React.FC = () => {
       </div>
 
       {errorMessage && (
-        <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
+        <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
           <AlertCircle size={18} />
           <span>{errorMessage}</span>
         </div>
@@ -209,7 +209,7 @@ export const ExercisesCatalogue: React.FC = () => {
             >
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <h2 style={{ fontSize: '1.05rem', color: '#fff' }}>{ex.name}</h2>
+                  <h2 style={{ fontSize: '1.05rem', color: 'var(--text-main)' }}>{ex.name}</h2>
                   {ex.is_custom && (
                     <span className="badge badge-amber" style={{ fontSize: '0.6875rem' }}>
                       Custom
@@ -238,7 +238,7 @@ export const ExercisesCatalogue: React.FC = () => {
 
       {/* Create Custom Exercise Modal (AC-30) */}
       {isCreating && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '1rem' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '1rem' }}>
           <div className="card" style={{ width: '100%', maxWidth: '500px', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
               <h2>New Custom Exercise</h2>
@@ -252,14 +252,14 @@ export const ExercisesCatalogue: React.FC = () => {
             </div>
 
             {createError && (
-              <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-md)', marginBottom: '1rem', fontSize: '0.8125rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
+              <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-sm)', marginBottom: '1rem', fontSize: '0.8125rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
                 <AlertCircle size={16} />
                 <span>{createError}</span>
               </div>
             )}
 
             {createSuccess && (
-              <div style={{ background: 'var(--accent-emerald-bg)', border: '1px solid var(--accent-emerald-border)', color: 'var(--accent-emerald)', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-md)', marginBottom: '1rem', fontSize: '0.8125rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="status">
+              <div style={{ background: 'var(--accent-emerald-bg)', border: '1px solid var(--accent-emerald-border)', color: 'var(--accent-emerald)', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-sm)', marginBottom: '1rem', fontSize: '0.8125rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="status">
                 <Check size={16} />
                 <span>{createSuccess}</span>
               </div>
