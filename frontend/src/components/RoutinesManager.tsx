@@ -141,7 +141,7 @@ export const RoutinesManager: React.FC<RoutinesManagerProps> = ({ onStartRoutine
       </div>
 
       {errorMessage && (
-        <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
+        <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
           <AlertCircle size={18} />
           <span>{errorMessage}</span>
         </div>
@@ -173,7 +173,7 @@ export const RoutinesManager: React.FC<RoutinesManagerProps> = ({ onStartRoutine
             <div key={routine.id} className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <h2 style={{ fontSize: '1.2rem', color: '#fff' }}>{routine.name}</h2>
+                  <h2 style={{ fontSize: '1.2rem', color: 'var(--text-main)' }}>{routine.name}</h2>
                   <div style={{ display: 'flex', gap: '0.25rem' }}>
                     <button
                       type="button"
@@ -209,7 +209,7 @@ export const RoutinesManager: React.FC<RoutinesManagerProps> = ({ onStartRoutine
                     <div
                       key={re.id || idx}
                       style={{
-                        background: '#090e1a',
+                        background: 'var(--bg-surface)',
                         padding: '0.5rem 0.75rem',
                         borderRadius: 'var(--radius-sm)',
                         display: 'flex',
@@ -218,7 +218,7 @@ export const RoutinesManager: React.FC<RoutinesManagerProps> = ({ onStartRoutine
                         fontSize: '0.8125rem',
                       }}
                     >
-                      <span style={{ color: '#fff', fontWeight: 500 }}>
+                      <span style={{ color: 'var(--text-main)', fontWeight: 500 }}>
                         {re.exercise?.name || `Exercise ${idx + 1}`}
                       </span>
                       <span className="badge badge-blue">
@@ -246,7 +246,7 @@ export const RoutinesManager: React.FC<RoutinesManagerProps> = ({ onStartRoutine
 
       {/* Create Routine Modal */}
       {isCreating && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '1rem' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '1rem' }}>
           <div className="card" style={{ width: '100%', maxWidth: '580px', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
               <h2>Create New Routine</h2>
@@ -287,7 +287,7 @@ export const RoutinesManager: React.FC<RoutinesManagerProps> = ({ onStartRoutine
               <div style={{ marginBottom: '1rem' }}>
                 <label className="form-label">Exercises in Routine</label>
                 {routineExercises.length === 0 ? (
-                  <div style={{ padding: '1rem', background: '#090e1a', borderRadius: 'var(--radius-md)', textAlign: 'center', color: 'var(--text-dim)', fontSize: '0.8125rem' }}>
+                  <div style={{ padding: '1rem', background: 'var(--bg-surface)', borderRadius: 'var(--radius-sm)', textAlign: 'center', color: 'var(--text-dim)', fontSize: '0.8125rem' }}>
                     Select exercises below to add them to this routine.
                   </div>
                 ) : (
@@ -296,9 +296,9 @@ export const RoutinesManager: React.FC<RoutinesManagerProps> = ({ onStartRoutine
                       <div
                         key={idx}
                         style={{
-                          background: '#090e1a',
+                          background: 'var(--bg-surface)',
                           border: '1px solid var(--border-subtle)',
-                          borderRadius: 'var(--radius-md)',
+                          borderRadius: 'var(--radius-sm)',
                           padding: '0.625rem 0.875rem',
                           display: 'flex',
                           alignItems: 'center',
@@ -307,7 +307,7 @@ export const RoutinesManager: React.FC<RoutinesManagerProps> = ({ onStartRoutine
                           flexWrap: 'wrap',
                         }}
                       >
-                        <strong style={{ color: '#fff', fontSize: '0.875rem' }}>{re.name}</strong>
+                        <strong style={{ color: 'var(--text-main)', fontSize: '0.875rem' }}>{re.name}</strong>
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>

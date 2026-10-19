@@ -268,8 +268,8 @@ export const NutritionPlanner: React.FC = () => {
     return (
       <div style={{ maxWidth: '900px', margin: '2rem auto', padding: '1.5rem 1rem', textAlign: 'center' }}>
         <div className="card" style={{ padding: '3rem 2rem' }}>
-          <div className="skeleton" style={{ height: '32px', width: '250px', margin: '0 auto 1.5rem', borderRadius: '4px' }} />
-          <div className="skeleton" style={{ height: '180px', width: '100%', borderRadius: '8px' }} />
+          <div className="skeleton" style={{ height: '32px', width: '250px', margin: '0 auto 1.5rem', borderRadius: '2px' }} />
+          <div className="skeleton" style={{ height: '180px', width: '100%', borderRadius: 'var(--radius-sm)' }} />
         </div>
       </div>
     )
@@ -287,7 +287,7 @@ export const NutritionPlanner: React.FC = () => {
         </div>
 
         {/* Tab switcher */}
-        <div style={{ display: 'flex', background: 'var(--bg-surface-elevated)', padding: '0.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+        <div style={{ display: 'flex', background: 'var(--bg-surface-elevated)', padding: '0.25rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
           <button
             type="button"
             className={`btn btn-sm ${activeTab === 'targets' ? 'btn-primary' : 'btn-ghost'}`}
@@ -315,14 +315,14 @@ export const NutritionPlanner: React.FC = () => {
       </div>
 
       {successMessage && (
-        <div style={{ background: 'var(--accent-emerald-bg)', border: '1px solid var(--accent-emerald-border)', color: 'var(--accent-emerald)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="status">
+        <div style={{ background: 'var(--accent-emerald-bg)', border: '1px solid var(--accent-emerald-border)', color: 'var(--accent-emerald)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="status">
           <Check size={18} />
           <span>{successMessage}</span>
         </div>
       )}
 
       {errorMessage && (
-        <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
+        <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
           <AlertCircle size={18} />
           <span>{errorMessage}</span>
         </div>
@@ -335,7 +335,7 @@ export const NutritionPlanner: React.FC = () => {
           <div className="card" style={{ borderLeft: '4px solid var(--accent-primary)' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
               <div>
-                <h2 style={{ fontSize: '1.15rem', color: '#fff' }}>Current Active Target (AC-23)</h2>
+                <h2 style={{ fontSize: '1.15rem', color: 'var(--text-main)' }}>Current Active Target (AC-23)</h2>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
                   Effective from {activeGoal?.effective_from || 'today'}
                 </span>
@@ -350,7 +350,7 @@ export const NutritionPlanner: React.FC = () => {
             {/* Macro Cards Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginTop: '0.5rem' }}>
               {!isCaloriesHidden && (
-                <div style={{ background: '#090e1a', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', textAlign: 'center' }}>
+                <div style={{ background: 'var(--bg-surface)', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)', textAlign: 'center' }}>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Daily Energy</span>
                   <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--accent-primary)', marginTop: '0.25rem' }}>
                     {activeGoal?.calorie_target_kcal || '—'} <span style={{ fontSize: '0.875rem' }}>kcal</span>
@@ -358,23 +358,23 @@ export const NutritionPlanner: React.FC = () => {
                 </div>
               )}
 
-              <div style={{ background: '#090e1a', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', textAlign: 'center' }}>
+              <div style={{ background: 'var(--bg-surface)', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)', textAlign: 'center' }}>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Protein Target</span>
-                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fff', marginTop: '0.25rem' }}>
+                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main)', marginTop: '0.25rem' }}>
                   {activeGoal?.protein_target_g || '—'} <span style={{ fontSize: '0.875rem' }}>g</span>
                 </div>
               </div>
 
-              <div style={{ background: '#090e1a', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', textAlign: 'center' }}>
+              <div style={{ background: 'var(--bg-surface)', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)', textAlign: 'center' }}>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Carbohydrate Target</span>
-                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fff', marginTop: '0.25rem' }}>
+                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main)', marginTop: '0.25rem' }}>
                   {activeGoal?.carbs_target_g || '—'} <span style={{ fontSize: '0.875rem' }}>g</span>
                 </div>
               </div>
 
-              <div style={{ background: '#090e1a', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', textAlign: 'center' }}>
+              <div style={{ background: 'var(--bg-surface)', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)', textAlign: 'center' }}>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Fat Target</span>
-                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fff', marginTop: '0.25rem' }}>
+                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main)', marginTop: '0.25rem' }}>
                   {activeGoal?.fat_target_g || '—'} <span style={{ fontSize: '0.875rem' }}>g</span>
                 </div>
               </div>
@@ -389,7 +389,7 @@ export const NutritionPlanner: React.FC = () => {
 
           {/* Edit / Create Target Form */}
           <div className="card">
-            <h2 style={{ fontSize: '1.15rem', marginBottom: '1rem', color: '#fff' }}>
+            <h2 style={{ fontSize: '1.15rem', marginBottom: '1rem', color: 'var(--text-main)' }}>
               Set New Target (Creates Versioned Goal)
             </h2>
 
@@ -483,7 +483,7 @@ export const NutritionPlanner: React.FC = () => {
       {activeTab === 'estimate' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div className="card">
-            <h2 style={{ fontSize: '1.15rem', marginBottom: '0.5rem', color: '#fff' }}>
+            <h2 style={{ fontSize: '1.15rem', marginBottom: '0.5rem', color: 'var(--text-main)' }}>
               Mifflin–St Jeor Energy Estimator (Rule S4)
             </h2>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
@@ -608,7 +608,7 @@ export const NutritionPlanner: React.FC = () => {
               ) : (
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    <h2 style={{ fontSize: '1.15rem', color: '#fff' }}>Calculation Breakdown & Assumptions</h2>
+                    <h2 style={{ fontSize: '1.15rem', color: 'var(--text-main)' }}>Calculation Breakdown & Assumptions</h2>
                     <button
                       type="button"
                       className="btn btn-primary btn-sm"
@@ -623,7 +623,7 @@ export const NutritionPlanner: React.FC = () => {
                   {/* Numbers */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
                     {!isCaloriesHidden && (
-                      <div style={{ background: '#090e1a', padding: '0.875rem', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                      <div style={{ background: 'var(--bg-surface)', padding: '0.875rem', borderRadius: 'var(--radius-sm)', textAlign: 'center' }}>
                         <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Calories</span>
                         <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--accent-emerald)' }}>
                           {estimateResult.calories} kcal
@@ -631,30 +631,30 @@ export const NutritionPlanner: React.FC = () => {
                       </div>
                     )}
 
-                    <div style={{ background: '#090e1a', padding: '0.875rem', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                    <div style={{ background: 'var(--bg-surface)', padding: '0.875rem', borderRadius: 'var(--radius-sm)', textAlign: 'center' }}>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Protein (1.6 g/kg)</span>
-                      <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
+                      <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-main)' }}>
                         {estimateResult.protein_g} g
                       </div>
                     </div>
 
-                    <div style={{ background: '#090e1a', padding: '0.875rem', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                    <div style={{ background: 'var(--bg-surface)', padding: '0.875rem', borderRadius: 'var(--radius-sm)', textAlign: 'center' }}>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Carbs (Remainder)</span>
-                      <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
+                      <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-main)' }}>
                         {estimateResult.carbs_g} g
                       </div>
                     </div>
 
-                    <div style={{ background: '#090e1a', padding: '0.875rem', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                    <div style={{ background: 'var(--bg-surface)', padding: '0.875rem', borderRadius: 'var(--radius-sm)', textAlign: 'center' }}>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>{isCaloriesHidden ? 'Fat' : 'Fat (25% kcal)'}</span>
-                      <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
+                      <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-main)' }}>
                         {estimateResult.fat_g} g
                       </div>
                     </div>
                   </div>
 
                   {/* Formula and transparency assumptions (Rule S4, AC-19) */}
-                  <div style={{ background: '#090e1a', padding: '0.875rem', borderRadius: 'var(--radius-md)', fontSize: '0.8125rem' }}>
+                  <div style={{ background: 'var(--bg-surface)', padding: '0.875rem', borderRadius: 'var(--radius-sm)', fontSize: '0.8125rem' }}>
                     <div style={{ color: 'var(--text-main)', fontWeight: 600, marginBottom: '0.25rem' }}>
                       Formula: {estimateResult.formula}
                     </div>
@@ -674,7 +674,7 @@ export const NutritionPlanner: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {/* Allergens Hard Filters (S9, AC-57) */}
           <div className="card">
-            <h2 style={{ fontSize: '1.15rem', color: '#fff', marginBottom: '0.35rem' }}>
+            <h2 style={{ fontSize: '1.15rem', color: 'var(--text-main)', marginBottom: '0.35rem' }}>
               Allergens (Hard Safety Filters — Rule S9)
             </h2>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
@@ -691,10 +691,10 @@ export const NutritionPlanner: React.FC = () => {
                       display: 'flex',
                       alignItems: 'center',
                       gap: '0.5rem',
-                      background: checked ? 'var(--accent-rose-bg)' : '#090e1a',
+                      background: checked ? 'var(--accent-rose-bg)' : 'var(--bg-surface)',
                       border: checked ? '1px solid var(--accent-rose-border)' : '1px solid var(--border-subtle)',
                       padding: '0.5rem 0.75rem',
-                      borderRadius: 'var(--radius-md)',
+                      borderRadius: 'var(--radius-sm)',
                       cursor: 'pointer',
                     }}
                   >
@@ -710,7 +710,7 @@ export const NutritionPlanner: React.FC = () => {
                       }}
                       style={{ accentColor: 'var(--accent-rose)' }}
                     />
-                    <span style={{ fontSize: '0.8125rem', color: checked ? '#fff' : 'var(--text-muted)', textTransform: 'capitalize' }}>
+                    <span style={{ fontSize: '0.8125rem', color: checked ? 'var(--text-main)' : 'var(--text-muted)', textTransform: 'capitalize' }}>
                       {allergen.replace('_', ' ')}
                     </span>
                   </label>
@@ -721,7 +721,7 @@ export const NutritionPlanner: React.FC = () => {
 
           {/* Diet Tags (AC-59) */}
           <div className="card">
-            <h2 style={{ fontSize: '1.15rem', color: '#fff', marginBottom: '0.35rem' }}>
+            <h2 style={{ fontSize: '1.15rem', color: 'var(--text-main)', marginBottom: '0.35rem' }}>
               Dietary Restrictions (AC-59)
             </h2>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
@@ -754,7 +754,7 @@ export const NutritionPlanner: React.FC = () => {
 
           {/* Excluded Ingredients (AC-59) */}
           <div className="card">
-            <h2 style={{ fontSize: '1.15rem', color: '#fff', marginBottom: '0.35rem' }}>
+            <h2 style={{ fontSize: '1.15rem', color: 'var(--text-main)', marginBottom: '0.35rem' }}>
               Excluded Ingredients (AC-59)
             </h2>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
@@ -815,7 +815,7 @@ export const NutritionPlanner: React.FC = () => {
 
           {/* Cuisines (AC-61) */}
           <div className="card">
-            <h2 style={{ fontSize: '1.15rem', color: '#fff', marginBottom: '0.35rem' }}>
+            <h2 style={{ fontSize: '1.15rem', color: 'var(--text-main)', marginBottom: '0.35rem' }}>
               Cuisine Preferences (AC-61)
             </h2>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
@@ -826,8 +826,8 @@ export const NutritionPlanner: React.FC = () => {
               {CUISINES.map((c) => {
                 const currentPref = cuisinePrefs[c] || 'neutral'
                 return (
-                  <div key={c} style={{ background: '#090e1a', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-                    <div style={{ fontWeight: 600, color: '#fff', textTransform: 'capitalize', marginBottom: '0.35rem' }}>
+                  <div key={c} style={{ background: 'var(--bg-surface)', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
+                    <div style={{ fontWeight: 600, color: 'var(--text-main)', textTransform: 'capitalize', marginBottom: '0.35rem' }}>
                       {c.replace('_', ' ')}
                     </div>
                     <select

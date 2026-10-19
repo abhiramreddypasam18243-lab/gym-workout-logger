@@ -154,13 +154,13 @@ export const StrengthAnalytics: React.FC = () => {
             <div style={{
               width: '38px',
               height: '38px',
-              borderRadius: 'var(--radius-md)',
-              background: 'linear-gradient(135deg, rgba(56,189,248,0.2), rgba(2,132,199,0.2))',
-              border: '1px solid rgba(56,189,248,0.3)',
+              borderRadius: 'var(--radius-sm)',
+              background: 'var(--accent-primary-soft)',
+              border: '1px solid color-mix(in srgb, var(--accent-primary) 30%, transparent)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 16px rgba(56,189,248,0.2)',
+              boxShadow: 'none',
             }}>
               <TrendingUp style={{ color: 'var(--accent-primary)' }} size={20} />
             </div>
@@ -189,7 +189,7 @@ export const StrengthAnalytics: React.FC = () => {
       </div>
 
       {errorMessage && (
-        <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
+        <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
           <AlertCircle size={18} />
           <span>{errorMessage}</span>
         </div>
@@ -260,8 +260,8 @@ export const StrengthAnalytics: React.FC = () => {
             width: '64px',
             height: '64px',
             borderRadius: '50%',
-            background: 'rgba(56,189,248,0.1)',
-            border: '1px solid rgba(56,189,248,0.25)',
+            background: 'color-mix(in srgb, var(--accent-primary) 10%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--accent-primary) 25%, transparent)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -286,7 +286,7 @@ export const StrengthAnalytics: React.FC = () => {
                 <Sparkles size={16} style={{ color: 'var(--accent-primary)' }} />
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
-                <span style={{ fontSize: '1.85rem', fontWeight: 900, color: '#fff', fontFamily: 'JetBrains Mono, monospace' }}>
+                <span style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--text-main)', fontFamily: 'var(--font-display)' }}>
                   {allTimeBest}
                 </span>
                 <span style={{ fontSize: '0.875rem', color: 'var(--accent-primary)', fontWeight: 700 }}>
@@ -303,20 +303,20 @@ export const StrengthAnalytics: React.FC = () => {
                 <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-dim)', letterSpacing: '0.05em' }}>
                   Window Delta Gain
                 </span>
-                <Trophy size={16} style={{ color: '#fbbf24' }} />
+                <Trophy size={16} style={{ color: 'var(--accent-amber)' }} />
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
                 <span style={{
                   fontSize: '1.85rem',
                   fontWeight: 900,
-                  color: e1rmGain >= 0 ? '#10b981' : 'var(--accent-rose)',
-                  fontFamily: 'JetBrains Mono, monospace',
+                  color: e1rmGain >= 0 ? 'var(--accent-emerald)' : 'var(--accent-rose)',
+                  fontFamily: 'var(--font-display)',
                   display: 'flex',
                   alignItems: 'center',
                 }}>
                   {e1rmGain >= 0 ? `+${e1rmGain.toFixed(1)}` : e1rmGain.toFixed(1)}
                 </span>
-                <span style={{ fontSize: '0.875rem', color: e1rmGain >= 0 ? '#10b981' : 'var(--accent-rose)', fontWeight: 700 }}>
+                <span style={{ fontSize: '0.875rem', color: e1rmGain >= 0 ? 'var(--accent-emerald)' : 'var(--accent-rose)', fontWeight: 700 }}>
                   {isLb ? 'lb' : 'kg'}
                 </span>
               </div>
@@ -333,7 +333,7 @@ export const StrengthAnalytics: React.FC = () => {
                 <Activity size={16} style={{ color: 'var(--text-dim)' }} />
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
-                <span style={{ fontSize: '1.85rem', fontWeight: 900, color: '#fff', fontFamily: 'JetBrains Mono, monospace' }}>
+                <span style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--text-main)', fontFamily: 'var(--font-display)' }}>
                   {trends.length}
                 </span>
                 <span style={{ fontSize: '0.875rem', color: 'var(--text-dim)', fontWeight: 600 }}>
@@ -350,7 +350,7 @@ export const StrengthAnalytics: React.FC = () => {
           <div className="card" style={{ padding: '1.5rem', position: 'relative' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
               <div>
-                <h2 style={{ fontSize: '1.2rem', color: '#fff', fontWeight: 800, margin: 0 }}>
+                <h2 style={{ fontSize: '1.2rem', color: 'var(--text-main)', fontWeight: 800, margin: 0 }}>
                   {selectedExercise?.name} — 1RM Trajectory
                 </h2>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', display: 'block', marginTop: '0.2rem' }}>
@@ -380,13 +380,13 @@ export const StrengthAnalytics: React.FC = () => {
                   <tbody>
                     {trends.map((t, idx) => (
                       <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', transition: 'background 0.15s ease' }}>
-                        <td style={{ padding: '0.65rem 0.5rem', color: '#fff', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8125rem' }}>
+                        <td style={{ padding: '0.65rem 0.5rem', color: 'var(--text-main)', fontFamily: 'var(--font-display)', fontSize: '0.8125rem' }}>
                           {t.date}
                         </td>
                         <td style={{ padding: '0.65rem 0.5rem', color: 'var(--text-main)', fontSize: '0.8125rem' }}>
                           {t.load} {t.unit} × {t.reps}
                         </td>
-                        <td style={{ padding: '0.65rem 0.5rem', fontWeight: 700, color: 'var(--accent-primary)', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.875rem' }}>
+                        <td style={{ padding: '0.65rem 0.5rem', fontWeight: 700, color: 'var(--accent-primary)', fontFamily: 'var(--font-display)', fontSize: '0.875rem' }}>
                           {t.e1rm} {t.unit}
                         </td>
                         <td style={{ padding: '0.65rem 0.5rem' }}>
@@ -408,9 +408,9 @@ export const StrengthAnalytics: React.FC = () => {
                 >
                   <defs>
                     <linearGradient id="curveGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.4" />
-                      <stop offset="60%" stopColor="#0284c7" stopOpacity="0.12" />
-                      <stop offset="100%" stopColor="#0284c7" stopOpacity="0.0" />
+                      <stop offset="0%" style={{ stopColor: 'var(--accent-primary)' }} stopOpacity="0.4" />
+                      <stop offset="60%" style={{ stopColor: 'var(--accent-primary)' }} stopOpacity="0.12" />
+                      <stop offset="100%" style={{ stopColor: 'var(--accent-primary)' }} stopOpacity="0.0" />
                     </linearGradient>
                     <filter id="glowNode" x="-30%" y="-30%" width="160%" height="160%">
                       <feGaussianBlur stdDeviation="3" result="blur" />
@@ -435,9 +435,9 @@ export const StrengthAnalytics: React.FC = () => {
                       <text
                         x={chartGeometry.pad.left - 10}
                         y={tick.y + 4}
-                        fill="var(--text-dim)"
+                        style={{ fill: 'var(--text-dim)' }}
                         fontSize="10"
-                        fontFamily="JetBrains Mono, monospace"
+                        fontFamily="Barlow Condensed, Arial Narrow, sans-serif"
                         textAnchor="end"
                       >
                         {tick.val}
@@ -455,11 +455,10 @@ export const StrengthAnalytics: React.FC = () => {
                   <path
                     d={chartGeometry.curvePath}
                     fill="none"
-                    stroke="#38bdf8"
+                    style={{ stroke: 'var(--accent-primary)' }}
                     strokeWidth="3"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    filter="url(#glowNode)"
                   />
 
                   {/* Data Nodes */}
@@ -484,7 +483,7 @@ export const StrengthAnalytics: React.FC = () => {
                             cy={pt.y}
                             r={isHovered ? 12 : 9}
                             fill="none"
-                            stroke={isAllTimeMax ? '#fbbf24' : '#38bdf8'}
+                            stroke={isAllTimeMax ? 'var(--accent-amber)' : 'var(--accent-primary)'}
                             strokeWidth="2"
                             strokeOpacity={isHovered ? 0.9 : 0.5}
                           />
@@ -495,8 +494,8 @@ export const StrengthAnalytics: React.FC = () => {
                           cx={pt.x}
                           cy={pt.y}
                           r={isHovered ? 6 : 4.5}
-                          fill={isAllTimeMax ? '#fbbf24' : '#0369a1'}
-                          stroke={isAllTimeMax ? '#fef08a' : '#38bdf8'}
+                          fill={isAllTimeMax ? 'var(--accent-amber)' : 'var(--bg-main)'}
+                          stroke={isAllTimeMax ? 'var(--text-main)' : 'var(--accent-primary)'}
                           strokeWidth="2"
                         />
 
@@ -505,8 +504,7 @@ export const StrengthAnalytics: React.FC = () => {
                           <g transform={`translate(${pt.x - 7}, ${pt.y - 22})`}>
                             <polygon
                               points="7,0 9,5 14,5 10,8 12,13 7,10 2,13 4,8 0,5 5,5"
-                              fill="#fbbf24"
-                              filter="drop-shadow(0 0 4px rgba(251,191,36,0.8))"
+                              style={{ fill: 'var(--accent-amber)' }}
                             />
                           </g>
                         )}
@@ -515,9 +513,9 @@ export const StrengthAnalytics: React.FC = () => {
                         <text
                           x={pt.x}
                           y={chartGeometry.height - 12}
-                          fill={isHovered ? '#38bdf8' : 'var(--text-dim)'}
+                          fill={isHovered ? 'var(--accent-primary)' : 'var(--text-dim)'}
                           fontSize="9"
-                          fontFamily="JetBrains Mono, monospace"
+                          fontFamily="Barlow Condensed, Arial Narrow, sans-serif"
                           textAnchor="middle"
                         >
                           {pt.data.date.slice(5)}
@@ -535,19 +533,18 @@ export const StrengthAnalytics: React.FC = () => {
                       top: Math.max(10, chartGeometry.points[hoveredIdx].y - 80),
                       left: `clamp(60px, ${chartGeometry.points[hoveredIdx].x}px, calc(100% - 180px))`,
                       transform: 'translateX(-50%)',
-                      background: 'rgba(9, 14, 26, 0.95)',
-                      backdropFilter: 'blur(16px)',
-                      border: '1px solid rgba(56, 189, 248, 0.4)',
-                      borderRadius: 'var(--radius-md)',
+                      background: 'var(--bg-surface)',
+                      border: '1px solid color-mix(in srgb, var(--accent-primary) 40%, transparent)',
+                      borderRadius: 'var(--radius-sm)',
                       padding: '0.6rem 0.85rem',
-                      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.8), 0 0 16px rgba(56, 189, 248, 0.25)',
+                      boxShadow: 'none',
                       pointerEvents: 'none',
                       zIndex: 20,
                       minWidth: '150px',
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                      <span style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', fontFamily: 'JetBrains Mono, monospace' }}>
+                      <span style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', fontFamily: 'var(--font-display)' }}>
                         {chartGeometry.points[hoveredIdx].data.date}
                       </span>
                       {Number(chartGeometry.points[hoveredIdx].data.e1rm) === allTimeBest && (
@@ -556,7 +553,7 @@ export const StrengthAnalytics: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    <div style={{ fontSize: '1.15rem', fontWeight: 900, color: '#38bdf8', fontFamily: 'JetBrains Mono, monospace' }}>
+                    <div style={{ fontSize: '1.15rem', fontWeight: 900, color: 'var(--accent-primary)', fontFamily: 'var(--font-display)' }}>
                       {chartGeometry.points[hoveredIdx].data.e1rm} {chartGeometry.points[hoveredIdx].data.unit}
                     </div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
@@ -570,15 +567,15 @@ export const StrengthAnalytics: React.FC = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem', flexWrap: 'wrap', gap: '0.5rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-subtle)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.75rem', color: 'var(--text-dim)' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#38bdf8', display: 'inline-block' }} />
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-primary)', display: 'inline-block' }} />
                   Estimated 1RM
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#fbbf24', display: 'inline-block' }} />
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-amber)', display: 'inline-block' }} />
                   ★ Peak Personal Record
                 </span>
               </div>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', fontFamily: 'JetBrains Mono, monospace' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', fontFamily: 'var(--font-display)' }}>
                 Unit: {isLb ? 'pounds (lb)' : 'kilograms (kg)'}
               </span>
             </div>
@@ -592,16 +589,16 @@ export const StrengthAnalytics: React.FC = () => {
                   width: '32px',
                   height: '32px',
                   borderRadius: 'var(--radius-sm)',
-                  background: 'rgba(245, 158, 11, 0.15)',
-                  border: '1px solid rgba(245, 158, 11, 0.35)',
+                  background: 'color-mix(in srgb, var(--accent-amber) 15%, transparent)',
+                  border: '1px solid color-mix(in srgb, var(--accent-amber) 35%, transparent)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}>
-                  <Trophy size={18} style={{ color: '#fbbf24' }} />
+                  <Trophy size={18} style={{ color: 'var(--accent-amber)' }} />
                 </div>
                 <div>
-                  <h2 style={{ fontSize: '1.15rem', color: '#fff', fontWeight: 800, margin: 0 }}>
+                  <h2 style={{ fontSize: '1.15rem', color: 'var(--text-main)', fontWeight: 800, margin: 0 }}>
                     Personal Record Milestones
                   </h2>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
@@ -623,19 +620,19 @@ export const StrengthAnalytics: React.FC = () => {
                     key={p.set_id || idx}
                     style={{
                       background: p.is_pr
-                        ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(6, 78, 59, 0.12))'
-                        : 'rgba(9, 14, 26, 0.7)',
+                        ? 'var(--bg-surface)'
+                        : 'var(--bg-surface)',
                       border: p.is_pr
-                        ? '1px solid rgba(16, 185, 129, 0.35)'
+                        ? '1px solid color-mix(in srgb, var(--accent-emerald) 35%, transparent)'
                         : '1px solid var(--border-card)',
                       padding: '0.9rem 1.15rem',
-                      borderRadius: 'var(--radius-md)',
+                      borderRadius: 'var(--radius-sm)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       flexWrap: 'wrap',
                       gap: '0.75rem',
-                      boxShadow: p.is_pr ? '0 4px 20px -4px rgba(16, 185, 129, 0.15)' : 'none',
+                      boxShadow: p.is_pr ? 'none' : 'none',
                     }}
                   >
                     <div>
@@ -643,7 +640,7 @@ export const StrengthAnalytics: React.FC = () => {
                         <span className={`badge ${p.is_pr ? 'badge-emerald' : 'badge-blue'}`}>
                           {p.is_pr ? '🏆 NEW PR' : 'BASELINE BENCHMARK'}
                         </span>
-                        <strong style={{ color: '#fff', fontSize: '0.95rem', fontFamily: 'JetBrains Mono, monospace' }}>
+                        <strong style={{ color: 'var(--text-main)', fontSize: '0.95rem', fontFamily: 'var(--font-display)' }}>
                           {p.load} {p.unit} × {p.reps} reps
                         </strong>
                       </div>
@@ -659,8 +656,8 @@ export const StrengthAnalytics: React.FC = () => {
                       <div style={{
                         fontSize: '1.35rem',
                         fontWeight: 900,
-                        color: p.is_pr ? '#10b981' : 'var(--accent-primary)',
-                        fontFamily: 'JetBrains Mono, monospace',
+                        color: p.is_pr ? 'var(--accent-emerald)' : 'var(--accent-primary)',
+                        fontFamily: 'var(--font-display)',
                       }}>
                         {p.e1rm} {p.unit}
                       </div>
@@ -680,8 +677,8 @@ export const StrengthAnalytics: React.FC = () => {
                     width: '32px',
                     height: '32px',
                     borderRadius: 'var(--radius-sm)',
-                    background: 'rgba(56, 189, 248, 0.15)',
-                    border: '1px solid rgba(56, 189, 248, 0.35)',
+                    background: 'color-mix(in srgb, var(--accent-primary) 15%, transparent)',
+                    border: '1px solid color-mix(in srgb, var(--accent-primary) 35%, transparent)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -689,7 +686,7 @@ export const StrengthAnalytics: React.FC = () => {
                     <Calendar size={18} style={{ color: 'var(--accent-primary)' }} />
                   </div>
                   <div>
-                    <h2 style={{ fontSize: '1.15rem', color: '#fff', fontWeight: 800, margin: 0 }}>
+                    <h2 style={{ fontSize: '1.15rem', color: 'var(--text-main)', fontWeight: 800, margin: 0 }}>
                       Weekly Consistency Heatmap (AC-44)
                     </h2>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
@@ -713,27 +710,27 @@ export const StrengthAnalytics: React.FC = () => {
                       key={idx}
                       style={{
                         background: met
-                          ? 'linear-gradient(180deg, rgba(16, 185, 129, 0.12), rgba(9, 14, 26, 0.8))'
-                          : 'rgba(9, 14, 26, 0.65)',
+                          ? 'var(--bg-surface)'
+                          : 'var(--bg-surface)',
                         border: met
-                          ? '1px solid rgba(16, 185, 129, 0.4)'
+                          ? '1px solid color-mix(in srgb, var(--accent-emerald) 40%, transparent)'
                           : '1px solid var(--border-card)',
-                        borderRadius: 'var(--radius-md)',
+                        borderRadius: 'var(--radius-sm)',
                         padding: '0.85rem 0.5rem',
                         textAlign: 'center',
                         position: 'relative',
-                        boxShadow: met ? '0 0 12px rgba(16, 185, 129, 0.15)' : 'none',
+                        boxShadow: met ? 'none' : 'none',
                       }}
                     >
-                      <span style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', display: 'block', fontFamily: 'JetBrains Mono, monospace' }}>
+                      <span style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', display: 'block', fontFamily: 'var(--font-display)' }}>
                         {w.week_start.slice(5)}
                       </span>
                       <div style={{
                         fontSize: '1.5rem',
                         fontWeight: 900,
-                        color: met ? '#10b981' : '#fff',
+                        color: met ? 'var(--accent-emerald)' : 'var(--text-main)',
                         margin: '0.2rem 0',
-                        fontFamily: 'JetBrains Mono, monospace',
+                        fontFamily: 'var(--font-display)',
                       }}>
                         {w.session_count}
                       </div>
@@ -750,7 +747,7 @@ export const StrengthAnalytics: React.FC = () => {
                         <div style={{
                           width: `${progressPct}%`,
                           height: '100%',
-                          background: met ? '#10b981' : 'var(--accent-primary)',
+                          background: met ? 'var(--accent-emerald)' : 'var(--accent-primary)',
                           borderRadius: '2px',
                         }} />
                       </div>
@@ -758,7 +755,7 @@ export const StrengthAnalytics: React.FC = () => {
                       <span style={{
                         fontSize: '0.6875rem',
                         fontWeight: 700,
-                        color: met ? '#10b981' : 'var(--text-dim)',
+                        color: met ? 'var(--accent-emerald)' : 'var(--text-dim)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.04em',
                       }}>

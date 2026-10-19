@@ -45,11 +45,11 @@ export const MotivationalQuoteCard: React.FC<MotivationalQuoteCardProps> = ({
       case 'strength':
         return <Dumbbell size={13} style={{ color: 'var(--accent-primary)' }} />
       case 'discipline':
-        return <Flame size={13} style={{ color: '#f59e0b' }} />
+        return <Flame size={13} style={{ color: 'var(--accent-amber)' }} />
       case 'resilience':
-        return <Heart size={13} style={{ color: '#10b981' }} />
+        return <Heart size={13} style={{ color: 'var(--accent-emerald)' }} />
       case 'greatness':
-        return <Award size={13} style={{ color: '#fbbf24' }} />
+        return <Award size={13} style={{ color: 'var(--accent-amber)' }} />
       default:
         return <Compass size={13} style={{ color: 'var(--accent-primary)' }} />
     }
@@ -59,17 +59,17 @@ export const MotivationalQuoteCard: React.FC<MotivationalQuoteCardProps> = ({
     return (
       <div
         style={{
-          background: 'linear-gradient(135deg, rgba(14, 21, 38, 0.9), rgba(9, 14, 26, 0.95))',
+          background: 'var(--bg-surface)',
           border: '1px solid var(--border-card)',
           borderLeft: '4px solid var(--accent-primary)',
-          borderRadius: 'var(--radius-md)',
+          borderRadius: 'var(--radius-sm)',
           padding: '0.75rem 1rem',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '1rem',
           flexWrap: 'wrap',
-          boxShadow: '0 4px 16px rgba(0,0,0,0.4), 0 0 16px var(--accent-primary-glow)',
+          boxShadow: 'none',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: '1 1 300px' }}>
@@ -78,7 +78,7 @@ export const MotivationalQuoteCard: React.FC<MotivationalQuoteCardProps> = ({
               width: '28px',
               height: '28px',
               borderRadius: '50%',
-              background: 'rgba(56, 189, 248, 0.15)',
+              background: 'color-mix(in srgb, var(--accent-primary) 15%, transparent)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -88,7 +88,7 @@ export const MotivationalQuoteCard: React.FC<MotivationalQuoteCardProps> = ({
             <Sparkles size={14} style={{ color: 'var(--accent-primary)' }} />
           </div>
           <div>
-            <span style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 600, fontStyle: 'italic' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-main)', fontWeight: 600, fontStyle: 'italic' }}>
               "{quote.quote}"
             </span>
             <span style={{ fontSize: '0.75rem', color: 'var(--accent-primary)', marginLeft: '0.5rem', fontWeight: 700 }}>
@@ -116,10 +116,10 @@ export const MotivationalQuoteCard: React.FC<MotivationalQuoteCardProps> = ({
     <div
       className="card"
       style={{
-        background: 'linear-gradient(135deg, rgba(14, 22, 42, 0.88), rgba(8, 13, 26, 0.96))',
+        background: 'var(--bg-surface)',
         border: '1px solid var(--border-card)',
         borderLeft: '4px solid var(--accent-primary)',
-        boxShadow: 'var(--shadow-specular), 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 25px var(--accent-primary-glow)',
+        boxShadow: 'none',
         padding: '1.4rem 1.6rem',
         position: 'relative',
         overflow: 'hidden',
@@ -148,7 +148,7 @@ export const MotivationalQuoteCard: React.FC<MotivationalQuoteCardProps> = ({
           <span
             className="badge"
             style={{
-              background: 'rgba(56, 189, 248, 0.12)',
+              background: 'color-mix(in srgb, var(--accent-primary) 12%, transparent)',
               color: 'var(--accent-primary)',
               border: '1px solid var(--accent-primary-glow)',
               display: 'inline-flex',
@@ -175,7 +175,7 @@ export const MotivationalQuoteCard: React.FC<MotivationalQuoteCardProps> = ({
             aria-label="Copy motivational quote"
             style={{ padding: '0.35rem 0.6rem', fontSize: '0.75rem' }}
           >
-            {copied ? <Check size={14} style={{ color: '#10b981' }} /> : <Copy size={14} />}
+            {copied ? <Check size={14} style={{ color: 'var(--accent-emerald)' }} /> : <Copy size={14} />}
             <span>{copied ? 'Copied!' : 'Copy'}</span>
           </button>
 
@@ -204,7 +204,7 @@ export const MotivationalQuoteCard: React.FC<MotivationalQuoteCardProps> = ({
           style={{
             fontSize: '1.15rem',
             fontWeight: 600,
-            color: '#fff',
+            color: 'var(--text-main)',
             lineHeight: 1.6,
             fontStyle: 'italic',
             letterSpacing: '-0.01em',

@@ -96,13 +96,13 @@ export const WorkoutHistory: React.FC = () => {
           <div style={{
             width: '38px',
             height: '38px',
-            borderRadius: 'var(--radius-md)',
-            background: 'linear-gradient(135deg, rgba(56,189,248,0.2), rgba(2,132,199,0.2))',
-            border: '1px solid rgba(56,189,248,0.3)',
+            borderRadius: 'var(--radius-sm)',
+            background: 'var(--accent-primary-soft)',
+            border: '1px solid color-mix(in srgb, var(--accent-primary) 30%, transparent)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 0 16px rgba(56,189,248,0.2)',
+            boxShadow: 'none',
           }}>
             <Calendar style={{ color: 'var(--accent-primary)' }} size={20} />
           </div>
@@ -130,7 +130,7 @@ export const WorkoutHistory: React.FC = () => {
       </div>
 
       {errorMessage && (
-        <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
+        <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
           <AlertCircle size={18} />
           <span>{errorMessage}</span>
         </div>
@@ -150,8 +150,8 @@ export const WorkoutHistory: React.FC = () => {
             width: '64px',
             height: '64px',
             borderRadius: '50%',
-            background: 'rgba(56,189,248,0.1)',
-            border: '1px solid rgba(56,189,248,0.25)',
+            background: 'color-mix(in srgb, var(--accent-primary) 10%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--accent-primary) 25%, transparent)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -192,7 +192,7 @@ export const WorkoutHistory: React.FC = () => {
                 }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                      <h2 style={{ fontSize: '1.25rem', color: '#fff', fontWeight: 800, margin: 0 }}>
+                      <h2 style={{ fontSize: '1.25rem', color: 'var(--text-main)', fontWeight: 800, margin: 0 }}>
                         {dateStr}
                       </h2>
                       <span className="badge badge-blue" style={{ fontSize: '0.6875rem' }}>
@@ -206,7 +206,7 @@ export const WorkoutHistory: React.FC = () => {
                         {session.exercises.length} Exercises
                       </span>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                        <Activity size={13} style={{ color: '#10b981' }} />
+                        <Activity size={13} style={{ color: 'var(--accent-emerald)' }} />
                         {totalSets} Total Sets
                       </span>
                     </div>
@@ -214,9 +214,9 @@ export const WorkoutHistory: React.FC = () => {
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
                     <div style={{
-                      background: 'rgba(9, 14, 26, 0.75)',
+                      background: 'var(--bg-surface)',
                       border: '1px solid var(--border-card)',
-                      borderRadius: 'var(--radius-md)',
+                      borderRadius: 'var(--radius-sm)',
                       padding: '0.5rem 0.85rem',
                       textAlign: 'right',
                     }}>
@@ -226,7 +226,7 @@ export const WorkoutHistory: React.FC = () => {
                       <strong style={{
                         color: 'var(--accent-primary)',
                         fontSize: '1.15rem',
-                        fontFamily: 'JetBrains Mono, monospace',
+                        fontFamily: 'var(--font-display)',
                         fontWeight: 900,
                       }}>
                         {totalVolume}
@@ -268,8 +268,8 @@ export const WorkoutHistory: React.FC = () => {
                     <div
                       key={we.id}
                       style={{
-                        background: 'rgba(9, 14, 26, 0.6)',
-                        borderRadius: 'var(--radius-md)',
+                        background: 'var(--bg-surface)',
+                        borderRadius: 'var(--radius-sm)',
                         padding: '0.85rem 1rem',
                         border: '1px solid var(--border-subtle)',
                       }}
@@ -280,7 +280,7 @@ export const WorkoutHistory: React.FC = () => {
                         justifyContent: 'space-between',
                         marginBottom: '0.65rem',
                       }}>
-                        <span style={{ fontWeight: 700, color: '#fff', fontSize: '0.925rem' }}>
+                        <span style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.925rem' }}>
                           {we.exercise?.name || 'Exercise'}
                         </span>
                         <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -293,19 +293,19 @@ export const WorkoutHistory: React.FC = () => {
                           <div
                             key={s.id}
                             style={{
-                              background: s.is_warmup ? 'rgba(255,255,255,0.03)' : 'rgba(12, 19, 36, 0.9)',
-                              border: s.is_warmup ? '1px dashed var(--border-subtle)' : '1px solid rgba(56, 189, 248, 0.25)',
+                              background: s.is_warmup ? 'rgba(255,255,255,0.03)' : 'var(--bg-surface)',
+                              border: s.is_warmup ? '1px dashed var(--border-subtle)' : '1px solid color-mix(in srgb, var(--accent-primary) 25%, transparent)',
                               borderRadius: 'var(--radius-sm)',
                               padding: '0.4rem 0.65rem',
                               fontSize: '0.8125rem',
                               display: 'flex',
                               alignItems: 'center',
                               gap: '0.45rem',
-                              fontFamily: 'JetBrains Mono, monospace',
+                              fontFamily: 'var(--font-display)',
                             }}
                           >
                             <span style={{ color: 'var(--text-dim)', fontSize: '0.75rem' }}>#{s.set_number}</span>
-                            <strong style={{ color: s.is_warmup ? 'var(--text-dim)' : '#fff' }}>
+                            <strong style={{ color: s.is_warmup ? 'var(--text-dim)' : 'var(--text-main)' }}>
                               {formatLoad(s.load_kg)} × {s.reps}
                             </strong>
                             {s.rpe && (

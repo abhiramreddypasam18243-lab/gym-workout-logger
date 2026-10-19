@@ -152,21 +152,21 @@ export const ProfileSettings: React.FC = () => {
       </div>
 
       {successMessage && (
-        <div style={{ background: 'var(--accent-emerald-bg)', border: '1px solid var(--accent-emerald-border)', color: 'var(--accent-emerald)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="status">
+        <div style={{ background: 'var(--accent-emerald-bg)', border: '1px solid var(--accent-emerald-border)', color: 'var(--accent-emerald)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="status">
           <Check size={18} />
           <span>{successMessage}</span>
         </div>
       )}
 
       {errorMessage && (
-        <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
+        <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
           <AlertCircle size={18} />
           <span>{errorMessage}</span>
         </div>
       )}
 
       {exportSuccess && (
-        <div style={{ background: 'var(--accent-cyan-bg, rgba(6,182,212,0.1))', border: '1px solid var(--accent-cyan-border, rgba(6,182,212,0.3))', color: '#38bdf8', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="status">
+        <div style={{ background: 'var(--accent-cyan-bg, color-mix(in srgb, var(--accent-primary) 10%, transparent))', border: '1px solid var(--accent-cyan-border, color-mix(in srgb, var(--accent-primary) 30%, transparent))', color: 'var(--accent-primary)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="status">
           <FileJson size={18} />
           <span>{exportSuccess}</span>
         </div>
@@ -177,7 +177,7 @@ export const ProfileSettings: React.FC = () => {
         <div className="card" style={{ borderLeft: '4px solid var(--accent-primary)' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
             <div>
-              <h2 style={{ fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#fff' }}>
+              <h2 style={{ fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)' }}>
                 <Shield size={20} style={{ color: 'var(--accent-primary)' }} />
                 Age & Nutrition Eligibility (Rule S2)
               </h2>
@@ -206,7 +206,7 @@ export const ProfileSettings: React.FC = () => {
 
         {/* General Preferences */}
         <div className="card">
-          <h2 style={{ fontSize: '1.15rem', marginBottom: '1rem', color: '#fff' }}>General Preferences</h2>
+          <h2 style={{ fontSize: '1.15rem', marginBottom: '1rem', color: 'var(--text-main)' }}>General Preferences</h2>
 
           <div className="form-group">
             <label className="form-label" htmlFor="display-name">Display Name</label>
@@ -283,7 +283,7 @@ export const ProfileSettings: React.FC = () => {
         <div className="card">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
             <Heart size={20} style={{ color: 'var(--accent-rose)' }} />
-            <h2 style={{ fontSize: '1.15rem', color: '#fff' }}>Wellbeing & Privacy Controls (Rule S7)</h2>
+            <h2 style={{ fontSize: '1.15rem', color: 'var(--text-main)' }}>Wellbeing & Privacy Controls (Rule S7)</h2>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -296,7 +296,7 @@ export const ProfileSettings: React.FC = () => {
                 style={{ width: '18px', height: '18px', accentColor: 'var(--accent-primary)', marginTop: '2px' }}
               />
               <div>
-                <strong style={{ color: '#fff', fontSize: '0.875rem' }}>Hide Calorie Numbers (AC-24)</strong>
+                <strong style={{ color: 'var(--text-main)', fontSize: '0.875rem' }}>Hide Calorie Numbers (AC-24)</strong>
                 <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
                   Hides calorie and kcal displays across all screens. Macros (protein, carbs, fat) remain visible.
                 </p>
@@ -312,7 +312,7 @@ export const ProfileSettings: React.FC = () => {
                 style={{ width: '18px', height: '18px', accentColor: 'var(--accent-primary)', marginTop: '2px' }}
               />
               <div>
-                <strong style={{ color: '#fff', fontSize: '0.875rem' }}>Pause Nutrition Features (AC-25)</strong>
+                <strong style={{ color: 'var(--text-main)', fontSize: '0.875rem' }}>Pause Nutrition Features (AC-25)</strong>
                 <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
                   Disables diet planning and food logging while keeping all your workout logging features active.
                 </p>
@@ -328,7 +328,7 @@ export const ProfileSettings: React.FC = () => {
                 style={{ width: '18px', height: '18px', accentColor: 'var(--accent-primary)', marginTop: '2px' }}
               />
               <div>
-                <strong style={{ color: '#fff', fontSize: '0.875rem' }}>Opt-in: Track Body Weight (AC-26)</strong>
+                <strong style={{ color: 'var(--text-main)', fontSize: '0.875rem' }}>Opt-in: Track Body Weight (AC-26)</strong>
                 <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
                   Disabled by default. Body weight is never requested or charted unless you opt in.
                 </p>
@@ -344,7 +344,7 @@ export const ProfileSettings: React.FC = () => {
                 style={{ width: '18px', height: '18px', accentColor: 'var(--accent-primary)', marginTop: '2px' }}
               />
               <div>
-                <strong style={{ color: '#fff', fontSize: '0.875rem' }}>Working with a Healthcare Professional (Rule S3, AC-18)</strong>
+                <strong style={{ color: 'var(--text-main)', fontSize: '0.875rem' }}>Working with a Healthcare Professional (Rule S3, AC-18)</strong>
                 <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
                   Disables automated estimates and requires manual targets as directed by your dietitian or doctor.
                 </p>
@@ -368,8 +368,8 @@ export const ProfileSettings: React.FC = () => {
 
       {/* Data Controls & Privacy (AC-88, AC-89) */}
       <div style={{ marginTop: '2.5rem' }}>
-        <h2 style={{ fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#fff', marginBottom: '0.5rem' }}>
-          <FileJson style={{ color: 'var(--accent-cyan, #06b6d4)' }} />
+        <h2 style={{ fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', marginBottom: '0.5rem' }}>
+          <FileJson style={{ color: 'var(--accent-cyan, var(--accent-primary))' }} />
           Data Controls & Privacy Rights
         </h2>
         <p style={{ fontSize: '0.875rem', color: 'var(--text-dim)', marginBottom: '1.25rem' }}>
@@ -381,11 +381,11 @@ export const ProfileSettings: React.FC = () => {
           <div className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem' }}>
-                <div style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)', background: 'rgba(6, 182, 212, 0.15)', color: '#38bdf8' }}>
+                <div style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)', background: 'color-mix(in srgb, var(--accent-primary) 15%, transparent)', color: 'var(--accent-primary)' }}>
                   <Download size={20} />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '1rem', color: '#fff', margin: 0 }}>Export All Personal Data (AC-88)</h3>
+                  <h3 style={{ fontSize: '1rem', color: 'var(--text-main)', margin: 0 }}>Export All Personal Data (AC-88)</h3>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Validated against published JSON Schema</span>
                 </div>
               </div>
@@ -409,8 +409,8 @@ export const ProfileSettings: React.FC = () => {
           <div
             className="card"
             style={{
-              borderColor: 'rgba(239, 68, 68, 0.3)',
-              background: 'linear-gradient(180deg, rgba(239, 68, 68, 0.04) 0%, rgba(20, 24, 33, 0.6) 100%)',
+              borderColor: 'color-mix(in srgb, var(--accent-rose) 30%, transparent)',
+              background: 'var(--accent-rose-bg)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
@@ -418,11 +418,11 @@ export const ProfileSettings: React.FC = () => {
           >
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem' }}>
-                <div style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)', background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}>
+                <div style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)', background: 'color-mix(in srgb, var(--accent-rose) 15%, transparent)', color: 'var(--accent-rose)' }}>
                   <Trash2 size={20} />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '1rem', color: '#f87171', margin: 0 }}>Delete Account (AC-89)</h3>
+                  <h3 style={{ fontSize: '1rem', color: 'var(--accent-rose)', margin: 0 }}>Delete Account (AC-89)</h3>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Permanent & Irreversible</span>
                 </div>
               </div>
@@ -444,9 +444,9 @@ export const ProfileSettings: React.FC = () => {
                 justifyContent: 'center',
                 gap: '0.5rem',
                 width: '100%',
-                background: 'rgba(239, 68, 68, 0.15)',
-                color: '#f87171',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
+                background: 'color-mix(in srgb, var(--accent-rose) 15%, transparent)',
+                color: 'var(--accent-rose)',
+                border: '1px solid color-mix(in srgb, var(--accent-rose) 30%, transparent)',
               }}
             >
               <Trash2 size={16} />
@@ -463,7 +463,6 @@ export const ProfileSettings: React.FC = () => {
             position: 'fixed',
             inset: 0,
             backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            backdropFilter: 'blur(6px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -479,16 +478,16 @@ export const ProfileSettings: React.FC = () => {
             style={{
               maxWidth: '460px',
               width: '100%',
-              border: '1px solid rgba(239, 68, 68, 0.4)',
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(239, 68, 68, 0.2)',
+              border: '1px solid color-mix(in srgb, var(--accent-rose) 40%, transparent)',
+              boxShadow: 'none',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-              <div style={{ padding: '0.625rem', borderRadius: '50%', background: 'rgba(239, 68, 68, 0.2)', color: '#f87171' }}>
+              <div style={{ padding: '0.625rem', borderRadius: '50%', background: 'color-mix(in srgb, var(--accent-rose) 20%, transparent)', color: 'var(--accent-rose)' }}>
                 <AlertTriangle size={24} />
               </div>
               <div>
-                <h3 id="delete-dialog-title" style={{ fontSize: '1.15rem', color: '#fff', margin: 0 }}>
+                <h3 id="delete-dialog-title" style={{ fontSize: '1.15rem', color: 'var(--text-main)', margin: 0 }}>
                   Confirm Permanent Deletion
                 </h3>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Action cannot be undone</span>
@@ -563,8 +562,8 @@ export const ProfileSettings: React.FC = () => {
                   className="btn"
                   disabled={isDeleting}
                   style={{
-                    background: '#ef4444',
-                    color: '#fff',
+                    background: 'var(--accent-rose)',
+                    color: 'var(--text-main)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.5rem',

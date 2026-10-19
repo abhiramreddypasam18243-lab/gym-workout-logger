@@ -5,7 +5,7 @@
 ![Security](https://img.shields.io/badge/pip--audit-0%20vulnerabilities-10b981?style=flat-square)
 ![Frontend](https://img.shields.io/badge/frontend-React%2019%20%7C%20Vite%20%7C%20TypeScript-38bdf8?style=flat-square)
 ![Backend](https://img.shields.io/badge/backend-FastAPI%20%7C%20SQLAlchemy%202%20%7C%20PostgreSQL%2016-38bdf8?style=flat-square)
-![Design](https://img.shields.io/badge/design-Level%20100%20Titanium%20SaaS-f59e0b?style=flat-square)
+![Design](https://img.shields.io/badge/design-Bold%20%26%20Sporty-ff5a1f?style=flat-square)
 
 A production-grade, full-stack athletic performance cockpit combining workout logging, automated progressive overload telemetry, e1RM analytics, and a deterministic, rule-based dietary planning engine.
 
@@ -13,11 +13,11 @@ A production-grade, full-stack athletic performance cockpit combining workout lo
 
 ---
 
-## ⚡ Level 100 Athletic SaaS User Interface
+## ⚡ User Interface
 
-The interface features a state-of-the-art dark titanium design system inspired by Whoop, Apple Fitness+, and Linear:
+The interface uses a bold, sporty design system (`frontend/src/index.css`):
 
-- **Atmospheric Dark Titanium Design System**: Dual breathing radial auras (`#38bdf8` cyan and `#10b981` emerald) with dynamic CSS pulse animations, microdot telemetry texture backdrop, and glassmorphism 2.0 cards with specular top rim highlights (`inset 0 1px 0 rgba(255,255,255,0.15)`).
+- **Bold & Sporty Design System**: Black background, one strong accent colour (Blaze Orange by default; Race Red, Volt and Ice in the navbar picker), Barlow Condensed capitals for headings and numbers, flat panels with square edges, and no glow effects. Every colour comes from CSS variables, so changing the accent restyles the whole app.
 - **Interactive Recovery Rest Timer HUD**: Floating interactive widget with a circular SVG countdown ring, quick presets (**30s, 60s, 90s, 2m, 3m**), `-15s` / `+15s` micro-adjusters, and automatic triggers on set completion.
 - **Zero-Latency Web Audio API Synthesis**: Pure browser-native sound generation without external asset requests. Synthesizes harmonic dual-tone set completion chimes, rest expiration fanfare, and tactile feedback with persistent mute/unmute control.
 - **Global Command Palette (`Ctrl+K` / `⌘K`)**: Instant fuzzy-search spotlight navigation with arrow key navigation across exercises, routines, food logs, and app controls.

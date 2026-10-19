@@ -86,12 +86,10 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header
       style={{
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-        background: 'rgba(7, 11, 22, 0.88)',
+        background: 'var(--bg-surface)',
         position: 'sticky',
         top: 0,
         zIndex: 50,
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
       }}
     >
@@ -125,15 +123,15 @@ export const Navbar: React.FC<NavbarProps> = ({
         >
           <div
             style={{
-              background: 'linear-gradient(135deg, #0284c7, #38bdf8)',
+              background: 'var(--accent-primary)',
               width: '38px',
               height: '38px',
-              borderRadius: '10px',
+              borderRadius: 'var(--radius-sm)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#031120',
-              boxShadow: '0 0 16px rgba(56, 189, 248, 0.45)',
+              color: 'var(--bg-surface)',
+              boxShadow: 'none',
               flexShrink: 0,
             }}
           >
@@ -148,7 +146,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 lineHeight: 1.1,
               }}
             >
-              <span style={{ color: '#fff' }}>TITAN</span>{' '}
+              <span style={{ color: 'var(--text-main)' }}>TITAN</span>{' '}
               <span className="text-gradient-cyan">STRENGTH</span>
             </div>
             <div
@@ -176,14 +174,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             padding: '0.4rem 0.85rem',
             background: 'rgba(255, 255, 255, 0.05)',
             border: '1px solid rgba(255, 255, 255, 0.09)',
-            borderRadius: '9999px',
+            borderRadius: 'var(--radius-sm)',
             color: 'var(--text-dim)',
             fontSize: '0.8125rem',
             cursor: 'pointer',
             transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.4)'
+            e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--accent-primary) 40%, transparent)'
             e.currentTarget.style.color = 'var(--text-muted)'
           }}
           onMouseLeave={(e) => {
@@ -199,7 +197,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             style={{
               background: 'rgba(255, 255, 255, 0.07)',
               padding: '1px 5px',
-              borderRadius: '4px',
+              borderRadius: '2px',
               fontSize: '0.6875rem',
               fontWeight: 700,
               fontFamily: 'var(--font-mono)',
@@ -214,9 +212,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           className="nav-scroll"
           aria-label="Main Navigation"
           style={{
-            background: 'rgba(14, 21, 38, 0.65)',
+            background: 'var(--bg-surface)',
             padding: '4px',
-            borderRadius: '12px',
+            borderRadius: 'var(--radius-sm)',
             border: '1px solid rgba(255, 255, 255, 0.06)',
           }}
         >
@@ -233,10 +231,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }}
                 aria-current={isActive ? 'page' : undefined}
                 style={{
-                  borderRadius: '8px',
+                  borderRadius: 'var(--radius-sm)',
                   fontWeight: isActive ? 800 : 600,
                   transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                  boxShadow: isActive ? '0 4px 12px rgba(56, 189, 248, 0.35)' : 'none',
+                  boxShadow: isActive ? 'none' : 'none',
                 }}
               >
                 {item.icon}
@@ -282,9 +280,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              background: 'rgba(14, 21, 38, 0.7)',
+              background: 'var(--bg-surface)',
               padding: '4px 8px',
-              borderRadius: '9999px',
+              borderRadius: 'var(--radius-sm)',
               border: '1px solid rgba(255, 255, 255, 0.08)',
             }}
             title="Change Athletic Color Theme"
@@ -325,14 +323,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                   width: '32px',
                   height: '32px',
                   borderRadius: '50%',
-                  background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(99, 102, 241, 0.2))',
-                  border: '1px solid rgba(56, 189, 248, 0.35)',
+                  background: 'var(--accent-primary-soft)',
+                  border: '1px solid color-mix(in srgb, var(--accent-primary) 35%, transparent)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontWeight: 800,
                   fontSize: '0.8125rem',
-                  color: '#fff',
+                  color: 'var(--text-main)',
                 }}
                 title={profile?.display_name || user.email}
               >

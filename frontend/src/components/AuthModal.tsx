@@ -62,7 +62,7 @@ export const AuthModal: React.FC = () => {
     <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem 1rem' }}>
       <div className="card" style={{ width: '100%', maxWidth: '420px', padding: '2rem' }}>
         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-          <div style={{ display: 'inline-flex', background: 'linear-gradient(135deg, #0284c7, #38bdf8)', width: '48px', height: '48px', borderRadius: '12px', alignItems: 'center', justifyContent: 'center', color: '#04111d', marginBottom: '0.75rem' }}>
+          <div style={{ display: 'inline-flex', background: 'var(--accent-primary)', width: '48px', height: '48px', borderRadius: 'var(--radius-sm)', alignItems: 'center', justifyContent: 'center', color: 'var(--text-on-accent)', marginBottom: '0.75rem' }}>
             <Dumbbell size={28} strokeWidth={2.5} />
           </div>
           <h1 style={{ fontSize: '1.5rem' }}>Titan Strength</h1>
@@ -80,7 +80,7 @@ export const AuthModal: React.FC = () => {
               flex: 1,
               borderRadius: 0,
               borderBottom: mode === 'login' ? '2px solid var(--accent-primary)' : '2px solid transparent',
-              color: mode === 'login' ? '#fff' : 'var(--text-dim)',
+              color: mode === 'login' ? 'var(--text-main)' : 'var(--text-dim)',
               fontWeight: 700,
             }}
             onClick={() => {
@@ -98,7 +98,7 @@ export const AuthModal: React.FC = () => {
               flex: 1,
               borderRadius: 0,
               borderBottom: mode === 'register' ? '2px solid var(--accent-primary)' : '2px solid transparent',
-              color: mode === 'register' ? '#fff' : 'var(--text-dim)',
+              color: mode === 'register' ? 'var(--text-main)' : 'var(--text-dim)',
               fontWeight: 700,
             }}
             onClick={() => {
@@ -112,7 +112,7 @@ export const AuthModal: React.FC = () => {
         </div>
 
         {errorMessage && (
-          <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.625rem 0.875rem', borderRadius: 'var(--radius-md)', marginBottom: '1rem', fontSize: '0.8125rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
+          <div style={{ background: 'var(--accent-rose-bg)', border: '1px solid var(--accent-rose-border)', color: 'var(--accent-rose)', padding: '0.625rem 0.875rem', borderRadius: 'var(--radius-sm)', marginBottom: '1rem', fontSize: '0.8125rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
             <AlertCircle size={16} />
             <span>{errorMessage}</span>
           </div>
