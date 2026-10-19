@@ -978,5 +978,547 @@
         "edible_weight_g": 5.0
       }
     ]
+  },
+  {
+    "name": "Egg Bhurji with Atta Roti",
+    "cuisine_code": "indian",
+    "instructions": "Knead atta with water and roll thin rotis; cook on a hot tawa. Saute onion and tomato in oil, add beaten eggs with turmeric and chilli, and scramble until just set. Serve with the rotis.",
+    "prep_minutes": 10,
+    "cook_minutes": 15,
+    "servings": 2.0,
+    "cost_minor_per_serving": 2000,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "high_protein",
+      "budget_friendly"
+    ],
+    "meal_types": [
+      "breakfast"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Whole Egg",
+        "ingredient_name": "Eggs",
+        "quantity": 200.0,
+        "unit": "g",
+        "edible_weight_g": 200.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Chopped tomato",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Coconut Oil",
+        "ingredient_name": "Oil",
+        "quantity": 8.0,
+        "unit": "g",
+        "edible_weight_g": 8.0
+      },
+      {
+        "food_name": "Whole Wheat Flour (Atta)",
+        "ingredient_name": "Atta for roti",
+        "quantity": 120.0,
+        "unit": "g",
+        "edible_weight_g": 120.0
+      }
+    ]
+  },
+  {
+    "name": "Masala Oats with Egg Whites",
+    "cuisine_code": "indian",
+    "instructions": "Saute onion, tomato and spinach with spices, add oats and water and simmer until thick. Stir in egg whites and cook for two minutes until set.",
+    "prep_minutes": 5,
+    "cook_minutes": 10,
+    "servings": 1.0,
+    "cost_minor_per_serving": 3800,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "high_protein",
+      "budget_friendly"
+    ],
+    "meal_types": [
+      "breakfast"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Rolled Oats",
+        "ingredient_name": "Rolled oats",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Egg White",
+        "ingredient_name": "Egg whites",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 40.0,
+        "unit": "g",
+        "edible_weight_g": 40.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Chopped tomato",
+        "quantity": 40.0,
+        "unit": "g",
+        "edible_weight_g": 40.0
+      },
+      {
+        "food_name": "Spinach (Raw)",
+        "ingredient_name": "Spinach",
+        "quantity": 30.0,
+        "unit": "g",
+        "edible_weight_g": 30.0
+      }
+    ]
+  },
+  {
+    "name": "Peanut Butter Banana Toast",
+    "cuisine_code": "indian",
+    "instructions": "Toast the bread, spread with peanut butter and top with sliced banana.",
+    "prep_minutes": 5,
+    "cook_minutes": 2,
+    "servings": 1.0,
+    "cost_minor_per_serving": 1900,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "vegetarian",
+      "budget_friendly"
+    ],
+    "meal_types": [
+      "breakfast",
+      "snack"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Whole Wheat Bread",
+        "ingredient_name": "Whole wheat bread",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Peanut Butter (Smooth)",
+        "ingredient_name": "Peanut butter",
+        "quantity": 20.0,
+        "unit": "g",
+        "edible_weight_g": 20.0
+      },
+      {
+        "food_name": "Banana (Raw)",
+        "ingredient_name": "Banana",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      }
+    ]
+  },
+  {
+    "name": "Masoor Dal with Atta Roti",
+    "cuisine_code": "indian",
+    "instructions": "Pressure-cook masoor dal with turmeric until soft. Temper ghee with cumin, onion and tomato and stir into the dal. Serve with hot atta rotis.",
+    "prep_minutes": 10,
+    "cook_minutes": 25,
+    "servings": 2.0,
+    "cost_minor_per_serving": 1600,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "vegetarian",
+      "high_protein",
+      "budget_friendly"
+    ],
+    "meal_types": [
+      "lunch",
+      "dinner"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Red Lentils (Masoor Dal, Raw)",
+        "ingredient_name": "Masoor dal",
+        "quantity": 120.0,
+        "unit": "g",
+        "edible_weight_g": 120.0
+      },
+      {
+        "food_name": "Whole Wheat Flour (Atta)",
+        "ingredient_name": "Atta for roti",
+        "quantity": 160.0,
+        "unit": "g",
+        "edible_weight_g": 160.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Chopped tomato",
+        "quantity": 80.0,
+        "unit": "g",
+        "edible_weight_g": 80.0
+      },
+      {
+        "food_name": "Ghee (Clarified Butter)",
+        "ingredient_name": "Ghee for tadka",
+        "quantity": 10.0,
+        "unit": "g",
+        "edible_weight_g": 10.0
+      }
+    ]
+  },
+  {
+    "name": "Chana Aloo Curry with Rice",
+    "cuisine_code": "indian",
+    "instructions": "Cook onion and tomato in oil with chana masala spices, add boiled chickpeas and diced potato with water and simmer until the potato is tender. Serve over steamed rice.",
+    "prep_minutes": 10,
+    "cook_minutes": 25,
+    "servings": 2.0,
+    "cost_minor_per_serving": 2200,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "vegan",
+      "gluten_free",
+      "dairy_free",
+      "budget_friendly"
+    ],
+    "meal_types": [
+      "lunch",
+      "dinner"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Chickpeas (Chana, Boiled)",
+        "ingredient_name": "Boiled chana",
+        "quantity": 300.0,
+        "unit": "g",
+        "edible_weight_g": 300.0
+      },
+      {
+        "food_name": "Russet Potato (Raw)",
+        "ingredient_name": "Diced potato",
+        "quantity": 200.0,
+        "unit": "g",
+        "edible_weight_g": 200.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 80.0,
+        "unit": "g",
+        "edible_weight_g": 80.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Chopped tomato",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Coconut Oil",
+        "ingredient_name": "Oil",
+        "quantity": 10.0,
+        "unit": "g",
+        "edible_weight_g": 10.0
+      },
+      {
+        "food_name": "White Basmati Rice (Raw)",
+        "ingredient_name": "Rice",
+        "quantity": 140.0,
+        "unit": "g",
+        "edible_weight_g": 140.0
+      }
+    ]
+  },
+  {
+    "name": "Toor Dal Khichdi with Spinach",
+    "cuisine_code": "indian",
+    "instructions": "Pressure-cook rice with water, then mix in cooked toor dal and chopped spinach and simmer. Finish with a ghee and onion tadka.",
+    "prep_minutes": 10,
+    "cook_minutes": 20,
+    "servings": 2.0,
+    "cost_minor_per_serving": 2100,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "vegetarian",
+      "gluten_free",
+      "budget_friendly"
+    ],
+    "meal_types": [
+      "lunch",
+      "dinner"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Yellow Lentils (Toor Dal, Boiled)",
+        "ingredient_name": "Cooked toor dal",
+        "quantity": 250.0,
+        "unit": "g",
+        "edible_weight_g": 250.0
+      },
+      {
+        "food_name": "White Basmati Rice (Raw)",
+        "ingredient_name": "Rice",
+        "quantity": 120.0,
+        "unit": "g",
+        "edible_weight_g": 120.0
+      },
+      {
+        "food_name": "Spinach (Raw)",
+        "ingredient_name": "Spinach",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Ghee (Clarified Butter)",
+        "ingredient_name": "Ghee",
+        "quantity": 10.0,
+        "unit": "g",
+        "edible_weight_g": 10.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 50.0,
+        "unit": "g",
+        "edible_weight_g": 50.0
+      }
+    ]
+  },
+  {
+    "name": "Egg & Potato Curry with Atta Roti",
+    "cuisine_code": "indian",
+    "instructions": "Hard-boil the eggs. Cook onion and tomato masala in oil, add diced potato and water and simmer until tender, then add the halved eggs. Serve with atta rotis.",
+    "prep_minutes": 15,
+    "cook_minutes": 25,
+    "servings": 2.0,
+    "cost_minor_per_serving": 2400,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "high_protein",
+      "budget_friendly"
+    ],
+    "meal_types": [
+      "lunch",
+      "dinner"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Whole Egg",
+        "ingredient_name": "Eggs",
+        "quantity": 200.0,
+        "unit": "g",
+        "edible_weight_g": 200.0
+      },
+      {
+        "food_name": "Russet Potato (Raw)",
+        "ingredient_name": "Diced potato",
+        "quantity": 150.0,
+        "unit": "g",
+        "edible_weight_g": 150.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 80.0,
+        "unit": "g",
+        "edible_weight_g": 80.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Chopped tomato",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Coconut Oil",
+        "ingredient_name": "Oil",
+        "quantity": 10.0,
+        "unit": "g",
+        "edible_weight_g": 10.0
+      },
+      {
+        "food_name": "Whole Wheat Flour (Atta)",
+        "ingredient_name": "Atta for roti",
+        "quantity": 120.0,
+        "unit": "g",
+        "edible_weight_g": 120.0
+      }
+    ]
+  },
+  {
+    "name": "Palak Masoor Dal with Brown Rice",
+    "cuisine_code": "indian",
+    "instructions": "Cook masoor dal until soft, add chopped spinach and simmer. Temper with ghee, onion and tomato. Serve over brown rice.",
+    "prep_minutes": 10,
+    "cook_minutes": 30,
+    "servings": 2.0,
+    "cost_minor_per_serving": 2300,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "vegetarian",
+      "gluten_free",
+      "high_protein",
+      "budget_friendly"
+    ],
+    "meal_types": [
+      "lunch",
+      "dinner"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Red Lentils (Masoor Dal, Raw)",
+        "ingredient_name": "Masoor dal",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Spinach (Raw)",
+        "ingredient_name": "Spinach",
+        "quantity": 150.0,
+        "unit": "g",
+        "edible_weight_g": 150.0
+      },
+      {
+        "food_name": "Brown Rice (Raw)",
+        "ingredient_name": "Brown rice",
+        "quantity": 140.0,
+        "unit": "g",
+        "edible_weight_g": 140.0
+      },
+      {
+        "food_name": "Ghee (Clarified Butter)",
+        "ingredient_name": "Ghee",
+        "quantity": 8.0,
+        "unit": "g",
+        "edible_weight_g": 8.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 50.0,
+        "unit": "g",
+        "edible_weight_g": 50.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Chopped tomato",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      }
+    ]
+  },
+  {
+    "name": "Chana Chaat",
+    "cuisine_code": "indian",
+    "instructions": "Toss boiled chickpeas with chopped onion, tomato and grated carrot, chaat masala, lemon juice and salt.",
+    "prep_minutes": 10,
+    "cook_minutes": 0,
+    "servings": 1.0,
+    "cost_minor_per_serving": 1100,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "vegan",
+      "gluten_free",
+      "dairy_free",
+      "budget_friendly"
+    ],
+    "meal_types": [
+      "snack"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Chickpeas (Chana, Boiled)",
+        "ingredient_name": "Boiled chana",
+        "quantity": 150.0,
+        "unit": "g",
+        "edible_weight_g": 150.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 30.0,
+        "unit": "g",
+        "edible_weight_g": 30.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Chopped tomato",
+        "quantity": 50.0,
+        "unit": "g",
+        "edible_weight_g": 50.0
+      },
+      {
+        "food_name": "Carrots (Raw)",
+        "ingredient_name": "Grated carrot",
+        "quantity": 30.0,
+        "unit": "g",
+        "edible_weight_g": 30.0
+      }
+    ]
+  },
+  {
+    "name": "Boiled Eggs with Masala Sweet Potato",
+    "cuisine_code": "indian",
+    "instructions": "Boil the eggs and the sweet potato. Cube the sweet potato and toss with onion, chaat masala and salt; serve with the halved eggs.",
+    "prep_minutes": 5,
+    "cook_minutes": 20,
+    "servings": 1.0,
+    "cost_minor_per_serving": 2200,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "gluten_free",
+      "dairy_free",
+      "high_protein",
+      "budget_friendly"
+    ],
+    "meal_types": [
+      "snack"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Whole Egg",
+        "ingredient_name": "Eggs",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Sweet Potato (Raw)",
+        "ingredient_name": "Sweet potato",
+        "quantity": 150.0,
+        "unit": "g",
+        "edible_weight_g": 150.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 20.0,
+        "unit": "g",
+        "edible_weight_g": 20.0
+      }
+    ]
   }
 ]

@@ -431,7 +431,7 @@ Dates and clocks in tests are injected, so results are deterministic.
 - [ ] **AC-48** (NFR) The database rejects a negative nutrient, a non-positive serving, and an invalid date range with its own `CHECK` constraints.
 - [ ] **AC-49** (DL1) Seed validation fails if any food lacks `data_source`, serving basis, state or `verified_at`; foods flagged `approximate` are labelled as such in API responses.
 - [ ] **AC-50** (DL1) For every seed food not flagged as an exception, `|kcal − (4 × protein + 4 × carbohydrate + 9 × fat)|` is at most the larger of 20 kcal and 15% of the food's kcal.
-- [ ] **AC-51** (FR-18) The seed command is idempotent (running it twice changes no counts) and loads 30 to 50 exercises, 40 to 60 foods and 15 to 25 recipes covering at least 4 cuisines, each recipe with at least 2 ingredients, valid servings and non-negative times.
+- [ ] **AC-51** (FR-18) The seed command is idempotent (running it twice changes no counts) and loads 30 to 50 exercises, 40 to 60 foods and 15 to 40 recipes covering at least 4 cuisines, each recipe with at least 2 ingredients, valid servings and non-negative times.
 - [ ] **AC-52** (S9) Every seed food has an allergen status; a recipe's allergens are the union of its ingredients' allergens; a recipe with a text-only ingredient reports its allergen data as incomplete.
 - [ ] **AC-53** (FR-06) Catalogue search filters by cuisine, diet tag and maximum time, with pagination.
 - [ ] **AC-54** (5.3) After a food's nutrient value is corrected in the catalogue, existing plan and log snapshots keep the old values, and new entries use the new ones.
@@ -611,6 +611,8 @@ Steps 5 and 6 (training) are independent of steps 7 to 9 (nutrition) once step 4
 | D-18 | 2026-10-16 | Neutral wording, a hide-calories option, a pause option, and opt-in weight tracking | Always show everything | Reduces harm for users for whom numbers are unhelpful |
 | D-19 | 2026-10-16 | A small reviewed catalogue with recorded sources and licences | Import a very large database | Quality, licence clarity and testability before scale |
 | D-20 | 2026-10-16 | An automated layering check (domain imports nothing from frameworks) | Convention only | Keeps the rules pure and testable |
+| D-27 | 2026-10-19 | New accounts start with "beef" in excluded ingredients (`DEFAULT_EXCLUDED_INGREDIENTS`); users can remove it | Remove beef from the catalogue; swap beef for chicken or mutton | India-focused app where many users avoid beef; keeps the catalogue intact and the choice with the user |
+| D-28 | 2026-10-19 | Ten Indian budget recipes (≤ ₹50/serving, tag `budget_friendly`) built only from existing catalogue foods; prices are documented estimates | Add new foods (rajma, besan, soya, curd) from USDA | USDA FoodData Central was unreachable from the network; existing foods need no new nutrient data. New foods can follow once USDA is reachable. AC-51 recipe range widened from 15–25 to 15–40 |
 
 ## 19. Open Questions
 

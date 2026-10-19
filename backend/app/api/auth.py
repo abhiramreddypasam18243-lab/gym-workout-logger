@@ -17,7 +17,7 @@ from app.api.deps import (
 )
 from app.config import get_settings
 from app.database import get_db
-from app.models.user import Session, User, UserProfile
+from app.models.user import Session, User, UserFoodConstraint, UserProfile
 from app.schemas.auth import LoginRequest, RegisterRequest
 from app.services.security import (
     DUMMY_PASSWORD_HASH,
@@ -86,6 +86,15 @@ async def register(
         display_name=payload.display_name or normalized_email.split("@")[0],
     )
     db.add(profile)
+    # Default exclusions (D-27): a normal, removable excluded-ingredient preference
+    for ingredient in settings.DEFAULT_EXCLUDED_INGREDIENTS:
+        db.add(
+            UserFoodConstraint(
+                user_id=user.id,
+                constraint_type="excluded_ingredient",
+                constraint_value=ingredient.strip().lower(),
+            )
+        )
     await db.commit()
     await db.refresh(user)
 

@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     REGISTRATION_ENABLED: bool = True
     DEMO_MODE: bool = False
 
+    # Excluded ingredients every new account starts with (D-27); users can remove them
+    DEFAULT_EXCLUDED_INGREDIENTS: list[str] = ["beef"]
+
     # Safety thresholds (spec §3, D-16)
     ESTIMATE_FLOOR_KCAL: int = 1500
     PLAN_MINIMUM_KCAL: int = 1200
