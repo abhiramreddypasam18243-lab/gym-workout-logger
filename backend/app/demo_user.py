@@ -16,6 +16,7 @@ from decimal import Decimal
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
 from app.database import async_session_factory
 from app.models.nutrition import (
     MealPlan,
@@ -23,7 +24,7 @@ from app.models.nutrition import (
     NutritionLog,
     Recipe,
 )
-from app.models.user import User, UserProfile
+from app.models.user import User, UserFoodConstraint, UserProfile
 from app.models.workout import (
     Exercise,
     RoutineExercise,
@@ -239,6 +240,16 @@ async def create_demo_user(
     for c in range(0, len(workout_sets), chunk_size):
         session.add_all(workout_sets[c : c + chunk_size])
         await session.flush()
+
+    # Same default exclusions as any new account (D-27)
+    for ingredient in settings.DEFAULT_EXCLUDED_INGREDIENTS:
+        session.add(
+            UserFoodConstraint(
+                user_id=demo_user_id,
+                constraint_type="excluded_ingredient",
+                constraint_value=ingredient.strip().lower(),
+            )
+        )
 
     # 9. Create the 7-day meal plan with the real planner, so every value comes from the
     #    reviewed catalogue (no invented nutrient data)

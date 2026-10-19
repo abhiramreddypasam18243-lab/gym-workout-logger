@@ -30,3 +30,4 @@ All decisions from the spec (section 18) plus project-specific choices made duri
 | D-24 | 2026-10-17 | Default currency INR, default units kg; users can switch to lb | USD/lb | Project context is India-based |
 | D-25 | 2026-10-17 | Open registration, toggleable via `REGISTRATION_ENABLED` env var | Invitation-only | Simplest for development; can be disabled for demo |
 | D-26 | 2026-10-17 | TLS via mkcert private CA | Caddy auto-certs; manual OpenSSL | One command, well-documented, works on all platforms |
+| D-27 | 2026-10-19 | New accounts start with "beef" in excluded ingredients (`DEFAULT_EXCLUDED_INGREDIENTS`); users can remove it | Remove beef from the catalogue; swap beef for chicken or mutton | India-focused app where many users avoid beef; keeps the catalogue intact and the choice with the user |

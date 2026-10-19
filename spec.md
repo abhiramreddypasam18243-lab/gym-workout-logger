@@ -611,6 +611,7 @@ Steps 5 and 6 (training) are independent of steps 7 to 9 (nutrition) once step 4
 | D-18 | 2026-10-16 | Neutral wording, a hide-calories option, a pause option, and opt-in weight tracking | Always show everything | Reduces harm for users for whom numbers are unhelpful |
 | D-19 | 2026-10-16 | A small reviewed catalogue with recorded sources and licences | Import a very large database | Quality, licence clarity and testability before scale |
 | D-20 | 2026-10-16 | An automated layering check (domain imports nothing from frameworks) | Convention only | Keeps the rules pure and testable |
+| D-27 | 2026-10-19 | New accounts start with "beef" in excluded ingredients (`DEFAULT_EXCLUDED_INGREDIENTS`); users can remove it | Remove beef from the catalogue; swap beef for chicken or mutton | India-focused app where many users avoid beef; keeps the catalogue intact and the choice with the user |
 
 ## 19. Open Questions
 
