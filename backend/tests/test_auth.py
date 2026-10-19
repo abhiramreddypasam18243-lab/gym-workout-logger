@@ -21,6 +21,7 @@ from pydantic import ValidationError
 from starlette.requests import Request
 
 from app.api.deps import verify_tls_for_login
+from app.config import settings
 from app.schemas.auth import LoginRequest, RegisterRequest
 from app.services.security import (
     DUMMY_PASSWORD_HASH,
@@ -155,6 +156,49 @@ def test_ac_07_tls_required_for_remote_clients():
     }
     req_remote_https = Request(scope_remote_https)
     verify_tls_for_login(req_remote_https)  # Does not raise
+
+
+def test_ac_07_forwarded_headers_only_from_trusted_proxy(monkeypatch):
+    """AC-07: X-Forwarded-Proto/For are ignored unless sent by TRUSTED_PROXY_IP."""
+    monkeypatch.setattr(settings, "TRUSTED_PROXY_IP", "10.0.0.5")
+
+    def make(peer: str, headers: list[tuple[bytes, bytes]]) -> Request:
+        return Request(
+            {
+                "type": "http",
+                "path": "/api/auth/login",
+                "client": (peer, 54321),
+                "scheme": "http",
+                "headers": headers,
+            }
+        )
+
+    # Untrusted remote client spoofing HTTPS -> still refused
+    spoofed = make("192.168.1.100", [(b"x-forwarded-proto", b"https")])
+    with pytest.raises(HTTPException) as exc_info:
+        verify_tls_for_login(spoofed)
+    assert exc_info.value.detail["code"] == "tls_required"
+
+    # Untrusted remote client spoofing a localhost X-Forwarded-For -> still refused
+    spoofed_for = make("192.168.1.100", [(b"x-forwarded-for", b"127.0.0.1")])
+    with pytest.raises(HTTPException):
+        verify_tls_for_login(spoofed_for)
+
+    # Trusted proxy forwarding an HTTPS request -> allowed
+    via_proxy = make(
+        "10.0.0.5",
+        [(b"x-forwarded-proto", b"https"), (b"x-forwarded-for", b"203.0.113.9")],
+    )
+    verify_tls_for_login(via_proxy)
+
+    # Trusted proxy forwarding plain HTTP from a remote client -> refused,
+    # even if the client prepended a fake localhost entry
+    plain_via_proxy = make(
+        "10.0.0.5",
+        [(b"x-forwarded-proto", b"http"), (b"x-forwarded-for", b"127.0.0.1, 203.0.113.9")],
+    )
+    with pytest.raises(HTTPException):
+        verify_tls_for_login(plain_via_proxy)
 
 
 def test_ac_09_unknown_fields_and_user_id_forbidden():

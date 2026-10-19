@@ -207,7 +207,7 @@ export const Dashboard: React.FC<{
 
   return (
     <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '1.75rem 1.25rem' }}>
-      {/* Top Hero Header with Animated Streak and Status Pills */}
+      {/* Top Hero Header with Status Pills */}
       <div
         className="card"
         style={{
@@ -223,23 +223,6 @@ export const Dashboard: React.FC<{
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
               <span className="badge badge-live">
                 <span className="pulse-dot" /> LIVE ADHERENCE
-              </span>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  padding: '0.25rem 0.65rem',
-                  borderRadius: '9999px',
-                  fontSize: '0.75rem',
-                  fontWeight: 800,
-                  background: 'rgba(245, 158, 11, 0.15)',
-                  border: '1px solid rgba(245, 158, 11, 0.4)',
-                  color: '#fbbf24',
-                  boxShadow: '0 0 12px rgba(245, 158, 11, 0.25)',
-                }}
-              >
-                🔥 7-DAY STREAK
               </span>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', fontWeight: 600 }}>
                 {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
@@ -518,10 +501,10 @@ export const Dashboard: React.FC<{
             <Info size={24} style={{ color: 'var(--text-dim)' }} />
             <div>
               <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-main)' }}>
-                Calorie Display Hidden
+                Energy Display Hidden
               </div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
-                Calorie numbers are concealed based on your profile privacy preference.
+                Energy numbers are hidden based on your wellbeing preference.
               </div>
             </div>
           </div>
@@ -865,9 +848,11 @@ export const Dashboard: React.FC<{
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                   {/* Snapshot Macros */}
                   <div style={{ textAlign: 'right', fontSize: '0.75rem' }}>
-                    <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>
-                      {log.items?.reduce((acc: number, it: any) => acc + (Number(it.nutrient_snapshot?.energy_kcal) || 0), 0)} kcal
-                    </div>
+                    {!isCaloriesHidden && (
+                      <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>
+                        {log.items?.reduce((acc: number, it: any) => acc + (Number(it.nutrient_snapshot?.energy_kcal) || 0), 0)} kcal
+                      </div>
+                    )}
                     <div style={{ color: 'var(--text-dim)', fontSize: '0.6875rem' }}>
                       P: {Math.round(log.items?.reduce((acc: number, it: any) => acc + (Number(it.nutrient_snapshot?.protein_g) || 0), 0))}g
                     </div>

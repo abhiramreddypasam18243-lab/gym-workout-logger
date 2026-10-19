@@ -13,7 +13,7 @@ config = context.config
 
 # Set up loggers
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 # Import all models here so Alembic detects them
 import app.models  # noqa: F401, E402

@@ -225,13 +225,18 @@ async def get_meal_plan(
             )
         )
 
-    explanation = ExplanationBlock(
-        constraints_applied=[],
-        scoring_weights={k: str(v) for k, v in DEFAULT_WEIGHTS.items()},
-        generation_version=plan.generation_version,
-        catalog_version="1.0",
-        share_approximate_nutrients=0.0,
-    )
+    stored_explanation = (plan.target_snapshot or {}).get("explanation")
+    if stored_explanation:
+        explanation = ExplanationBlock.model_validate(stored_explanation)
+    else:
+        # Plans generated before the explanation was stored with the plan
+        explanation = ExplanationBlock(
+            constraints_applied=[],
+            scoring_weights={k: str(v) for k, v in DEFAULT_WEIGHTS.items()},
+            generation_version=plan.generation_version,
+            catalog_version="1.0",
+            share_approximate_nutrients=0.0,
+        )
 
     return MealPlanResponse(
         id=plan.id,

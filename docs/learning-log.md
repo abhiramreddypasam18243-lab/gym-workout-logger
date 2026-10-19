@@ -491,3 +491,24 @@ Each step adds an entry: what was built, why it's designed that way, one risk, a
 
 
 
+
+---
+
+## Review fixes (2026-10-19): safety bypasses, Postgres tests, missing AC tests
+
+**What was built**
+- The under-18 check now uses an injected clock (`get_now` in `app/api/deps.py`) instead of the `X-Current-Date` header, which any client could send to skip rule S2.
+- `X-Forwarded-Proto` and `X-Forwarded-For` are trusted only from `TRUSTED_PROXY_IP` (IPs, CIDRs or `*`). Otherwise a remote client could claim HTTPS or claim to be localhost.
+- CORS refuses `*`; dev origins are added only in development. Render now runs with `ENVIRONMENT=production`.
+- `init_db` stops if a migration fails (no silent `create_all`), and creates the demo user only with `DEMO_MODE=true`.
+- Migration `002_align_indexes` makes `alembic check` report no drift (AC-97).
+- The planner calculates `share_approximate_nutrients` (it was hard-coded to 0) and stores the explanation with the plan, so `GET /meal-plans/{id}` returns it unchanged (AC-72, D-09).
+- UI: the hard-coded "7-day streak" badge was removed, and the remaining calorie numbers are hidden when `calories_hidden` is on (AC-24).
+- All database tests run on PostgreSQL (`tests/db.py`, `TEST_DATABASE_URL`). New tests cover AC-05, 26, 29, 30, 65, 71, 72 and 97.
+
+**Why it is designed this way**
+- A request header is client input, so it can never be a test hook. Example: a 17-year-old sends `X-Current-Date: 2099-01-01` and the age check computes 72. With the clock injected via `app.dependency_overrides[get_now]`, only test code can move time.
+- `X-Forwarded-For: 127.0.0.1, 203.0.113.9`: the leftmost entry is whatever the client wrote; the rightmost is what our proxy appended. So we read the rightmost, and only when the request really came from the proxy.
+
+**One thing that could go wrong**
+- With Docker Compose, nginx reaches the backend from a Docker network address, so remote-login rules depend on `TRUSTED_PROXY_IP` matching that network and on TLS being in front (D-16/D-26, not yet set up).

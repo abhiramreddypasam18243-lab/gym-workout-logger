@@ -13,6 +13,7 @@ import pytest
 
 from app.models.nutrition import MealPlan, NutritionLog
 from app.models.workout import WorkoutRoutine, WorkoutSession
+from tests.db import create_test_engine, reset_schema
 
 
 def test_ac_08_ownership_isolation_contract():
@@ -60,11 +61,10 @@ async def test_ac_08_api_ownership_matrix():
     from datetime import UTC, datetime, timedelta
 
     from httpx import ASGITransport, AsyncClient
-    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
     from app.api.deps import get_db
     from app.main import app
-    from app.models.base import Base
     from app.models.user import Session, User
     from app.models.workout import (
         Exercise,
@@ -75,9 +75,9 @@ async def test_ac_08_api_ownership_matrix():
     )
     from app.services.security import generate_csrf_token, generate_session_token, hash_token
 
-    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+    engine = create_test_engine()
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(reset_schema)
 
     session_factory = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     async with session_factory() as db:

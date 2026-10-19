@@ -8,10 +8,9 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.main import app
-from app.models.base import Base
 from app.models.nutrition import (
     Food,
     FoodNutrient,
@@ -28,13 +27,14 @@ from app.seed.loader import (
     validate_food_provenance,
 )
 from app.services.security import generate_csrf_token, generate_session_token, hash_token
+from tests.db import create_test_engine, reset_schema
 
 
 @pytest_asyncio.fixture
 async def test_db():
-    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+    engine = create_test_engine()
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(reset_schema)
 
     session_factory = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     async with session_factory() as session:

@@ -7,20 +7,20 @@ from pathlib import Path
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.api.deps import get_db
+from app.api.deps import get_db, get_now
 from app.main import app
-from app.models.base import Base
 from app.models.user import Session, User, UserProfile
 from app.services.security import generate_csrf_token, generate_session_token, hash_token
+from tests.db import create_test_engine, reset_schema
 
 
 @pytest_asyncio.fixture
 async def test_db():
-    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+    engine = create_test_engine()
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(reset_schema)
 
     session_factory = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     async with session_factory() as session:
@@ -156,10 +156,8 @@ async def test_ac_17_adult_confirmation_and_minor_blocking(unconfirmed_user_clie
     await client.post("/api/profile/confirm-adult")
 
     # 3. On 2026-10-15 (age 17): nutrition is blocked with nutrition_not_available_for_minors
-    minor_res = await client.get(
-        "/api/nutrition/goals",
-        headers={"X-Current-Date": "2026-10-15"},
-    )
+    app.dependency_overrides[get_now] = lambda: datetime(2026, 10, 15, 12, 0, tzinfo=UTC)
+    minor_res = await client.get("/api/nutrition/goals")
     assert minor_res.status_code == 403
     assert minor_res.json()["detail"]["code"] == "nutrition_not_available_for_minors"
 
@@ -167,11 +165,16 @@ async def test_ac_17_adult_confirmation_and_minor_blocking(unconfirmed_user_clie
     assert (await client.get("/api/workouts")).status_code == 200
 
     # 4. On 2026-10-16 (turned 18!): nutrition planning is allowed
-    adult_res = await client.get(
-        "/api/nutrition/goals",
-        headers={"X-Current-Date": "2026-10-16"},
-    )
+    app.dependency_overrides[get_now] = lambda: datetime(2026, 10, 16, 12, 0, tzinfo=UTC)
+    adult_res = await client.get("/api/nutrition/goals")
     assert adult_res.status_code == 200
+
+    # 5. A client-supplied date header must not change the clock (S2 bypass regression)
+    app.dependency_overrides[get_now] = lambda: datetime(2026, 10, 15, 12, 0, tzinfo=UTC)
+    spoofed = await client.get("/api/nutrition/goals", headers={"X-Current-Date": "2099-01-01"})
+    assert spoofed.status_code == 403
+    assert spoofed.json()["detail"]["code"] == "nutrition_not_available_for_minors"
+    del app.dependency_overrides[get_now]
 
 
 # ---------------------------------------------------------------------------

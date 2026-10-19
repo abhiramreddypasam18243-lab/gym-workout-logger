@@ -1,9 +1,9 @@
 """Database initialization script run before starting the backend server (AC-97, AC-103).
 
 Ensures:
-1. Database tables are migrated to latest Alembic revision (with fallback to metadata create_all).
+1. Database tables are migrated to the latest Alembic revision; a failed migration stops startup.
 2. Exercise and food catalogues are seeded if not present.
-3. Synthetic demo account (demo@titanstrength.test / DemoUser2026!) exists.
+3. The synthetic demo account exists, only when DEMO_MODE is true.
 """
 
 import asyncio
@@ -14,9 +14,8 @@ from sqlalchemy import select
 
 from alembic import command
 from app.config import settings
-from app.database import async_session_factory, engine
+from app.database import async_session_factory
 from app.demo_user import DEMO_EMAIL, create_demo_user
-from app.models.base import Base
 from app.models.user import User
 from app.models.workout import Exercise
 from app.seed.loader import run_seed
@@ -28,20 +27,12 @@ logger = logging.getLogger("init_db")
 def run_migrations() -> None:
     """Run Alembic migrations up to head."""
     logger.info("Applying database migrations with Alembic...")
-    try:
-        cfg = Config("alembic.ini")
-        command.upgrade(cfg, "head")
-        logger.info("Alembic migrations completed successfully.")
-    except Exception as exc:
-        logger.warning("Alembic migration encountered an issue (%s). Running schema sync fallback...", exc)
+    command.upgrade(Config("alembic.ini"), "head")
+    logger.info("Alembic migrations completed successfully.")
 
 
 async def seed_data() -> None:
     """Ensure schema exists, seed exercises/foods, and initialize demo user."""
-    # Ensure tables exist in case migration fallback was needed
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
     async with async_session_factory() as session:
         # Check if catalogue is already seeded
         res = await session.execute(select(Exercise).limit(1))
@@ -53,6 +44,10 @@ async def seed_data() -> None:
             logger.info("Catalogue seed complete.")
         else:
             logger.info("Catalogue already populated.")
+
+        if not settings.DEMO_MODE:
+            logger.info("DEMO_MODE is off; skipping synthetic demo user.")
+            return
 
         # Check if demo user exists
         user_res = await session.execute(select(User).where(User.email == DEMO_EMAIL))

@@ -218,7 +218,7 @@ export const NutritionPlanner: React.FC = () => {
           <Heart size={44} style={{ color: 'var(--accent-amber)', margin: '0 auto 1rem' }} />
           <h2>Nutrition Features Are Currently Paused</h2>
           <p style={{ marginTop: '0.5rem', maxWidth: '480px', marginInline: 'auto' }}>
-            In accordance with Rule S7, nutrition planning and calorie displays are currently switched off. All your training and workout features remain fully functional.
+            In accordance with Rule S7, nutrition planning and energy displays are currently switched off. All your training and workout features remain fully functional.
           </p>
           <button
             type="button"
@@ -340,7 +340,7 @@ export const NutritionPlanner: React.FC = () => {
                   Effective from {activeGoal?.effective_from || 'today'}
                 </span>
               </div>
-              {activeGoal?.warning && (
+              {activeGoal?.warning && !isCaloriesHidden && (
                 <span className="badge badge-amber">
                   {activeGoal.warning === 'below_recommended_minimum' ? 'Below Recommended Minimum (< 1500 kcal)' : activeGoal.warning}
                 </span>
@@ -382,7 +382,7 @@ export const NutritionPlanner: React.FC = () => {
 
             {isCaloriesHidden && (
               <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: '0.75rem', fontStyle: 'italic' }}>
-                Calorie numbers are hidden per your wellbeing preferences (Rule S7, AC-24).
+                Energy numbers are hidden per your wellbeing preferences.
               </p>
             )}
           </div>
@@ -646,7 +646,7 @@ export const NutritionPlanner: React.FC = () => {
                     </div>
 
                     <div style={{ background: '#090e1a', padding: '0.875rem', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Fat (25% kcal)</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>{isCaloriesHidden ? 'Fat' : 'Fat (25% kcal)'}</span>
                       <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
                         {estimateResult.fat_g} g
                       </div>
@@ -658,9 +658,9 @@ export const NutritionPlanner: React.FC = () => {
                     <div style={{ color: 'var(--text-main)', fontWeight: 600, marginBottom: '0.25rem' }}>
                       Formula: {estimateResult.formula}
                     </div>
-                    <div style={{ color: 'var(--text-dim)' }}>
+                    {!isCaloriesHidden && <div style={{ color: 'var(--text-dim)' }}>
                       BMR: <strong>{estimateResult.bmr} kcal</strong> • TDEE Multiplier: <strong>{estimateResult.activity_factor}</strong> • Goal Factor: <strong>{estimateResult.goal_adjustment}</strong>
-                    </div>
+                    </div>}
                   </div>
                 </div>
               )}

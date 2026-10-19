@@ -121,6 +121,7 @@ class PreparedRecipe:
                         "unit": ing.unit,
                         "quantity_base": ing.quantity,
                         "nutrients_per_100g": {k: str(v) for k, v in fn_map.items()},
+                        "approximate": bool(ing.food.approximate),
                     }
                 )
             else:
@@ -133,6 +134,7 @@ class PreparedRecipe:
                         "unit": ing.unit,
                         "quantity_base": ing.quantity,
                         "nutrients_per_100g": {},
+                        "approximate": False,
                     }
                 )
 
@@ -597,6 +599,31 @@ class DietPlannerService:
             "catalog_version": "1.0",
         }
 
+        # Explanation block (AC-72): share of the plan's nutrient values from approximate foods
+        nutrient_values_total = 0
+        nutrient_values_approximate = 0
+        for m in planned_meals_records:
+            for item_data in m["recipe"].ingredient_snapshots:
+                n_values = len(item_data["nutrients_per_100g"])
+                nutrient_values_total += n_values
+                if item_data["approximate"]:
+                    nutrient_values_approximate += n_values
+        explanation = ExplanationBlock(
+            constraints_applied=[
+                {"filter": k, "removed_count": v} for k, v in constraints_applied_summary.items()
+            ],
+            scoring_weights={k: str(v) for k, v in DEFAULT_WEIGHTS.items()},
+            generation_version="1.0",
+            catalog_version="1.0",
+            share_approximate_nutrients=(
+                round(nutrient_values_approximate / nutrient_values_total, 4)
+                if nutrient_values_total
+                else 0.0
+            ),
+        )
+        # Stored with the plan so later reads show the explanation as generated (D-09)
+        target_snapshot["explanation"] = explanation.model_dump()
+
         # 8. Transactional persistence (AC-71)
         end_date = payload.start_date + timedelta(days=payload.days - 1)
         meal_plan = MealPlan(
@@ -673,21 +700,6 @@ class DietPlannerService:
             )
 
         await self.db.commit()
-
-        # 9. Build Explanation Block (AC-72)
-        applied_list = [
-            {"filter": k, "removed_count": v} for k, v in constraints_applied_summary.items()
-        ]
-        explanation = ExplanationBlock(
-            constraints_applied=applied_list,
-            scoring_weights={k: str(v) for k, v in DEFAULT_WEIGHTS.items()},
-            generation_version="1.0",
-            catalog_version="1.0",
-            share_approximate_nutrients=0.0,
-            statement=(
-                "This plan is generated using deterministic scoring heuristics and is not guaranteed optimal or medically tailored."
-            ),
-        )
 
         response_days = [
             DayNutrientTotal(
