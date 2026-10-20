@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import check_nutrition_access, verify_csrf
 from app.database import get_db
-from app.domain.targets import calculate_target_estimate
+from app.domain.targets import GOAL_FACTORS, calculate_target_estimate
 from app.models.nutrition import NutritionGoal
 from app.models.user import Session, User, UserCuisinePreference, UserFoodConstraint
 from app.schemas.nutrition import (
@@ -106,7 +106,7 @@ async def estimate_nutrition_targets(
         activity_level = "moderate"
 
     goal = payload.goal or profile.goal or "build_strength"
-    if goal not in ("maintain", "build_strength"):
+    if goal not in GOAL_FACTORS:
         goal = "build_strength"
 
     # Compute estimate using pure domain logic

@@ -68,7 +68,7 @@ Build a secure, well-tested full-stack application that lets a gym user record t
 
 **Non-goals (v1)**
 - Medical diagnosis, treatment plans, eating-disorder management or clinical nutrition advice.
-- Weight-loss or calorie-deficit goals (decision D-11); supported goals are `maintain` and `build_strength`.
+- Weight-loss or calorie-deficit goals (decision D-11); supported goals are `maintain`, `build_strength` and `build_muscle` (D-29); none of them is a deficit.
 - Guaranteed optimal plans or guaranteed strength gains.
 - Wearable integration, barcode scanning, payments, social features, AI chat, and real-time nutrition data from third-party providers.
 - Email verification, password reset and social login (documented limitations).
@@ -122,7 +122,7 @@ This app touches food, body data and health-adjacent decisions, so these rules a
 - Totals for a meal or day are sums of item nutrient snapshots; they are never recomputed from the live catalogue for historical records.
 
 ### 5.4 Targets
-- **Estimate (optional):** `BMR = 10 × weight_kg + 6.25 × height_cm − 5 × age + s`, with `s = +5` (male), `−161` (female), or `−78` (unspecified, the midpoint, shown as an assumption). `TDEE = BMR × activity factor` (sedentary 1.2, light 1.375, moderate 1.55, very active 1.725). Goal adjustment: `maintain` 0%, `build_strength` +5%. Calories are rounded to the nearest 10.
+- **Estimate (optional):** `BMR = 10 × weight_kg + 6.25 × height_cm − 5 × age + s`, with `s = +5` (male), `−161` (female), or `−78` (unspecified, the midpoint, shown as an assumption). `TDEE = BMR × activity factor` (sedentary 1.2, light 1.375, moderate 1.55, very active 1.725). Goal adjustment: `maintain` 0%, `build_strength` +5%, `build_muscle` +10% (*initial*, D-29). Calories are rounded to the nearest 10.
 - **Protein** defaults to 1.6 g per kg of body weight; **fat** to 25% of calories (÷ 9 kcal per g); **carbohydrate** is the remaining calories (÷ 4 kcal per g). All grams round to the nearest 1 g. Every default is editable, and the rationale text states each assumption. Cite your source for these defaults in the README.
 - Targets are **versioned**: a change creates a new `nutrition_goals` row with an `effective_from` date; the active target on a date is the latest row on or before it.
 
@@ -395,6 +395,7 @@ Dates and clocks in tests are injected, so results are deterministic.
 - [ ] **AC-18** (S3) With `needs_professional_guidance` on, the estimate endpoint returns 409 `manual_targets_required`, manual targets are accepted, and responses carry `requires_professional_guidance: true`.
 - [ ] **AC-19** (S4) For male, 80 kg, 180 cm, age 25, moderate activity, `build_strength`: BMR 1,805, TDEE 2,797.75, plus 5% = 2,937.64, rounded to **2,940 kcal**; protein **128 g** (1.6 × 80); fat **82 g** (25% of 2,940 kcal ÷ 9); carbohydrate **423 g** (the remaining 1,693 kcal ÷ 4). The response lists the formula, activity factor, goal adjustment, protein and fat assumptions.
 - [ ] **AC-20** (S4) The same inputs with `sex_for_estimate = unspecified` use `s = −78`: BMR 1,722, TDEE 2,669.1, plus 5% = 2,802.56, rounded to **2,800 kcal**, and the assumption is shown.
+- [ ] **AC-119** (5.4, D-29) The same inputs as AC-19 with `build_muscle`: TDEE 2,797.75 plus 10% = 3,077.53, rounded to **3,080 kcal**; protein **128 g**; fat **86 g** (25% of 3,080 kcal ÷ 9); carbohydrate **450 g** (the remaining 1,798 kcal ÷ 4). No goal factor is below 1.0 (S6).
 - [ ] **AC-21** (S5) For female, 45 kg, 160 cm, age 30, sedentary, `maintain` (BMR 1,139, TDEE 1,366.8), the estimate endpoint returns `estimate_below_floor`, saves no target, and tells the user to enter a target manually or seek guidance.
 - [ ] **AC-22** (S5) A manual target of 1,400 kcal is saved with a `below_recommended_minimum` warning; a manual target of 1,100 kcal is saved, but plan generation returns 422 `target_below_minimum`.
 - [ ] **AC-23** (5.4) Changing a target creates a new `nutrition_goals` row; the active target on a date is the latest row with `effective_from` on or before it; earlier rows and existing plan snapshots are unchanged.
@@ -613,6 +614,7 @@ Steps 5 and 6 (training) are independent of steps 7 to 9 (nutrition) once step 4
 | D-20 | 2026-10-16 | An automated layering check (domain imports nothing from frameworks) | Convention only | Keeps the rules pure and testable |
 | D-27 | 2026-10-19 | New accounts start with "beef" in excluded ingredients (`DEFAULT_EXCLUDED_INGREDIENTS`); users can remove it | Remove beef from the catalogue; swap beef for chicken or mutton | India-focused app where many users avoid beef; keeps the catalogue intact and the choice with the user |
 | D-28 | 2026-10-19 | Ten Indian budget recipes (≤ ₹50/serving, tag `budget_friendly`) built only from existing catalogue foods; prices are documented estimates | Add new foods (rajma, besan, soya, curd) from USDA | USDA FoodData Central was unreachable from the network; existing foods need no new nutrient data. New foods can follow once USDA is reachable. AC-51 recipe range widened from 15–25 to 15–40 |
+| D-29 | 2026-10-20 | Add a `build_muscle` goal (+10% calories, *initial* placeholder); keep protein default 1.6 g/kg; still no weight-loss or deficit goal | Add a fat-loss goal (needs S6/D-11 changed); recomposition label for maintain | User asked for muscle building and weight loss; muscle building fits the safety rules, weight loss would require relaxing S6, which the user chose not to do |
 
 ## 19. Open Questions
 

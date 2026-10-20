@@ -108,7 +108,7 @@ class UserProfile(Base):
             "body_weight_kg >= 20 AND body_weight_kg <= 400", name="chk_profile_weight"
         ),
         CheckConstraint("units IN ('kg', 'lb')", name="chk_profile_units"),
-        CheckConstraint("goal IN ('maintain', 'build_strength')", name="chk_profile_goal"),
+        CheckConstraint("goal IN ('maintain', 'build_strength', 'build_muscle')", name="chk_profile_goal"),
     )
 
     user_id: Mapped[uuid.UUID] = mapped_column(

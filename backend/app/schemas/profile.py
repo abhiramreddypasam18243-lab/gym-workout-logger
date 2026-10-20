@@ -26,7 +26,7 @@ class ProfileUpdateRequest(StrictSchema):
     track_body_weight: bool | None = None
     weekly_session_target: int | None = Field(default=None, ge=0, le=21)
     currency_code: str | None = Field(default=None, min_length=3, max_length=3)
-    goal: Literal["maintain", "build_strength"] | None = None
+    goal: Literal["maintain", "build_strength", "build_muscle"] | None = None
     activity_level: Literal["sedentary", "light", "moderate", "very_active"] | None = None
 
     @field_validator("timezone")

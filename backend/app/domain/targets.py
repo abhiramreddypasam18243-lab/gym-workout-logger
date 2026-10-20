@@ -11,7 +11,7 @@ from typing import Any, Literal
 
 Sex = Literal["male", "female", "unspecified"]
 ActivityLevel = Literal["sedentary", "light", "moderate", "very_active"]
-Goal = Literal["maintain", "build_strength"]
+Goal = Literal["maintain", "build_strength", "build_muscle"]
 
 # Mifflin-St Jeor sex adjustment factor (s)
 SEX_FACTORS: dict[Sex, Decimal] = {
@@ -32,6 +32,7 @@ ACTIVITY_FACTORS: dict[ActivityLevel, Decimal] = {
 GOAL_FACTORS: dict[Goal, Decimal] = {
     "maintain": Decimal("1.0"),
     "build_strength": Decimal("1.05"),  # +5%
+    "build_muscle": Decimal("1.10"),  # +10% (initial placeholder for review, D-29)
 }
 
 

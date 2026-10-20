@@ -258,6 +258,7 @@ export const ProfileSettings: React.FC = () => {
                 onChange={(e) => setGoal(e.target.value)}
               >
                 <option value="build_strength">Build Strength (+5% surplus)</option>
+                <option value="build_muscle">Build Muscle (+10% surplus)</option>
                 <option value="maintain">Maintain Current Weight</option>
               </select>
             </div>

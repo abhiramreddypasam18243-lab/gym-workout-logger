@@ -46,7 +46,7 @@ class NutritionEstimateRequest(StrictSchema):
     age: int | None = Field(default=None, ge=18, le=120)
     sex_for_estimate: Literal["male", "female", "unspecified"] | None = None
     activity_level: Literal["sedentary", "light", "moderate", "very_active"] | None = None
-    goal: Literal["maintain", "build_strength"] | None = None
+    goal: Literal["maintain", "build_strength", "build_muscle"] | None = None
     save_as_active: bool = False
 
 

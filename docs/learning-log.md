@@ -572,3 +572,19 @@ Each step adds an entry: what was built, why it's designed that way, one risk, a
 
 **One thing that could go wrong**
 - Any further recipe needs AC-51 widened again (currently 15–40).
+
+---
+
+## Build-muscle goal (2026-10-20, D-29, AC-119)
+
+**What was built**
+- A third goal, `build_muscle`: calories = TDEE × 1.10 (an *initial* placeholder for review); protein still defaults to 1.6 g/kg and stays editable.
+- Migration `003_build_muscle_goal` widens the `chk_profile_goal` check constraint; it uses Alembic batch mode so it also works on SQLite.
+- The estimate endpoint used to turn any unknown goal into `build_strength`; it now checks against the domain's `GOAL_FACTORS`, so the new goal isn't silently computed as +5%.
+
+**Why it is designed this way**
+- Weight loss was also requested, but spec S6 / D-11 forbid deficit goals and `ag.md` marks that rule "never relax", so only muscle building was added. A test asserts every goal factor is at least 1.0.
+- Worked example (AC-119): 80 kg male, 180 cm, 25 years, moderate activity → TDEE 2,797.75 × 1.10 = 3,077.5 → 3,080 kcal; P 128 g, F 86 g, C 450 g.
+
+**One thing that could go wrong**
+- The +10% surplus has no cited source yet; review it, like the other placeholder thresholds, before relying on it.
