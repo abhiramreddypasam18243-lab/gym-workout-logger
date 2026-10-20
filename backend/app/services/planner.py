@@ -25,6 +25,7 @@ from app.domain.nutrients import (
 )
 from app.domain.scoring import (
     DEFAULT_WEIGHTS,
+    affordable_serving_sizes,
     calculate_candidate_score,
     calculate_target_fit,
     select_best_serving_size,
@@ -421,9 +422,14 @@ class DietPlannerService:
                 evaluated_list: list[tuple[Decimal, str, PreparedRecipe, Decimal]] = []
                 for cand in scored_candidates:
                     # Discrete serving size selection (AC-64)
+                    # With a daily budget, only sizes that fit the slot's share are allowed
+                    # (D-30, AC-120); the budget filter above guarantees 0.5 fits
                     best_s = select_best_serving_size(
                         cand.per_serving_nutrients.calories,
                         slot_kcal if slot_kcal else Decimal("600"),
+                        allowed_sizes=affordable_serving_sizes(
+                            cand.cost_minor_per_serving, slot_budget
+                        ),
                     )
 
                     cand_kcal = best_s * cand.per_serving_nutrients.calories

@@ -588,3 +588,18 @@ Each step adds an entry: what was built, why it's designed that way, one risk, a
 
 **One thing that could go wrong**
 - The +10% surplus has no cited source yet; review it, like the other placeholder thresholds, before relying on it.
+
+---
+
+## Strict daily budget (2026-10-20, D-30, AC-120)
+
+**What was built**
+- `affordable_serving_sizes` (pure domain function) returns the serving sizes whose cost fits a slot's share of the daily budget. The planner picks the calorie-closest size only among those, so a day never costs more than the budget.
+- Substitution suggestions now apply the plan's budget and time caps too; before, they skipped both, although AC-73 says substitutes pass the same hard filters.
+
+**Why it is designed this way**
+- Example: ₹150/day gives breakfast 25% = ₹37.50. A ₹40-per-serving recipe can only be served at 0.5 (₹20); before this change the planner could pick 2.0 (₹80) to reach calories.
+- Measured on the demo account (2,800 kcal / 160 g targets): no limit ≈ ₹440/day; ₹150 ≈ ₹115/day (max ₹129) at ≈ 2,340 kcal and 108 g protein; ₹250 ≈ ₹156/day at ≈ 2,540 kcal.
+
+**One thing that could go wrong**
+- Very low budgets give noticeably fewer calories and less protein than the targets; the plan shows this through `target_deviation` warnings rather than failing.

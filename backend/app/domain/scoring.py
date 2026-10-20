@@ -105,3 +105,19 @@ def select_best_serving_size(
             best_size = s
 
     return best_size
+
+
+def affordable_serving_sizes(
+    cost_minor_per_serving: int | None,
+    slot_budget_minor: Decimal | None,
+    allowed_sizes: tuple[Decimal, ...] = ALLOWED_SERVING_SIZES,
+) -> tuple[Decimal, ...]:
+    """Serving sizes whose cost fits the slot's share of the daily budget (D-30, AC-120).
+
+    With no budget, or a recipe without a cost, every allowed size is returned.
+    Example: Rs 40 per serving and a Rs 37.50 slot budget allow only 0.5 (Rs 20).
+    """
+    if slot_budget_minor is None or cost_minor_per_serving is None:
+        return allowed_sizes
+    cost = Decimal(cost_minor_per_serving)
+    return tuple(s for s in allowed_sizes if cost * s <= slot_budget_minor)
