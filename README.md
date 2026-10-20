@@ -107,6 +107,7 @@ All numeric thresholds are consolidated in `backend/app/config.py` and cite peer
 | **Activity Multipliers** | 1.2 to 1.725 | FAO/WHO/UNU Scientific Consultation on Human Energy Requirements (2004) |
 | **Protein Target** | 1.6 to 2.2 g/kg | Morton RW, et al. *Br J Sports Med.* 2018; 52(6):376–384 (resistance training meta-analysis) |
 | **Strength Surplus** | +5% TDEE | Helms ER, et al. *J Sports Med Phys Fitness.* 2015 (lean mass accrual without fat gain) |
+| **Muscle-Building Surplus** | +10% TDEE | *Initial placeholder for review* (D-29); no source cited yet |
 | **e1RM Formula** | Epley | Epley B. *Boyd Epley Workout.* Lincoln, NE: Univ. of Nebraska; 1985 (valid for 1–12 reps) |
 
 ---
