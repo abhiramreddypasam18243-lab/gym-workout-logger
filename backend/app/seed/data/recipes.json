@@ -1520,5 +1520,345 @@
         "edible_weight_g": 20.0
       }
     ]
+  },
+  {
+    "name": "Tofu Bhurji with Atta Roti",
+    "cuisine_code": "indian",
+    "instructions": "Crumble firm tofu. Saute onion, tomato and spinach in oil with turmeric and chilli, add the tofu and cook for five minutes. Serve with atta rotis.",
+    "prep_minutes": 10,
+    "cook_minutes": 15,
+    "servings": 2.0,
+    "cost_minor_per_serving": 5300,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "vegetarian",
+      "high_protein"
+    ],
+    "meal_types": [
+      "breakfast"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Firm Tofu",
+        "ingredient_name": "Firm tofu",
+        "quantity": 300.0,
+        "unit": "g",
+        "edible_weight_g": 300.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Chopped tomato",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Spinach (Raw)",
+        "ingredient_name": "Spinach",
+        "quantity": 50.0,
+        "unit": "g",
+        "edible_weight_g": 50.0
+      },
+      {
+        "food_name": "Coconut Oil",
+        "ingredient_name": "Oil",
+        "quantity": 8.0,
+        "unit": "g",
+        "edible_weight_g": 8.0
+      },
+      {
+        "food_name": "Whole Wheat Flour (Atta)",
+        "ingredient_name": "Atta for roti",
+        "quantity": 120.0,
+        "unit": "g",
+        "edible_weight_g": 120.0
+      }
+    ]
+  },
+  {
+    "name": "Dahi Oats Bowl with Almonds",
+    "cuisine_code": "indian",
+    "instructions": "Stir rolled oats into thick dahi (strained yogurt) and rest for ten minutes. Top with sliced banana and chopped almonds.",
+    "prep_minutes": 5,
+    "cook_minutes": 0,
+    "servings": 1.0,
+    "cost_minor_per_serving": 11700,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "vegetarian",
+      "high_protein"
+    ],
+    "meal_types": [
+      "breakfast",
+      "snack"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Greek Yogurt (Nonfat, Plain)",
+        "ingredient_name": "Thick dahi",
+        "quantity": 200.0,
+        "unit": "g",
+        "edible_weight_g": 200.0
+      },
+      {
+        "food_name": "Rolled Oats",
+        "ingredient_name": "Rolled oats",
+        "quantity": 50.0,
+        "unit": "g",
+        "edible_weight_g": 50.0
+      },
+      {
+        "food_name": "Almonds (Raw)",
+        "ingredient_name": "Chopped almonds",
+        "quantity": 15.0,
+        "unit": "g",
+        "edible_weight_g": 15.0
+      },
+      {
+        "food_name": "Banana (Raw)",
+        "ingredient_name": "Banana",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      }
+    ]
+  },
+  {
+    "name": "Quinoa Vegetable Upma with Paneer",
+    "cuisine_code": "indian",
+    "instructions": "Rinse and cook quinoa. Saute onion and carrot in ghee with mustard seeds and curry leaves, add the quinoa and cubed paneer and toss until hot.",
+    "prep_minutes": 10,
+    "cook_minutes": 20,
+    "servings": 2.0,
+    "cost_minor_per_serving": 5500,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "vegetarian",
+      "gluten_free",
+      "high_protein"
+    ],
+    "meal_types": [
+      "breakfast"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Quinoa (Raw)",
+        "ingredient_name": "Quinoa",
+        "quantity": 120.0,
+        "unit": "g",
+        "edible_weight_g": 120.0
+      },
+      {
+        "food_name": "Paneer (Indian Cottage Cheese)",
+        "ingredient_name": "Paneer cubes",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Carrots (Raw)",
+        "ingredient_name": "Diced carrot",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Ghee (Clarified Butter)",
+        "ingredient_name": "Ghee",
+        "quantity": 6.0,
+        "unit": "g",
+        "edible_weight_g": 6.0
+      }
+    ]
+  },
+  {
+    "name": "Palak Paneer with Brown Rice",
+    "cuisine_code": "indian",
+    "instructions": "Blanch and puree spinach. Cook onion and tomato in ghee with garam masala, add the spinach puree and paneer cubes and simmer. Serve with brown rice.",
+    "prep_minutes": 15,
+    "cook_minutes": 25,
+    "servings": 2.0,
+    "cost_minor_per_serving": 5100,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "vegetarian",
+      "gluten_free",
+      "high_protein"
+    ],
+    "meal_types": [
+      "lunch",
+      "dinner"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Paneer (Indian Cottage Cheese)",
+        "ingredient_name": "Paneer cubes",
+        "quantity": 150.0,
+        "unit": "g",
+        "edible_weight_g": 150.0
+      },
+      {
+        "food_name": "Spinach (Raw)",
+        "ingredient_name": "Spinach",
+        "quantity": 250.0,
+        "unit": "g",
+        "edible_weight_g": 250.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Chopped tomato",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Ghee (Clarified Butter)",
+        "ingredient_name": "Ghee",
+        "quantity": 8.0,
+        "unit": "g",
+        "edible_weight_g": 8.0
+      },
+      {
+        "food_name": "Brown Rice (Raw)",
+        "ingredient_name": "Brown rice",
+        "quantity": 140.0,
+        "unit": "g",
+        "edible_weight_g": 140.0
+      }
+    ]
+  },
+  {
+    "name": "Paneer Tikka with Peppers",
+    "cuisine_code": "indian",
+    "instructions": "Marinate paneer, bell pepper and onion in thick dahi with tikka spices. Thread on skewers and grill or pan-roast with a little oil until charred.",
+    "prep_minutes": 20,
+    "cook_minutes": 15,
+    "servings": 2.0,
+    "cost_minor_per_serving": 6300,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "vegetarian",
+      "gluten_free",
+      "high_protein"
+    ],
+    "meal_types": [
+      "lunch",
+      "dinner",
+      "snack"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Paneer (Indian Cottage Cheese)",
+        "ingredient_name": "Paneer cubes",
+        "quantity": 200.0,
+        "unit": "g",
+        "edible_weight_g": 200.0
+      },
+      {
+        "food_name": "Bell Pepper (Red, Raw)",
+        "ingredient_name": "Bell pepper",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Onion",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Greek Yogurt (Nonfat, Plain)",
+        "ingredient_name": "Dahi marinade",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Coconut Oil",
+        "ingredient_name": "Oil",
+        "quantity": 8.0,
+        "unit": "g",
+        "edible_weight_g": 8.0
+      }
+    ]
+  },
+  {
+    "name": "Chana Paneer Salad",
+    "cuisine_code": "indian",
+    "instructions": "Toss boiled chana with paneer cubes, tomato, onion and bell pepper, chaat masala, lemon juice and salt.",
+    "prep_minutes": 15,
+    "cook_minutes": 0,
+    "servings": 2.0,
+    "cost_minor_per_serving": 3100,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "vegetarian",
+      "gluten_free",
+      "high_protein"
+    ],
+    "meal_types": [
+      "lunch",
+      "snack"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Chickpeas (Chana, Boiled)",
+        "ingredient_name": "Boiled chana",
+        "quantity": 200.0,
+        "unit": "g",
+        "edible_weight_g": 200.0
+      },
+      {
+        "food_name": "Paneer (Indian Cottage Cheese)",
+        "ingredient_name": "Paneer cubes",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Chopped tomato",
+        "quantity": 80.0,
+        "unit": "g",
+        "edible_weight_g": 80.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 40.0,
+        "unit": "g",
+        "edible_weight_g": 40.0
+      },
+      {
+        "food_name": "Bell Pepper (Red, Raw)",
+        "ingredient_name": "Bell pepper",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      }
+    ]
   }
 ]

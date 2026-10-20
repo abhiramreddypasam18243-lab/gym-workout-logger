@@ -1,4 +1,4 @@
-# Budget Recipe Costs
+# Recipe Cost Estimates
 
 Ten Indian budget recipes (tag `budget_friendly`, decision D-28) cost at most ₹50 per serving. They use only foods already in the catalogue, so every nutrient value comes from the sources in `DATA_LICENCES.md`.
 
@@ -47,3 +47,16 @@ Cost per serving = Σ (grams × price per kg ÷ 1000) ÷ servings, rounded to th
 | Boiled Eggs with Masala Sweet Potato | 1 | 22 | 280 | 15 | Whole Egg 100 g x ₹140/kg; Sweet Potato (Raw) 150 g x ₹50/kg; Yellow Onion (Raw) 20 g x ₹40/kg |
 
 Nutrients are per serving, calculated from the catalogue's per-100 g values. The app recalculates them the same way (spec 5.3).
+
+## Vegetarian protein recipes (2026-10-20)
+
+Six egg-free, high-protein Indian dishes built around paneer, tofu, dahi and quinoa. They are not budget recipes (₹31–117 per serving). Extra price assumptions (₹/kg): paneer 400, firm tofu 300, Greek yogurt (used as thick dahi) 450, quinoa 500, almonds 900, red bell pepper 150.
+
+| Recipe | Servings | ₹/serving | kcal | Protein (g) | Ingredients (grams × ₹/kg) |
+|---|---:|---:|---:|---:|---|
+| Tofu Bhurji with Atta Roti | 2 | 53 | 386 | 24 | Firm Tofu 300 g x ₹300/kg; Yellow Onion (Raw) 60 g x ₹40/kg; Tomato (Raw) 60 g x ₹40/kg; Spinach (Raw) 50 g x ₹60/kg; Coconut Oil 8 g x ₹250/kg; Whole Wheat Flour (Atta) 120 g x ₹45/kg |
+| Dahi Oats Bowl with Almonds | 1 | 117 | 448 | 31 | Greek Yogurt (Nonfat, Plain) 200 g x ₹450/kg; Rolled Oats 50 g x ₹200/kg; Almonds (Raw) 15 g x ₹900/kg; Banana (Raw) 60 g x ₹60/kg |
+| Quinoa Vegetable Upma with Paneer | 2 | 55 | 405 | 18 | Quinoa (Raw) 120 g x ₹500/kg; Paneer (Indian Cottage Cheese) 100 g x ₹400/kg; Yellow Onion (Raw) 60 g x ₹40/kg; Carrots (Raw) 60 g x ₹50/kg; Ghee (Clarified Butter) 6 g x ₹650/kg |
+| Palak Paneer with Brown Rice | 2 | 51 | 534 | 23 | Paneer (Indian Cottage Cheese) 150 g x ₹400/kg; Spinach (Raw) 250 g x ₹60/kg; Yellow Onion (Raw) 60 g x ₹40/kg; Tomato (Raw) 60 g x ₹40/kg; Ghee (Clarified Butter) 8 g x ₹650/kg; Brown Rice (Raw) 140 g x ₹120/kg |
+| Paneer Tikka with Peppers | 2 | 63 | 345 | 22 | Paneer (Indian Cottage Cheese) 200 g x ₹400/kg; Bell Pepper (Red, Raw) 100 g x ₹150/kg; Yellow Onion (Raw) 60 g x ₹40/kg; Greek Yogurt (Nonfat, Plain) 60 g x ₹450/kg; Coconut Oil 8 g x ₹250/kg |
+| Chana Paneer Salad | 2 | 31 | 321 | 19 | Chickpeas (Chana, Boiled) 200 g x ₹45/kg; Paneer (Indian Cottage Cheese) 100 g x ₹400/kg; Tomato (Raw) 80 g x ₹40/kg; Yellow Onion (Raw) 40 g x ₹40/kg; Bell Pepper (Red, Raw) 60 g x ₹150/kg |

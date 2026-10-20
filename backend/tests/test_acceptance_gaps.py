@@ -245,7 +245,7 @@ async def test_ac_26_no_flow_requires_body_weight(session_factory):
 
         plan = await client.post(
             "/api/meal-plans/generate",
-            json={"start_date": "2026-10-19", "days": 1, "meal_slots": ["breakfast", "lunch"]},
+            json={"start_date": date.today().isoformat(), "days": 1, "meal_slots": ["breakfast", "lunch"]},
         )
         assert plan.status_code == 200, plan.text
         assert plan.json()["status"] == "ok"

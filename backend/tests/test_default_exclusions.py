@@ -1,6 +1,7 @@
 """D-27: new accounts start with beef excluded; the exclusion is an ordinary, removable preference."""
 
 import json
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -50,7 +51,7 @@ async def test_d27_new_account_excludes_beef_by_default_and_can_remove_it(sessio
         assert prefs.status_code == 200
         assert prefs.json()["excluded_ingredients"] == ["beef"]
 
-        plan = await client.post("/api/meal-plans/generate", json={"start_date": "2026-10-20", "days": 7})
+        plan = await client.post("/api/meal-plans/generate", json={"start_date": date.today().isoformat(), "days": 7})
         assert plan.status_code == 200
         data = plan.json()
         assert data["status"] == "ok"
@@ -62,7 +63,7 @@ async def test_d27_new_account_excludes_beef_by_default_and_can_remove_it(sessio
         cleared = await client.patch("/api/nutrition/preferences", json={"excluded_ingredients": []})
         assert cleared.status_code == 200
         assert cleared.json()["excluded_ingredients"] == []
-        plan2 = await client.post("/api/meal-plans/generate", json={"start_date": "2026-10-20", "days": 7})
+        plan2 = await client.post("/api/meal-plans/generate", json={"start_date": date.today().isoformat(), "days": 7})
         assert plan2.status_code == 200
         filters2 = {c["filter"] for c in plan2.json()["explanation"]["constraints_applied"]}
         assert "excluded:beef" not in filters2
