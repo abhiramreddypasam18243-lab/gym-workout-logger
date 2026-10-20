@@ -136,7 +136,7 @@ This app touches food, body data and health-adjacent decisions, so these rules a
 1. No ingredient carries any of the user's allergens, and (with `exclude_unverified_allergens` on and any allergy set) every ingredient has verified allergen data and a catalogue link (text-only ingredients are excluded).
 2. It satisfies every diet tag (vegan, vegetarian, pescatarian, halal, kosher, gluten-free, lactose-free, and so on) and contains no excluded ingredient.
 3. It is allowed for the slot (`meal_types`).
-4. If a time cap is set, `prep_minutes + cook_minutes` is within it; if a daily budget is set, the recipe's cost fits the slot's share of it.
+4. If a time cap is set, `prep_minutes + cook_minutes` is within it; if a daily budget is set, the recipe's cost fits the slot's share of it, at its chosen serving size (D-30).
 
 Allergy, diet and exclusion filters are **safety filters**. Time and budget are **user hard caps** applied when set. Cuisine preference and variety are **ranking factors only**.
 
@@ -150,7 +150,7 @@ Allergy, diet and exclusion filters are **safety filters**. Time and budget are 
 - `repetition` = times the recipe is already in the plan, plus 1 if it was in the same slot the previous day.
 - Initial weights: `w_t = 1.0`, `w_c = 0.3`, `w_p = 0.2`, `w_b = 0.2`, `w_r = 0.5`.
 
-**Step 3: choose.** Slots are filled day by day, in a fixed slot order. For each slot, the serving size that minimises `|kcal − slot_kcal|` is chosen (ties go to the smaller size), then the highest-scoring candidate wins; **ties are broken by recipe ID ascending**. The result is fully deterministic for the same inputs and the same catalogue.
+**Step 3: choose.** Slots are filled day by day, in a fixed slot order. For each slot, the serving size that minimises `|kcal − slot_kcal|` is chosen (ties go to the smaller size), considering only sizes whose cost fits the slot's budget share when a daily budget is set (D-30), then the highest-scoring candidate wins; **ties are broken by recipe ID ascending**. The result is fully deterministic for the same inputs and the same catalogue.
 
 **Step 4: totals and warnings.** Day totals are the sums of the meals. A `target_deviation` warning appears when day calories differ from the target by more than 10%, or protein is below 90% of its target (*initial*). If a hard filter leaves a slot with no candidate, no plan is created and the response is `infeasible` (section 7).
 
@@ -458,6 +458,7 @@ Dates and clocks in tests are injected, so results are deterministic.
 - [ ] **AC-72** (FR-08) Every plan response includes the explanation block: constraints applied with counts removed, scoring weights, `generation_version`, catalogue version, the share of approximate nutrient values, and the statement that the plan is not guaranteed optimal.
 
 ### Substitutions, edits and grocery list
+- [ ] **AC-120** (5.5, D-30) With a daily budget set, every planned meal costs at most its slot's share of the budget at its chosen serving size, so every day costs at most the budget (e.g. ₹150/day: breakfast ≤ ₹37.50, lunch and dinner ≤ ₹45, snack ≤ ₹22.50). Substitution suggestions obey the same budget and time caps. Calorie shortfalls show as `target_deviation` warnings.
 - [ ] **AC-73** (FR-10) Substitution suggestions pass the same hard filters for the slot, exclude the current recipe, are ordered by score, number at most 5, and each shows its nutrient differences from the current meal.
 - [ ] **AC-74** (FR-10) Accepting a substitution updates the meal, the day totals, the grocery list and the plan status (`edited`), and the totals equal a from-scratch recomputation.
 - [ ] **AC-75** (5.6) A manually added recipe that violates an allergy is rejected with `violates_hard_constraint`; one that only exceeds a time cap or is of an unwanted cuisine is accepted with a warning.
@@ -615,6 +616,7 @@ Steps 5 and 6 (training) are independent of steps 7 to 9 (nutrition) once step 4
 | D-27 | 2026-10-19 | New accounts start with "beef" in excluded ingredients (`DEFAULT_EXCLUDED_INGREDIENTS`); users can remove it | Remove beef from the catalogue; swap beef for chicken or mutton | India-focused app where many users avoid beef; keeps the catalogue intact and the choice with the user |
 | D-28 | 2026-10-19 | Ten Indian budget recipes (≤ ₹50/serving, tag `budget_friendly`) built only from existing catalogue foods; prices are documented estimates | Add new foods (rajma, besan, soya, curd) from USDA | USDA FoodData Central was unreachable from the network; existing foods need no new nutrient data. New foods can follow once USDA is reachable. AC-51 recipe range widened from 15–25 to 15–40 |
 | D-29 | 2026-10-20 | Add a `build_muscle` goal (+10% calories, *initial* placeholder); keep protein default 1.6 g/kg; still no weight-loss or deficit goal | Add a fat-loss goal (needs S6/D-11 changed); recomposition label for maintain | User asked for muscle building and weight loss; muscle building fits the safety rules, weight loss would require relaxing S6, which the user chose not to do |
+| D-30 | 2026-10-20 | A daily budget is a strict cap: serving sizes are limited to those whose cost fits the slot's share, so no day exceeds the budget; substitutions obey the plan's budget and time caps | Budget as ranking only, letting servings scale to meet calories (₹150/day plans averaged ₹229/day) | User: "budget is important". Low budgets now fall short of calorie targets instead (₹150/day ≈ 2,340 of 2,800 kcal), flagged by existing target_deviation warnings |
 
 ## 19. Open Questions
 

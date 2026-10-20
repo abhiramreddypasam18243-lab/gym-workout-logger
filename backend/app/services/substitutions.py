@@ -15,6 +15,7 @@ from app.domain.grocery import (
 )
 from app.domain.scoring import (
     DEFAULT_WEIGHTS,
+    affordable_serving_sizes,
     calculate_candidate_score,
     calculate_target_fit,
     select_best_serving_size,
@@ -150,6 +151,12 @@ class SubstitutionService:
             if t.get("protein_target_g"):
                 target_prot = Decimal(str(t["protein_target_g"])) * slot_share
 
+        # The plan's user hard caps apply to substitutes too (spec 5.5 step 1.4, AC-73, D-30)
+        caps = (plan.target_snapshot or {}).get("constraints", {})
+        max_minutes = caps.get("max_minutes")
+        daily_budget = caps.get("daily_budget_minor")
+        slot_budget = Decimal(daily_budget) * slot_share if daily_budget is not None else None
+
         scored_options: list[tuple[Decimal, str, PreparedRecipe, Decimal]] = []
 
         for r in db_recipes:
@@ -182,10 +189,18 @@ class SubstitutionService:
             ):
                 continue
 
-            # Discrete serving size selection (AC-64)
+            # Hard filter 6: time and budget caps of the plan
+            if max_minutes is not None and cand.total_minutes > max_minutes:
+                continue
+            sizes = affordable_serving_sizes(cand.cost_minor_per_serving, slot_budget)
+            if not sizes:
+                continue
+
+            # Discrete serving size selection (AC-64), within the budget (D-30)
             best_s = select_best_serving_size(
                 cand.per_serving_nutrients.calories,
                 target_kcal if target_kcal else Decimal("600"),
+                allowed_sizes=sizes,
             )
 
             cand_kcal = best_s * cand.per_serving_nutrients.calories
