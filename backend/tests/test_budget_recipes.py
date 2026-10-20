@@ -22,7 +22,7 @@ SLOT_SHARE = {"breakfast": Decimal("0.25"), "lunch": Decimal("0.30"), "dinner": 
 
 
 def test_budget_recipes_use_only_catalogue_foods_and_cost_at_most_50_rupees():
-    assert len(BUDGET) == 10
+    assert len(BUDGET) == 14  # 10 from D-28 + 4 using the USDA Indian staples (2026-10-20)
     for r in BUDGET:
         assert r["cost_minor_per_serving"] <= 5000, r["name"]
         assert r["cost_currency"] == "INR"

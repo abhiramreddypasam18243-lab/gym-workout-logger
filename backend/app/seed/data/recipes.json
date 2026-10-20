@@ -1860,5 +1860,245 @@
         "edible_weight_g": 60.0
       }
     ]
+  },
+  {
+    "name": "Rajma Chawal",
+    "cuisine_code": "indian",
+    "instructions": "Cook onion, tomato, ginger and garlic in oil with rajma masala, add boiled rajma and water and simmer until thick. Serve over steamed rice.",
+    "prep_minutes": 10,
+    "cook_minutes": 30,
+    "servings": 2.0,
+    "cost_minor_per_serving": 2100,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "vegan",
+      "gluten_free",
+      "dairy_free",
+      "high_protein",
+      "budget_friendly"
+    ],
+    "meal_types": [
+      "lunch",
+      "dinner"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Rajma (Red Kidney Beans, Boiled)",
+        "ingredient_name": "Boiled rajma",
+        "quantity": 300.0,
+        "unit": "g",
+        "edible_weight_g": 300.0
+      },
+      {
+        "food_name": "White Basmati Rice (Raw)",
+        "ingredient_name": "Rice",
+        "quantity": 140.0,
+        "unit": "g",
+        "edible_weight_g": 140.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 80.0,
+        "unit": "g",
+        "edible_weight_g": 80.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Chopped tomato",
+        "quantity": 120.0,
+        "unit": "g",
+        "edible_weight_g": 120.0
+      },
+      {
+        "food_name": "Coconut Oil",
+        "ingredient_name": "Oil",
+        "quantity": 10.0,
+        "unit": "g",
+        "edible_weight_g": 10.0
+      }
+    ]
+  },
+  {
+    "name": "Besan Chilla with Curd",
+    "cuisine_code": "indian",
+    "instructions": "Whisk besan with water, chopped onion, tomato and spinach, ajwain and salt into a batter. Cook thin chillas on an oiled tawa and serve with curd.",
+    "prep_minutes": 10,
+    "cook_minutes": 15,
+    "servings": 2.0,
+    "cost_minor_per_serving": 1600,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "vegetarian",
+      "gluten_free",
+      "budget_friendly"
+    ],
+    "meal_types": [
+      "breakfast"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Besan (Chickpea Flour)",
+        "ingredient_name": "Besan",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 50.0,
+        "unit": "g",
+        "edible_weight_g": 50.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Chopped tomato",
+        "quantity": 50.0,
+        "unit": "g",
+        "edible_weight_g": 50.0
+      },
+      {
+        "food_name": "Spinach (Raw)",
+        "ingredient_name": "Spinach",
+        "quantity": 40.0,
+        "unit": "g",
+        "edible_weight_g": 40.0
+      },
+      {
+        "food_name": "Coconut Oil",
+        "ingredient_name": "Oil",
+        "quantity": 8.0,
+        "unit": "g",
+        "edible_weight_g": 8.0
+      },
+      {
+        "food_name": "Curd (Plain Whole-Milk Yogurt)",
+        "ingredient_name": "Curd",
+        "quantity": 200.0,
+        "unit": "g",
+        "edible_weight_g": 200.0
+      }
+    ]
+  },
+  {
+    "name": "Soya Chunk Curry with Rice",
+    "cuisine_code": "indian",
+    "instructions": "Soak soya chunks in hot water and squeeze dry. Cook onion and tomato masala in oil, stir in a little curd, add the chunks and simmer. Serve with rice.",
+    "prep_minutes": 15,
+    "cook_minutes": 25,
+    "servings": 2.0,
+    "cost_minor_per_serving": 2100,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "vegetarian",
+      "gluten_free",
+      "high_protein",
+      "budget_friendly"
+    ],
+    "meal_types": [
+      "lunch",
+      "dinner"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Soya Chunks (Defatted Soy Flour Values)",
+        "ingredient_name": "Soya chunks (dry)",
+        "quantity": 80.0,
+        "unit": "g",
+        "edible_weight_g": 80.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 80.0,
+        "unit": "g",
+        "edible_weight_g": 80.0
+      },
+      {
+        "food_name": "Tomato (Raw)",
+        "ingredient_name": "Chopped tomato",
+        "quantity": 120.0,
+        "unit": "g",
+        "edible_weight_g": 120.0
+      },
+      {
+        "food_name": "Curd (Plain Whole-Milk Yogurt)",
+        "ingredient_name": "Curd",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      },
+      {
+        "food_name": "Coconut Oil",
+        "ingredient_name": "Oil",
+        "quantity": 10.0,
+        "unit": "g",
+        "edible_weight_g": 10.0
+      },
+      {
+        "food_name": "White Basmati Rice (Raw)",
+        "ingredient_name": "Rice",
+        "quantity": 140.0,
+        "unit": "g",
+        "edible_weight_g": 140.0
+      }
+    ]
+  },
+  {
+    "name": "Moong Dal Khichdi",
+    "cuisine_code": "indian",
+    "instructions": "Pressure-cook moong dal and rice with turmeric, diced carrot and water until soft. Finish with a ghee, cumin and onion tadka.",
+    "prep_minutes": 10,
+    "cook_minutes": 25,
+    "servings": 2.0,
+    "cost_minor_per_serving": 1800,
+    "cost_currency": "INR",
+    "diet_tags": [
+      "vegetarian",
+      "gluten_free",
+      "budget_friendly"
+    ],
+    "meal_types": [
+      "lunch",
+      "dinner"
+    ],
+    "ingredients": [
+      {
+        "food_name": "Moong Dal (Mung Beans, Raw)",
+        "ingredient_name": "Moong dal",
+        "quantity": 100.0,
+        "unit": "g",
+        "edible_weight_g": 100.0
+      },
+      {
+        "food_name": "White Basmati Rice (Raw)",
+        "ingredient_name": "Rice",
+        "quantity": 120.0,
+        "unit": "g",
+        "edible_weight_g": 120.0
+      },
+      {
+        "food_name": "Ghee (Clarified Butter)",
+        "ingredient_name": "Ghee",
+        "quantity": 10.0,
+        "unit": "g",
+        "edible_weight_g": 10.0
+      },
+      {
+        "food_name": "Yellow Onion (Raw)",
+        "ingredient_name": "Chopped onion",
+        "quantity": 40.0,
+        "unit": "g",
+        "edible_weight_g": 40.0
+      },
+      {
+        "food_name": "Carrots (Raw)",
+        "ingredient_name": "Diced carrot",
+        "quantity": 60.0,
+        "unit": "g",
+        "edible_weight_g": 60.0
+      }
+    ]
   }
 ]

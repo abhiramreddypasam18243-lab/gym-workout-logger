@@ -1006,5 +1006,158 @@
       "fiber_g": 8.0
     },
     "allergens": ["milk", "soy"]
+  },
+  {
+    "name": "Moong Dal (Mung Beans, Raw)",
+    "food_category": "legumes",
+    "cuisine_code": "indian",
+    "serving_description": "1/4 cup (50g)",
+    "default_serving_g": 50.0,
+    "state": "raw",
+    "approximate": false,
+    "allergens_verified": true,
+    "data_source": "USDA FoodData Central",
+    "source_reference": "FDC: 174256 (Mung beans, mature seeds, raw)",
+    "verified_at": "2026-10-20",
+    "nutrients": {
+      "energy_kcal": 347,
+      "protein_g": 23.9,
+      "carbs_g": 62.6,
+      "fat_g": 1.15,
+      "fiber_g": 16.3
+    },
+    "allergens": []
+  },
+  {
+    "name": "Rajma (Red Kidney Beans, Boiled)",
+    "food_category": "legumes",
+    "cuisine_code": "indian",
+    "serving_description": "1/2 cup (90g)",
+    "default_serving_g": 90.0,
+    "state": "cooked",
+    "approximate": false,
+    "allergens_verified": true,
+    "data_source": "USDA FoodData Central",
+    "source_reference": "FDC: 175194 (Beans, kidney, red, mature seeds, cooked, boiled, without salt)",
+    "verified_at": "2026-10-20",
+    "nutrients": {
+      "energy_kcal": 127,
+      "protein_g": 8.67,
+      "carbs_g": 22.8,
+      "fat_g": 0.5,
+      "fiber_g": 7.4
+    },
+    "allergens": []
+  },
+  {
+    "name": "Besan (Chickpea Flour)",
+    "food_category": "legumes",
+    "cuisine_code": "indian",
+    "serving_description": "1/4 cup (25g)",
+    "default_serving_g": 25.0,
+    "state": "raw",
+    "approximate": false,
+    "allergens_verified": true,
+    "data_source": "USDA FoodData Central",
+    "source_reference": "FDC: 174288 (Chickpea flour (besan))",
+    "verified_at": "2026-10-20",
+    "nutrients": {
+      "energy_kcal": 387,
+      "protein_g": 22.4,
+      "carbs_g": 57.8,
+      "fat_g": 6.69,
+      "fiber_g": 10.8
+    },
+    "allergens": []
+  },
+  {
+    "name": "Curd (Plain Whole-Milk Yogurt)",
+    "food_category": "dairy_eggs",
+    "cuisine_code": "indian",
+    "serving_description": "1 cup (245g)",
+    "default_serving_g": 245.0,
+    "state": "raw",
+    "approximate": false,
+    "allergens_verified": true,
+    "data_source": "USDA FoodData Central",
+    "source_reference": "FDC: 171284 (Yogurt, plain, whole milk)",
+    "verified_at": "2026-10-20",
+    "nutrients": {
+      "energy_kcal": 61.0,
+      "protein_g": 3.47,
+      "carbs_g": 4.66,
+      "fat_g": 3.25,
+      "fiber_g": 0.0
+    },
+    "allergens": [
+      "milk"
+    ]
+  },
+  {
+    "name": "Peanuts (Raw)",
+    "food_category": "nuts_seeds",
+    "cuisine_code": "indian",
+    "serving_description": "1/4 cup (36g)",
+    "default_serving_g": 36.0,
+    "state": "raw",
+    "approximate": false,
+    "allergens_verified": true,
+    "data_source": "USDA FoodData Central",
+    "source_reference": "FDC: 172430 (Peanuts, all types, raw)",
+    "verified_at": "2026-10-20",
+    "nutrients": {
+      "energy_kcal": 567,
+      "protein_g": 25.8,
+      "carbs_g": 16.1,
+      "fat_g": 49.2,
+      "fiber_g": 8.5
+    },
+    "allergens": [
+      "peanuts"
+    ]
+  },
+  {
+    "name": "Moong Sprouts (Raw)",
+    "food_category": "vegetables",
+    "cuisine_code": "indian",
+    "serving_description": "1 cup (104g)",
+    "default_serving_g": 104.0,
+    "state": "raw",
+    "approximate": false,
+    "allergens_verified": true,
+    "data_source": "USDA FoodData Central",
+    "source_reference": "FDC: 169957 (Mung beans, mature seeds, sprouted, raw)",
+    "verified_at": "2026-10-20",
+    "nutrients": {
+      "energy_kcal": 30.0,
+      "protein_g": 3.04,
+      "carbs_g": 5.94,
+      "fat_g": 0.18,
+      "fiber_g": 1.8
+    },
+    "allergens": []
+  },
+  {
+    "name": "Soya Chunks (Defatted Soy Flour Values)",
+    "food_category": "plant_protein",
+    "cuisine_code": "indian",
+    "serving_description": "1/2 cup (25g)",
+    "default_serving_g": 25.0,
+    "state": "raw",
+    "approximate": true,
+    "allergens_verified": true,
+    "data_source": "USDA FoodData Central",
+    "source_reference": "FDC: 174275 (Soy flour, defatted)",
+    "verified_at": "2026-10-20",
+    "nutrients": {
+      "energy_kcal": 327,
+      "protein_g": 51.5,
+      "carbs_g": 33.9,
+      "fat_g": 1.22,
+      "fiber_g": 17.5
+    },
+    "allergens": [
+      "soy"
+    ]
   }
 ]
