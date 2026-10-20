@@ -37,6 +37,18 @@ interface InfeasibleData {
   message: string
 }
 
+// Recipe costs are estimates in paise (see docs/budget-recipe-costs.md)
+const BUDGET_PRESETS = [150, 250, 400]
+const formatRupees = (minor: number) => `₹${Math.round(minor / 100)}`
+const sumCost = (meals: any[]): number | null => {
+  const priced = meals.filter((m) => m.cost_minor != null)
+  return priced.length ? priced.reduce((acc, m) => acc + Number(m.cost_minor), 0) : null
+}
+const RELAX_HINTS: Record<string, string> = {
+  daily_budget: 'Raise the daily budget, or remove it',
+  max_minutes: 'Allow more cooking time per meal',
+}
+
 export const MealPlanView: React.FC = () => {
   const { profile } = useAuth()
   const isCaloriesHidden = profile?.calories_hidden || false
@@ -481,7 +493,7 @@ export const MealPlanView: React.FC = () => {
               </div>
               <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                 {infeasibleData.relaxable.map((r, i) => (
-                  <li key={i}>{r}</li>
+                  <li key={i}>{RELAX_HINTS[r] ?? r}</li>
                 ))}
               </ul>
             </div>
@@ -540,6 +552,15 @@ export const MealPlanView: React.FC = () => {
               </h2>
               <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
                 {currentPlan.start_date} to {currentPlan.end_date} • Engine v{currentPlan.generation_version}
+                {sumCost(currentPlan.meals) != null && (
+                  <>
+                    {' '}• Est. cost{' '}
+                    <strong style={{ color: 'var(--text-main)' }}>{formatRupees(sumCost(currentPlan.meals)!)}</strong>
+                    {currentPlan.days?.length > 0 && (
+                      <> ({formatRupees(sumCost(currentPlan.meals)! / currentPlan.days.length)}/day)</>
+                    )}
+                  </>
+                )}
               </div>
             </div>
 
@@ -752,6 +773,20 @@ export const MealPlanView: React.FC = () => {
                           <span style={{ color: 'var(--text-secondary)', marginRight: '0.25rem' }}>Fat:</span>
                           <strong>{Math.round(day.fat_g)}g</strong>
                         </div>
+                        {sumCost(dayMeals) != null && (
+                          <div
+                            style={{
+                              background: 'var(--bg-surface-elevated)',
+                              padding: '0.25rem 0.625rem',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '0.875rem',
+                            }}
+                            title="Estimated cost for this day"
+                          >
+                            <span style={{ color: 'var(--text-secondary)', marginRight: '0.25rem' }}>Cost:</span>
+                            <strong>{formatRupees(sumCost(dayMeals)!)}</strong>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -816,6 +851,11 @@ export const MealPlanView: React.FC = () => {
                                   }}
                                 >
                                   {meal.cuisine_code}
+                                </span>
+                              )}
+                              {meal.cost_minor != null && (
+                                <span title="Estimated cost for this meal" style={{ marginLeft: 'auto', fontWeight: 600, color: 'var(--text-main)' }}>
+                                  {formatRupees(meal.cost_minor)}
                                 </span>
                               )}
                             </div>
@@ -1519,7 +1559,29 @@ export const MealPlanView: React.FC = () => {
                     value={dailyBudget}
                     onChange={(e) => setDailyBudget(e.target.value)}
                     min={0}
+                    aria-describedby="daily-budget-presets"
                   />
+                  <div id="daily-budget-presets" role="group" aria-label="Budget presets" style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+                    {BUDGET_PRESETS.map((amount) => (
+                      <button
+                        key={amount}
+                        type="button"
+                        className={`btn btn-xs ${Number(dailyBudget) === amount ? 'btn-primary' : 'btn-secondary'}`}
+                        aria-pressed={Number(dailyBudget) === amount}
+                        onClick={() => setDailyBudget(amount)}
+                      >
+                        ₹{amount}/day
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      className={`btn btn-xs ${dailyBudget === '' ? 'btn-primary' : 'btn-secondary'}`}
+                      aria-pressed={dailyBudget === ''}
+                      onClick={() => setDailyBudget('')}
+                    >
+                      No limit
+                    </button>
+                  </div>
                 </div>
               </div>
 

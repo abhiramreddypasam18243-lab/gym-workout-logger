@@ -544,3 +544,31 @@ Each step adds an entry: what was built, why it's designed that way, one risk, a
 
 **One thing that could go wrong**
 - Prices drift. If they change, update `cost_minor_per_serving` together with the breakdown in `docs/budget-recipe-costs.md`.
+
+---
+
+## Meal-plan costs, budget presets, vegetarian protein recipes (2026-10-20)
+
+**What was built**
+- The meal plan shows estimated cost per meal, per day, and for the whole plan (with a daily average), from the `cost_minor` the API already returned.
+- The Generate Plan form has ₹150 / ₹250 / ₹400 / No-limit presets; an infeasible plan explains what to relax in plain words.
+- Six egg-free, high-protein Indian vegetarian recipes (paneer, tofu, dahi, quinoa), 18–31 g protein per serving, from existing catalogue foods; costs in `docs/budget-recipe-costs.md`.
+- The four meal-plan dialogs now open as centred overlays; `.modal-backdrop` had no positioning styles before.
+- Two tests used a hard-coded plan date that only worked on 2026-10-19; they now use today's date.
+
+**One thing that could go wrong**
+- The budget cap checks half a serving, but the planner then scales servings to meet calorie targets, so a ₹150/day plan can average more than ₹150/day. The new cost display makes this visible; enforcing the budget on the chosen servings is a separate decision.
+
+---
+
+## Indian staples from USDA (2026-10-20)
+
+**What was built**
+- Seven foods from USDA FoodData Central (SR Legacy): moong dal, rajma, besan, curd, peanuts, moong sprouts and soya chunks. Values were copied unchanged from the API responses and each cites its FDC ID. All pass the loader's provenance and 4-4-9 energy checks.
+- Four budget recipes using them (₹16–21 per serving): Rajma Chawal, Besan Chilla with Curd, Soya Chunk Curry with Rice, Moong Dal Khichdi. The catalogue is now 40 recipes, AC-51's upper limit.
+
+**Why it is designed this way**
+- USDA has no SR Legacy entry for soya chunks, so they use the values for defatted soy flour, which chunks are made from, and are flagged `approximate` (DL1). The app shows the share of approximate values in each plan's explanation (AC-72).
+
+**One thing that could go wrong**
+- Any further recipe needs AC-51 widened again (currently 15–40).

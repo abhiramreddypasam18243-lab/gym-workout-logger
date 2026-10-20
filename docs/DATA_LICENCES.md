@@ -10,7 +10,7 @@ Every food nutrient value in the seed catalogue must come from a source whose li
 - **URL:** https://fdc.nal.usda.gov/
 - **Licence:** Public domain (U.S. government work, not subject to copyright)
 - **Used for:** Nutrient values for common Western foods (chicken, rice, eggs, vegetables, etc.)
-- **Access date:** TBD (will be recorded when seed data is created in Step 4)
+- **Access date:** 2026-10-16 (initial catalogue); 2026-10-20 (Indian staples: moong dal, rajma, besan, curd, peanuts, moong sprouts, defatted soy flour, via the FDC API, SR Legacy)
 
 ### 2. Indian Food Composition Tables (IFCT) — NIN/ICMR
 
