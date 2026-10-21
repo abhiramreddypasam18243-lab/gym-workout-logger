@@ -45,6 +45,10 @@ class Food(Base):
     data_source: Mapped[str] = mapped_column(String(100), nullable=False)
     source_reference: Mapped[str | None] = mapped_column(String(200), nullable=True)
     verified_at: Mapped[date | None] = mapped_column(Date, nullable=True)
+    # NULL = reviewed catalogue food; set = a custom food only its owner can see (D-32)
+    owner_user_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=True, index=True
+    )
 
     nutrients: Mapped[list["FoodNutrient"]] = relationship(
         "FoodNutrient", back_populates="food", cascade="all, delete-orphan"

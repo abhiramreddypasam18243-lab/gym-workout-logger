@@ -107,6 +107,15 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return data as T
 }
 
+export interface CustomFoodInput {
+  name: string
+  serving_description: string
+  default_serving_g: string | null
+  state: 'raw' | 'cooked' | 'as_sold'
+  nutrients: { energy_kcal: string; protein_g: string; carbs_g: string; fat_g: string; fiber_g?: string }
+  allergens: string[]
+}
+
 export const api = {
   // Auth
   async register(email: string, password: string, displayName?: string) {
@@ -188,6 +197,23 @@ export const api = {
     if (params?.offset) query.set('offset', String(params.offset))
     const qs = query.toString() ? `?${query.toString()}` : ''
     return request<any[]>(`/api/foods${qs}`)
+  },
+
+  // Custom foods (D-32): per-100 g values the user enters; only the owner sees them
+  async listMyFoods(): Promise<any[]> {
+    return request<any[]>('/api/foods?mine=true&limit=100')
+  },
+
+  async createCustomFood(food: CustomFoodInput): Promise<any> {
+    return request<any>('/api/foods', { method: 'POST', body: JSON.stringify(food) })
+  },
+
+  async updateCustomFood(id: string, food: Partial<CustomFoodInput>): Promise<any> {
+    return request<any>(`/api/foods/${id}`, { method: 'PATCH', body: JSON.stringify(food) })
+  },
+
+  async deleteCustomFood(id: string): Promise<void> {
+    await request<void>(`/api/foods/${id}`, { method: 'DELETE' })
   },
 
   async searchFoods(params?: { q?: string; category?: string; page?: number; page_size?: number }): Promise<{ items: any[] }> {

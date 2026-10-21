@@ -68,6 +68,65 @@
       "title": "CustomExerciseExportData",
       "type": "object"
     },
+    "CustomFoodExportData": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "food_category": {
+          "title": "Food Category",
+          "type": "string"
+        },
+        "serving_description": {
+          "title": "Serving Description",
+          "type": "string"
+        },
+        "default_serving_g": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Default Serving G"
+        },
+        "state": {
+          "title": "State",
+          "type": "string"
+        },
+        "nutrients_per_100g": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Nutrients Per 100G",
+          "type": "object"
+        },
+        "allergens": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Allergens",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "food_category",
+        "serving_description",
+        "state"
+      ],
+      "title": "CustomFoodExportData",
+      "type": "object"
+    },
     "ExportMetadata": {
       "properties": {
         "export_version": {
@@ -936,6 +995,13 @@
         "$ref": "#/$defs/CustomExerciseExportData"
       },
       "title": "Custom Exercises",
+      "type": "array"
+    },
+    "custom_foods": {
+      "items": {
+        "$ref": "#/$defs/CustomFoodExportData"
+      },
+      "title": "Custom Foods",
       "type": "array"
     },
     "meal_plans": {

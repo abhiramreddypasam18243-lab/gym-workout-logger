@@ -927,13 +927,13 @@ export const Dashboard: React.FC<{
                   {logType === 'food' ? (
                     foodsList.map((f: any) => (
                       <option key={f.id} value={f.id}>
-                        {f.name} ({f.brand || 'Common'}) — {f.serving_size_g}g serving
+                        {f.name}{f.is_custom ? ' (your food)' : ''} — {f.serving_description}
                       </option>
                     ))
                   ) : (
                     recipesList.map((r: any) => (
                       <option key={r.id} value={r.id}>
-                        {r.name} ({r.servings_yield} servings yield)
+                        {r.name} ({Number(r.servings)} servings)
                       </option>
                     ))
                   )}

@@ -1,31 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Utensils, Shield, Calculator, AlertCircle, Check, Heart, Sliders } from 'lucide-react'
+import { Utensils, Shield, Calculator, AlertCircle, Check, Heart, Sliders, Apple } from 'lucide-react'
 import { api, ApiError } from '../api/client'
 import { useAuth } from '../context/AuthContext'
-
-// Codes must match the catalogue's food tags exactly; the planner filter is an exact match (D-31)
-const EU_ALLERGENS = [
-  'gluten',
-  'crustaceans',
-  'eggs',
-  'fish',
-  'peanuts',
-  'soy',
-  'milk',
-  'tree_nuts',
-  'celery',
-  'mustard',
-  'sesame',
-  'sulphites',
-  'lupin',
-  'molluscs',
-]
-
-const ALLERGEN_LABELS: Record<string, string> = {
-  gluten: 'cereals with gluten',
-  soy: 'soybeans',
-  tree_nuts: 'tree nuts',
-}
+import { EU_ALLERGENS, allergenLabel } from '../utils/allergens'
+import CustomFoods from './CustomFoods'
 
 const DIET_TAGS = [
   'vegan',
@@ -45,7 +23,7 @@ export const NutritionPlanner: React.FC = () => {
   const isNutritionPaused = profile?.nutrition_paused || false
   const isAdultConfirmed = !!profile?.adult_confirmed_at
 
-  const [activeTab, setActiveTab] = useState<'targets' | 'estimate' | 'preferences'>('targets')
+  const [activeTab, setActiveTab] = useState<'targets' | 'estimate' | 'preferences' | 'foods'>('targets')
 
   // Target state
   const [activeGoal, setActiveGoal] = useState<any | null>(null)
@@ -318,6 +296,14 @@ export const NutritionPlanner: React.FC = () => {
             <Sliders size={14} />
             <span>Preferences & Safety</span>
           </button>
+          <button
+            type="button"
+            className={`btn btn-sm ${activeTab === 'foods' ? 'btn-primary' : 'btn-ghost'}`}
+            onClick={() => setActiveTab('foods')}
+          >
+            <Apple size={14} />
+            <span>My Foods</span>
+          </button>
         </div>
       </div>
 
@@ -334,6 +320,8 @@ export const NutritionPlanner: React.FC = () => {
           <span>{errorMessage}</span>
         </div>
       )}
+
+      {activeTab === 'foods' && <CustomFoods />}
 
       {/* TAB 1: ACTIVE TARGETS */}
       {activeTab === 'targets' && (
@@ -719,7 +707,7 @@ export const NutritionPlanner: React.FC = () => {
                       style={{ accentColor: 'var(--accent-rose)' }}
                     />
                     <span style={{ fontSize: '0.8125rem', color: checked ? 'var(--text-main)' : 'var(--text-muted)', textTransform: 'capitalize' }}>
-                      {ALLERGEN_LABELS[allergen] ?? allergen}
+                      {allergenLabel(allergen)}
                     </span>
                   </label>
                 )

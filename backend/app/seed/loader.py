@@ -139,7 +139,7 @@ async def seed_foods(session: AsyncSession) -> tuple[int, dict[str, Food]]:
         validate_food_atwater(f_data)
         validate_food_allergens(f_data)
 
-    existing_result = await session.execute(select(Food))
+    existing_result = await session.execute(select(Food).where(Food.owner_user_id.is_(None)))
     existing_foods = {f.name.strip().lower(): f for f in existing_result.scalars().all()}
 
     inserted_count = 0

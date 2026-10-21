@@ -226,6 +226,7 @@ Everything else follows the blueprint: `ON DELETE CASCADE` for owned child rows,
 | GET | `/api/analytics/strength` | Strength trends, PRs, volume |
 | GET | `/api/analytics/consistency` | Sessions per week |
 | GET, POST | `/api/foods`, `/api/recipes` | Catalogue search |
+| POST, PATCH, DELETE | `/api/foods`, `/api/foods/{id}` | The caller's custom foods (D-32); `GET /api/foods?mine=true` lists only them |
 | GET, POST | `/api/nutrition/goals`; POST `/api/nutrition/goals/estimate` | Versioned targets; an estimate with assumptions |
 | POST | `/api/meal-plans/generate` | Generate a plan (or an `infeasible` explanation) |
 | GET, PATCH, DELETE | `/api/meal-plans/{id}` | Read, edit, delete |
@@ -437,6 +438,7 @@ Dates and clocks in tests are injected, so results are deterministic.
 - [ ] **AC-53** (FR-06) Catalogue search filters by cuisine, diet tag and maximum time, with pagination.
 - [ ] **AC-54** (5.3) After a food's nutrient value is corrected in the catalogue, existing plan and log snapshots keep the old values, and new entries use the new ones.
 - [ ] **AC-55** (NFR) Deleting a food referenced by history returns 409.
+- [ ] **AC-122** (D-32) A custom food is created with per-100 g values and comes back `is_custom`, `approximate`, `allergens_verified: false` and source `User-entered`; macros over 100 g, energy over 900 kcal, negative values or unknown allergens return 422 and a duplicate name for the same owner returns 409. Another user or an anonymous caller gets 404 for it and does not see it in search, and cannot log it; logging 1 serving of 180 g at 130 kcal per 100 g records 234 kcal, and editing the food leaves that log unchanged. Catalogue foods return 403 on edit or delete, a logged custom food cannot be deleted (409), the seed never links a recipe to a user's food, and export and account deletion include custom foods.
 
 ### Plan generation
 - [ ] **AC-56** (5.5) The same inputs and catalogue give identical plans (compared on content), over 20 runs.
@@ -619,6 +621,7 @@ Steps 5 and 6 (training) are independent of steps 7 to 9 (nutrition) once step 4
 | D-29 | 2026-10-20 | Add a `build_muscle` goal (+10% calories, *initial* placeholder); keep protein default 1.6 g/kg; still no weight-loss or deficit goal | Add a fat-loss goal (needs S6/D-11 changed); recomposition label for maintain | User asked for muscle building and weight loss; muscle building fits the safety rules, weight loss would require relaxing S6, which the user chose not to do |
 | D-30 | 2026-10-20 | A daily budget is a strict cap: serving sizes are limited to those whose cost fits the slot's share, so no day exceeds the budget; substitutions obey the plan's budget and time caps | Budget as ranking only, letting servings scale to meet calories (₹150/day plans averaged ₹229/day) | User: "budget is important". Low budgets now fall short of calorie targets instead (₹150/day ≈ 2,340 of 2,800 kcal), flagged by existing target_deviation warnings |
 | D-31 | 2026-10-21 | Allergy constraints and food tags use one set of 14 codes (`gluten`, `crustaceans`, `eggs`, `fish`, `peanuts`, `soy`, `milk`, `tree_nuts`, `celery`, `mustard`, `sesame`, `sulphites`, `lupin`, `molluscs`) in `app/domain/allergens.py`; the API maps old spellings (`soybeans`, `cereals_gluten`) and rejects unknown codes; a migration rewrites saved rows; seed foods must use the 14 codes | Rename the catalogue tags to the UI spellings | Review found the settings screen saved `soybeans`/`cereals_gluten` while foods were tagged `soy`/`gluten`, so those allergies never matched the exact-match filter (S9). Fixing at the API boundary also protects older clients |
+| D-32 | 2026-10-21 | Custom-food editor (stretch): users add foods with per-100 g kcal, protein, carbohydrate, fat (and optional fibre) and EU-14 allergens; stored in `foods` with `owner_user_id`, labelled `User-entered`, `approximate`, allergens unverified; visible to and loggable by the owner only; never used by the planner; catalogue foods are read-only | Let custom foods into the planner; serving-based entry | User chose per-100 g entry for logging only. Keeps the planner on reviewed recipes (D-19) and invents no nutrient data |
 
 ## 19. Open Questions
 
