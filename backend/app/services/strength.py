@@ -4,6 +4,7 @@ import uuid
 from collections import defaultdict
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
+from typing import Any
 from zoneinfo import ZoneInfo
 
 from sqlalchemy import select
@@ -34,7 +35,7 @@ class StrengthAnalyticsService:
         days: int | None = None,
         start_date: date | None = None,
         end_date: date | None = None,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Return best e1RM per session date in user timezone within the window (AC-42).
 
         Converts units for lb users (to 1 decimal place), labels estimates as estimated (AC-39),
@@ -72,7 +73,7 @@ class StrengthAnalyticsService:
             cutoff_date = (now_local - timedelta(days=days)).date()
 
         # Group working sets by local session date
-        daily_best: dict[date, dict] = {}
+        daily_best: dict[date, dict[str, Any]] = {}
 
         for sess in sessions:
             # Convert started_at to user's timezone
@@ -118,7 +119,7 @@ class StrengthAnalyticsService:
                         }
 
         # Format output items, converting units if user prefers lb (AC-42, AC-96)
-        formatted_trends: list[dict] = []
+        formatted_trends: list[dict[str, Any]] = []
         is_lb = units.lower() == "lb"
 
         for s_date in sorted(daily_best.keys()):
@@ -154,7 +155,7 @@ class StrengthAnalyticsService:
         user_id: uuid.UUID,
         user_timezone: str = "UTC",
         weeks: int = 12,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Return workout sessions per week in user timezone (spec §5.2, AC-44).
 
         Rules:
@@ -216,7 +217,7 @@ class StrengthAnalyticsService:
                 week_counts[week_monday] += 1
 
         # Build complete chronological weekly list (including 0s, AC-44)
-        output: list[dict] = []
+        output: list[dict[str, Any]] = []
         for i in range(weeks):
             week_mon = earliest_monday + timedelta(weeks=i)
             week_sun = week_mon + timedelta(days=6)
@@ -233,7 +234,7 @@ class StrengthAnalyticsService:
         user_id: uuid.UUID,
         exercise_id: uuid.UUID,
         units: str = "kg",
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         """Detect personal records for an exercise chronologically (spec §5.2, AC-41).
 
         First working set is baseline, strictly greater e1RM is PR, equal is not.
@@ -256,7 +257,7 @@ class StrengthAnalyticsService:
 
         # Collect all working sets
         domain_sets: list[StrengthSetInput] = []
-        set_meta_map: dict[tuple, dict] = {}
+        set_meta_map: dict[tuple[Any, ...], dict[str, Any]] = {}
 
         for sess in sessions:
             for we in sess.exercises:
@@ -283,7 +284,7 @@ class StrengthAnalyticsService:
         pr_results = detect_personal_records(domain_sets)
 
         is_lb = units.lower() == "lb"
-        output: list[dict] = []
+        output: list[dict[str, Any]] = []
 
         for pr in pr_results:
             key = (pr.set_input.completed_at, pr.set_input.set_number)

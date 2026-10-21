@@ -2,7 +2,7 @@
 
 from datetime import UTC, date, datetime
 from decimal import Decimal
-from typing import Annotated
+from typing import Annotated, Any, cast
 from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
@@ -11,9 +11,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import check_nutrition_access, verify_csrf
 from app.database import get_db
-from app.domain.targets import GOAL_FACTORS, calculate_target_estimate
+from app.domain.allergens import EU_ALLERGENS, normalize_allergen
+from app.domain.targets import GOAL_FACTORS, ActivityLevel, Goal, Sex, calculate_target_estimate
 from app.models.nutrition import NutritionGoal
-from app.models.user import Session, User, UserCuisinePreference, UserFoodConstraint
+from app.models.user import Session, User, UserCuisinePreference, UserFoodConstraint, UserProfile
 from app.schemas.nutrition import (
     NutritionEstimateRequest,
     NutritionEstimateResponse,
@@ -26,6 +27,13 @@ from app.schemas.nutrition import (
 router = APIRouter(prefix="/api/nutrition", tags=["nutrition"])
 
 
+def _profile(user: User) -> UserProfile:
+    """The user's profile; check_nutrition_access has already rejected users without one."""
+    if user.profile is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="profile_not_found")
+    return user.profile
+
+
 @router.post("/goals/estimate", response_model=NutritionEstimateResponse)
 async def estimate_nutrition_targets(
     request: Request,
@@ -33,7 +41,7 @@ async def estimate_nutrition_targets(
     auth: Annotated[tuple[User, Session], Depends(check_nutrition_access)],
     _csrf: Annotated[None, Depends(verify_csrf)],
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> dict:
+) -> dict[str, Any]:
     """Generate transparent, optional target estimate (spec §5.4, S3, S4, S5, AC-18–21).
 
     Rules:
@@ -43,7 +51,7 @@ async def estimate_nutrition_targets(
     - If valid: option to save as active target.
     """
     user, _session = auth
-    profile = user.profile
+    profile = _profile(user)
 
     # Rule S3 (AC-18): Professional guidance blocks automated estimates
     if profile.needs_professional_guidance:
@@ -114,9 +122,9 @@ async def estimate_nutrition_targets(
         weight_kg=Decimal(str(weight_kg)),
         height_cm=Decimal(str(height_cm)),
         age=age,
-        sex=sex,
-        activity_level=activity_level,
-        goal=goal,
+        sex=cast(Sex, sex),
+        activity_level=cast(ActivityLevel, activity_level),
+        goal=cast(Goal, goal),
         estimate_floor_kcal=Decimal("1500"),
     )
 
@@ -196,7 +204,7 @@ async def create_nutrition_goal(
     auth: Annotated[tuple[User, Session], Depends(check_nutrition_access)],
     _csrf: Annotated[None, Depends(verify_csrf)],
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> dict:
+) -> dict[str, Any]:
     """Save a new versioned nutrition target (spec §5.4, S5, AC-22, AC-23).
 
     Rules:
@@ -205,7 +213,7 @@ async def create_nutrition_goal(
     - Returns target with disclaimer (AC-28).
     """
     user, _session = auth
-    profile = user.profile
+    profile = _profile(user)
 
     today_local = datetime.now(ZoneInfo(profile.timezone or "UTC")).date()
     eff_from = payload.effective_from or today_local
@@ -250,13 +258,13 @@ async def get_active_nutrition_goal(
     auth: Annotated[tuple[User, Session], Depends(check_nutrition_access)],
     db: Annotated[AsyncSession, Depends(get_db)],
     on_date: date | None = Query(None, description="Query date (defaults to today in user timezone)"),
-) -> dict | None:
+) -> dict[str, Any] | None:
     """Retrieve active nutrition target on a given date (spec §5.4, AC-23).
 
     Returns the latest nutrition_goals row with effective_from on or before target date.
     """
     user, _session = auth
-    profile = user.profile
+    profile = _profile(user)
 
     target_date = on_date or datetime.now(ZoneInfo(profile.timezone or "UTC")).date()
 
@@ -301,7 +309,7 @@ async def get_active_nutrition_goal(
 async def get_user_nutrition_preferences(
     auth: Annotated[tuple[User, Session], Depends(check_nutrition_access)],
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> dict:
+) -> dict[str, Any]:
     """Get user dietary constraints, allergies, and cuisine preferences (spec §6, FR-06)."""
     user, _session = auth
 
@@ -339,23 +347,38 @@ async def update_user_nutrition_preferences(
     auth: Annotated[tuple[User, Session], Depends(check_nutrition_access)],
     _csrf: Annotated[None, Depends(verify_csrf)],
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> dict:
+) -> dict[str, Any]:
     """Update dietary constraints, allergies, and cuisine preferences (spec §6, FR-06, S9)."""
     user, _session = auth
 
     if payload.allergies is not None:
+        # The planner's allergy filter is an exact match on catalogue codes (S9, D-31)
+        allergy_codes: list[str] = []
+        for raw in payload.allergies:
+            code = normalize_allergen(raw)
+            if code is None:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail={
+                        "code": "unknown_allergen",
+                        "message": f"'{raw}' is not one of the 14 EU allergens",
+                        "allowed": list(EU_ALLERGENS),
+                    },
+                )
+            if code not in allergy_codes:
+                allergy_codes.append(code)
         await db.execute(
             delete(UserFoodConstraint).where(
                 UserFoodConstraint.user_id == user.id,
                 UserFoodConstraint.constraint_type == "allergy",
             )
         )
-        for a in payload.allergies:
+        for code in allergy_codes:
             db.add(
                 UserFoodConstraint(
                     user_id=user.id,
                     constraint_type="allergy",
-                    constraint_value=a.lower().strip(),
+                    constraint_value=code,
                     is_hard_constraint=True,
                 )
             )

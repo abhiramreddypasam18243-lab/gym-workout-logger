@@ -9,6 +9,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.domain.allergens import EU_ALLERGENS
 from app.domain.nutrients import check_atwater_consistency
 from app.models.nutrition import (
     Food,
@@ -36,6 +37,13 @@ def validate_food_provenance(food: dict[str, Any]) -> None:
         raise ValueError(
             f"Food '{name}' is missing required provenance fields: {', '.join(missing)}"
         )
+
+
+def validate_food_allergens(food: dict[str, Any]) -> None:
+    """Every allergen code must be one of the 14 EU codes the planner filters on (S9, D-31)."""
+    unknown = [a for a in food.get("allergens", []) if a.strip().lower() not in EU_ALLERGENS]
+    if unknown:
+        raise ValueError(f"Food '{food.get('name')}' has unknown allergen codes: {', '.join(unknown)}")
 
 
 def validate_food_atwater(food: dict[str, Any]) -> None:
@@ -129,6 +137,7 @@ async def seed_foods(session: AsyncSession) -> tuple[int, dict[str, Food]]:
     for f_data in foods_data:
         validate_food_provenance(f_data)
         validate_food_atwater(f_data)
+        validate_food_allergens(f_data)
 
     existing_result = await session.execute(select(Food))
     existing_foods = {f.name.strip().lower(): f for f in existing_result.scalars().all()}

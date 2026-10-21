@@ -3,6 +3,7 @@
 import base64
 import uuid
 from datetime import UTC, datetime
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import delete, select
@@ -307,7 +308,7 @@ async def start_workout_from_routine(
     current_user: User = Depends(get_current_user_required),
     _: None = Depends(verify_csrf),
     db: AsyncSession = Depends(get_db),
-) -> dict:
+) -> dict[str, Any]:
     """Start workout from routine pre-filling exercises with target sets and no sets logged (AC-35)."""
     stmt = (
         select(WorkoutRoutine)
@@ -323,7 +324,7 @@ async def start_workout_from_routine(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="routine_not_found")
 
     now = datetime.now(UTC)
-    prefilled_exercises = [
+    prefilled_exercises: list[dict[str, Any]] = [
         {
             "exercise_id": str(re.exercise_id),
             "exercise_name": re.exercise.name if re.exercise else None,

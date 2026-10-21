@@ -1,7 +1,7 @@
 """User profile and wellbeing settings router (spec §6, §7, S2, S3, S7, AC-15, AC-17)."""
 
 from datetime import UTC, datetime
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/api/profile", tags=["profile"])
 @router.get("")
 async def get_profile(
     auth: Annotated[tuple[User, Session], Depends(get_current_session)],
-) -> dict:
+) -> dict[str, Any]:
     """Get current user's profile and settings."""
     user, _session = auth
     p = user.profile
@@ -54,7 +54,7 @@ async def update_profile(
     auth: Annotated[tuple[User, Session], Depends(get_current_session)],
     _csrf: Annotated[None, Depends(verify_csrf)],
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> dict:
+) -> dict[str, Any]:
     """Update profile with validation (spec FR-01, AC-15)."""
     user, _session = auth
     p = user.profile
@@ -98,7 +98,7 @@ async def confirm_adult(
     auth: Annotated[tuple[User, Session], Depends(get_current_session)],
     _csrf: Annotated[None, Depends(verify_csrf)],
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> dict:
+) -> dict[str, Any]:
     """Record confirmation that the user is 18 or older (spec S2, AC-17)."""
     user, _session = auth
     p = user.profile
