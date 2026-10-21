@@ -1,7 +1,7 @@
 """Authentication routes (spec §7, §10, AC-01–07)."""
 
 from datetime import UTC, datetime, timedelta
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy import select
@@ -38,7 +38,7 @@ settings = get_settings()
 async def register(
     payload: RegisterRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> dict:
+) -> dict[str, Any]:
     """Register a new user account (spec §7, §10, AC-01, AC-02, AC-09)."""
     if not settings.REGISTRATION_ENABLED:
         raise HTTPException(
@@ -114,7 +114,7 @@ async def login(
     request: Request,
     response: Response,
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> dict:
+) -> dict[str, Any]:
     """Sign in and establish revocable session (spec SEC2, SEC5, SEC6, SEC7, AC-03, AC-04, AC-07)."""
     # Enforce TLS for non-localhost clients (AC-07)
     verify_tls_for_login(request)
@@ -218,7 +218,7 @@ async def logout(
     auth: Annotated[tuple[User, Session], Depends(get_current_session)],
     _csrf: Annotated[None, Depends(verify_csrf)],
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> dict:
+) -> dict[str, Any]:
     """Revoke session and clear cookies (spec SEC2, AC-05, AC-06)."""
     _user, session = auth
     session.revoked_at = datetime.now(UTC)
@@ -233,7 +233,7 @@ async def logout(
 @router.get("/me")
 async def me(
     auth: Annotated[tuple[User, Session], Depends(get_current_session)],
-) -> dict:
+) -> dict[str, Any]:
     """Return currently authenticated user (spec §7)."""
     user, _session = auth
     display_name = user.profile.display_name if user.profile else user.email.split("@")[0]

@@ -167,7 +167,7 @@ def aggregate_grocery_items(
     for (_ident, family), entries in grouped.items():
         first_item = entries[0][0]
         canonical_unit = entries[0][2]
-        total_canonical = sum(e[1] for e in entries)
+        total_canonical = sum((e[1] for e in entries), Decimal("0"))
         any_text_only = any(e[0].is_text_only for e in entries)
 
         display = format_grocery_quantity(total_canonical, family)
