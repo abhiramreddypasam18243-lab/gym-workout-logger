@@ -1,6 +1,6 @@
 """Health check endpoint (D5, AC-107)."""
 
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import text
@@ -12,7 +12,7 @@ router = APIRouter(tags=["health"])
 
 
 @router.get("/api/health")
-async def health_check(db: Annotated[AsyncSession, Depends(get_db)]) -> dict:
+async def health_check(db: Annotated[AsyncSession, Depends(get_db)]) -> dict[str, Any]:
     """Liveness and database status check.
 
     Returns 200 with database status. Used by Docker health checks

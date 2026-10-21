@@ -97,12 +97,12 @@ npm run build                     # Production compilation
 
 ## 🧪 Safety Thresholds & Scientific Citations (AC-116)
 
-All numeric thresholds are consolidated in `backend/app/config.py` and cite peer-reviewed clinical and exercise science literature:
+All numeric thresholds are consolidated in `backend/app/config.py`. They are **placeholders for review**, not authoritative clinical values (`ag.md`). The sources below are the references each value is meant to be checked against; the 1,500 and 1,200 kcal thresholds in particular still need a confirmed source (spec §19).
 
 | Parameter | Value | Scientific Citation / Source |
 |---|---|---|
 | `estimate_floor_kcal` | 1,500 kcal | Dietary Guidelines for Americans (USDA/HHS); placeholder floor preventing extreme deficits |
-| `plan_minimum_kcal` | 1,200 kcal | Clinical minimum safe energy threshold for sedentary adults without medical supervision |
+| `plan_minimum_kcal` | 1,200 kcal | Placeholder minimum below which no plan is generated; source to be confirmed |
 | **BMR Formula** | Mifflin–St Jeor | Mifflin MD, St Jeor ST, et al. *Am J Clin Nutr.* 1990; 51(2):241–247 |
 | **Activity Multipliers** | 1.2 to 1.725 | FAO/WHO/UNU Scientific Consultation on Human Energy Requirements (2004) |
 | **Protein Target** | 1.6 to 2.2 g/kg | Morton RW, et al. *Br J Sports Med.* 2018; 52(6):376–384 (resistance training meta-analysis) |

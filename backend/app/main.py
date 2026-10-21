@@ -1,5 +1,6 @@
 """FastAPI application entry point with security middleware and routers (spec §7, §10, SEC8, SEC9)."""
 
+from collections.abc import Awaitable, Callable
 from pathlib import Path
 
 from fastapi import FastAPI, Request, Response, status
@@ -32,7 +33,9 @@ MAX_BODY_BYTES = 1024 * 1024
 
 
 @app.middleware("http")
-async def security_and_limits_middleware(request: Request, call_next):
+async def security_and_limits_middleware(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
     # 1. Body size limit check (AC-13)
     content_length = request.headers.get("content-length")
     if content_length and int(content_length) > MAX_BODY_BYTES:
@@ -90,7 +93,7 @@ if static_dir.exists() and (static_dir / "index.html").exists():
         app.mount("/assets", StaticFiles(directory=str(static_dir / "assets")), name="assets")
 
     @app.get("/{full_path:path}")
-    async def serve_spa(full_path: str):
+    async def serve_spa(full_path: str) -> Response:
         if full_path.startswith("api/"):
             return JSONResponse(status_code=404, content={"error": "Not Found"})
         target = static_dir / full_path
