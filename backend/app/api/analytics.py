@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import date
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,7 +23,7 @@ async def get_strength_analytics(
     days: int | None = Query(None, ge=1, le=730, description="Window in days"),
     start_date: date | None = Query(None, description="Start date filter"),
     end_date: date | None = Query(None, description="End date filter"),
-) -> list[dict]:
+) -> list[dict[str, Any]]:
     """Return best e1RM per session date in user timezone (spec §5.2, FR-05, AC-42).
 
     Converts units for lb users, labels estimates, and returns empty list with 200 when no data.
@@ -49,7 +49,7 @@ async def get_weekly_consistency(
     auth: Annotated[tuple[User, Session], Depends(get_current_session)],
     db: Annotated[AsyncSession, Depends(get_db)],
     weeks: int = Query(12, ge=1, le=52, description="Number of weeks to evaluate"),
-) -> dict:
+) -> dict[str, Any]:
     """Return workout sessions per week in user timezone (spec §5.2, AC-44).
 
     Rules:
@@ -79,7 +79,7 @@ async def get_exercise_prs(
     exercise_id: uuid.UUID,
     auth: Annotated[tuple[User, Session], Depends(get_current_session)],
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> list[dict]:
+) -> list[dict[str, Any]]:
     """Return chronological PR milestones for an exercise (spec §5.2, AC-41)."""
     user, _session = auth
     units_str = user.profile.units if user.profile else "kg"

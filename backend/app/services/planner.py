@@ -248,7 +248,7 @@ class DietPlannerService:
         # 5. Day-by-day, slot-by-slot generation (AC-56, AC-62–66)
         for day_idx in range(payload.days):
             current_date = payload.start_date + timedelta(days=day_idx)
-            day_slot_recipes: dict[str, UUID] = {}
+            day_slot_recipes: dict[str, UUID | None] = {}
             day_meals: list[dict[str, Any]] = []
 
             for slot_order, slot in enumerate(payload.meal_slots):

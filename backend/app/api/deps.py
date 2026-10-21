@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.config import settings
-from app.database import get_db
+from app.database import get_db as get_db  # re-exported for routers
 from app.models.user import Session, User
 from app.services.security import hash_token
 

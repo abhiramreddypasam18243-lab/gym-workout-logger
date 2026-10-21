@@ -415,15 +415,15 @@ class NutritionLogService:
                 logged_days_set.add(local_day)
                 l_cal = Decimal("0")
                 l_prot = Decimal("0")
-                for it in log_entry.items:
-                    if it.nutrient_snapshot:
-                        snap = it.nutrient_snapshot
+                for log_item in log_entry.items:
+                    if log_item.nutrient_snapshot:
+                        snap = log_item.nutrient_snapshot
                         is_rec = snap.get("is_recipe_per_serving") == "true"
                         if is_rec:
-                            l_cal += it.quantity * Decimal(str(snap.get("energy_kcal", 0)))
-                            l_prot += it.quantity * Decimal(str(snap.get("protein_g", 0)))
+                            l_cal += log_item.quantity * Decimal(str(snap.get("energy_kcal", 0)))
+                            l_prot += log_item.quantity * Decimal(str(snap.get("protein_g", 0)))
                         else:
-                            factor = it.quantity / Decimal("100")
+                            factor = log_item.quantity / Decimal("100")
                             l_cal += factor * Decimal(str(snap.get("energy_kcal", 0)))
                             l_prot += factor * Decimal(str(snap.get("protein_g", 0)))
 
