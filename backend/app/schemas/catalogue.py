@@ -3,8 +3,9 @@
 import uuid
 from datetime import date
 from decimal import Decimal
+from typing import Literal, Self
 
-from pydantic import Field, computed_field
+from pydantic import Field, computed_field, model_validator
 
 from app.schemas.base import StrictSchema
 
@@ -48,12 +49,49 @@ class FoodResponse(StrictSchema):
     verified_at: date | None = None
     nutrients: list[FoodNutrientSchema] = []
     allergens: list[str] = []
+    is_custom: bool = False
 
     @computed_field  # type: ignore[prop-decorator]
     @property
     def is_approximate(self) -> bool:
         """Label approximate foods clearly in API responses (AC-49)."""
         return self.approximate
+
+
+class CustomFoodNutrients(StrictSchema):
+    """Per-100 g values the user copies from a label or another source (D-32)."""
+
+    energy_kcal: Decimal = Field(..., ge=0, le=900)
+    protein_g: Decimal = Field(..., ge=0, le=100)
+    carbs_g: Decimal = Field(..., ge=0, le=100)
+    fat_g: Decimal = Field(..., ge=0, le=100)
+    fiber_g: Decimal | None = Field(default=None, ge=0, le=100)
+
+    @model_validator(mode="after")
+    def macros_fit_in_100_g(self) -> Self:
+        if self.protein_g + self.carbs_g + self.fat_g > 100:
+            raise ValueError("protein, carbohydrate and fat together cannot exceed 100 g per 100 g")
+        return self
+
+
+class CustomFoodCreate(StrictSchema):
+    name: str = Field(..., min_length=1, max_length=200)
+    food_category: str = Field(default="custom", min_length=1, max_length=50)
+    serving_description: str = Field(default="100 g", min_length=1, max_length=100)
+    default_serving_g: Decimal | None = Field(default=None, gt=0, le=2000)
+    state: Literal["raw", "cooked", "as_sold"] = "as_sold"
+    nutrients: CustomFoodNutrients
+    allergens: list[str] = Field(default_factory=list, max_length=14)
+
+
+class CustomFoodUpdate(StrictSchema):
+    name: str | None = Field(default=None, min_length=1, max_length=200)
+    food_category: str | None = Field(default=None, min_length=1, max_length=50)
+    serving_description: str | None = Field(default=None, min_length=1, max_length=100)
+    default_serving_g: Decimal | None = Field(default=None, gt=0, le=2000)
+    state: Literal["raw", "cooked", "as_sold"] | None = None
+    nutrients: CustomFoodNutrients | None = None
+    allergens: list[str] | None = Field(default=None, max_length=14)
 
 
 class RecipeIngredientResponse(StrictSchema):

@@ -296,6 +296,7 @@ async def create_demo_user(
                         unit="serving",
                     )
                 ],
+                user_id=demo_user_id,
             )
             session.add_all(items)
             nutrition_log_count += 1

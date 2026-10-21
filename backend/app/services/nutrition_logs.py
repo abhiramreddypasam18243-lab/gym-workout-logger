@@ -9,7 +9,7 @@ from uuid import UUID
 from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -80,7 +80,7 @@ class NutritionLogService:
         self.db.add(log)
         await self.db.flush()
 
-        log_items = await self._build_log_items(log.id, payload.items)
+        log_items = await self._build_log_items(log.id, payload.items, user_id=user_id)
         for it in log_items:
             self.db.add(it)
         await self.db.commit()
@@ -91,8 +91,13 @@ class NutritionLogService:
         self,
         log_id: UUID,
         item_inputs: Sequence[NutritionLogItemCreate],
+        *,
+        user_id: UUID,
     ) -> list[NutritionLogItem]:
-        """Resolve nutrients and create historical snapshots for log items (AC-54, AC-82)."""
+        """Resolve nutrients and create historical snapshots for log items (AC-54, AC-82).
+
+        Only catalogue items and the user's own custom foods and recipes can be logged (D-32).
+        """
         created_items: list[NutritionLogItem] = []
 
         for item_in in item_inputs:
@@ -102,7 +107,10 @@ class NutritionLogService:
                 # Fetch food and nutrients
                 f_stmt = (
                     select(Food)
-                    .where(Food.id == item_in.food_id)
+                    .where(
+                        Food.id == item_in.food_id,
+                        or_(Food.owner_user_id.is_(None), Food.owner_user_id == user_id),
+                    )
                     .options(selectinload(Food.nutrients))
                 )
                 food = (await self.db.execute(f_stmt)).scalars().first()
@@ -136,7 +144,10 @@ class NutritionLogService:
                 # Fetch recipe with full ingredients
                 r_stmt = (
                     select(Recipe)
-                    .where(Recipe.id == item_in.recipe_id)
+                    .where(
+                        Recipe.id == item_in.recipe_id,
+                        or_(Recipe.owner_user_id.is_(None), Recipe.owner_user_id == user_id),
+                    )
                     .options(
                         selectinload(Recipe.ingredients)
                         .selectinload(RecipeIngredient.food)
@@ -264,7 +275,7 @@ class NutritionLogService:
             log.notes = payload.notes
 
         if payload.items is not None:
-            new_items = await self._build_log_items(log.id, payload.items)
+            new_items = await self._build_log_items(log.id, payload.items, user_id=user_id)
             log.items.clear()
             for it in new_items:
                 log.items.append(it)

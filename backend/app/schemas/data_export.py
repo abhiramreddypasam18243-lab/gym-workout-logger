@@ -109,6 +109,17 @@ class CustomExerciseExportData(BaseModel):
     instructions: str | None = None
 
 
+class CustomFoodExportData(BaseModel):
+    id: str
+    name: str
+    food_category: str
+    serving_description: str
+    default_serving_g: str | None = None
+    state: str
+    nutrients_per_100g: dict[str, str] = Field(default_factory=dict)
+    allergens: list[str] = Field(default_factory=list)
+
+
 class PlannedMealItemExportData(BaseModel):
     id: str
     food_id: str | None = None
@@ -173,6 +184,7 @@ class CompleteUserDataExport(BaseModel):
     routines: list[RoutineExportData] = Field(default_factory=list)
     workout_sessions: list[WorkoutSessionExportData] = Field(default_factory=list)
     custom_exercises: list[CustomExerciseExportData] = Field(default_factory=list)
+    custom_foods: list[CustomFoodExportData] = Field(default_factory=list)
     meal_plans: list[MealPlanExportData] = Field(default_factory=list)
     nutrition_logs: list[NutritionLogExportData] = Field(default_factory=list)
 

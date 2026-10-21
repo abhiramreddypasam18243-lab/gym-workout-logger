@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models.nutrition import (
+    Food,
     MealPlan,
     NutritionGoal,
     NutritionLog,
@@ -31,6 +32,7 @@ from app.schemas.data_export import (
     CompleteUserDataExport,
     CuisinePreferenceExportData,
     CustomExerciseExportData,
+    CustomFoodExportData,
     ExportMetadata,
     FoodConstraintExportData,
     MealPlanExportData,
@@ -248,6 +250,27 @@ class DataControlsService:
             for ce in cust_exercises
         ]
 
+        # 8b. Custom Foods (owner_user_id == user_id, D-32)
+        cust_food_stmt = (
+            select(Food)
+            .where(Food.owner_user_id == user_id)
+            .options(selectinload(Food.nutrients), selectinload(Food.allergens))
+            .order_by(Food.name.asc())
+        )
+        custom_foods_data = [
+            CustomFoodExportData(
+                id=str(cf.id),
+                name=cf.name,
+                food_category=cf.food_category,
+                serving_description=cf.serving_description,
+                default_serving_g=str(cf.default_serving_g) if cf.default_serving_g is not None else None,
+                state=cf.state,
+                nutrients_per_100g={n.nutrient_code: str(n.amount_per_100g) for n in cf.nutrients},
+                allergens=sorted(a.allergen_code for a in cf.allergens),
+            )
+            for cf in (await self.db.execute(cust_food_stmt)).scalars().all()
+        ]
+
         # 9. Meal Plans
         plans_stmt = (
             select(MealPlan)
@@ -348,6 +371,7 @@ class DataControlsService:
             "workout_exercises": workout_exercises_count,
             "workout_sets": workout_sets_count,
             "custom_exercises": len(custom_exercises_data),
+            "custom_foods": len(custom_foods_data),
             "meal_plans": len(meal_plans_data),
             "planned_meals": planned_meals_count,
             "planned_meal_items": planned_meal_items_count,
@@ -370,6 +394,7 @@ class DataControlsService:
             routines=routines_data,
             workout_sessions=workout_sessions_data,
             custom_exercises=custom_exercises_data,
+            custom_foods=custom_foods_data,
             meal_plans=meal_plans_data,
             nutrition_logs=nutrition_logs_data,
         )
@@ -449,6 +474,8 @@ class DataControlsService:
 
         # 6. Delete Custom Exercises (owner_user_id == user_id)
         await self.db.execute(delete(Exercise).where(Exercise.owner_user_id == user_id))
+        # Custom foods go after logs and plans, which reference them (RESTRICT)
+        await self.db.execute(delete(Food).where(Food.owner_user_id == user_id))
 
         # 7. Delete Nutrition Goals and Constraints
         await self.db.execute(delete(NutritionGoal).where(NutritionGoal.user_id == user_id))

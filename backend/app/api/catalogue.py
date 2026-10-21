@@ -4,7 +4,7 @@ import uuid
 from decimal import Decimal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import func, or_, select
+from sqlalchemy import ColumnElement, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -14,6 +14,7 @@ from app.api.deps import (
     get_db,
     verify_csrf,
 )
+from app.domain.allergens import EU_ALLERGENS, normalize_allergen
 from app.domain.nutrients import (
     NutrientProfile,
     RecipeIngredientInput,
@@ -21,6 +22,8 @@ from app.domain.nutrients import (
 )
 from app.models.nutrition import (
     Food,
+    FoodAllergen,
+    FoodNutrient,
     NutritionLogItem,
     PlannedMealItem,
     Recipe,
@@ -31,6 +34,9 @@ from app.models.nutrition import (
 from app.models.user import User
 from app.models.workout import Exercise
 from app.schemas.catalogue import (
+    CustomFoodCreate,
+    CustomFoodNutrients,
+    CustomFoodUpdate,
     ExerciseCreateRequest,
     ExerciseResponse,
     FoodNutrientSchema,
@@ -142,8 +148,10 @@ async def create_custom_exercise(
 
 
 # ---------------------------------------------------------------------------
-# Foods Endpoints (FR-06, AC-49, AC-50, AC-55)
+# Foods Endpoints (FR-06, AC-49, AC-50, AC-55, custom foods D-32 / AC-122)
 # ---------------------------------------------------------------------------
+
+USER_ENTERED_SOURCE = "User-entered"
 
 
 def _map_food_to_response(food: Food) -> FoodResponse:
@@ -171,23 +179,93 @@ def _map_food_to_response(food: Food) -> FoodResponse:
         verified_at=food.verified_at,
         nutrients=nutrients,
         allergens=allergens,
+        is_custom=food.owner_user_id is not None,
     )
+
+
+def _visible_to(user: User | None) -> ColumnElement[bool]:
+    """Catalogue foods are public; a custom food is visible only to its owner (D-32)."""
+    if user is None:
+        return Food.owner_user_id.is_(None)
+    return or_(Food.owner_user_id.is_(None), Food.owner_user_id == user.id)
+
+
+async def _load_visible_food(db: AsyncSession, food_id: uuid.UUID, user: User | None) -> Food:
+    stmt = (
+        select(Food)
+        .options(selectinload(Food.nutrients), selectinload(Food.allergens))
+        .where(Food.id == food_id, _visible_to(user))
+        .execution_options(populate_existing=True)
+    )
+    food = (await db.execute(stmt)).scalar_one_or_none()
+    if not food:
+        # Another user's custom food is indistinguishable from a missing one
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="food_not_found")
+    return food
+
+
+def _allergen_codes(raw: list[str]) -> list[str]:
+    codes: list[str] = []
+    for value in raw:
+        code = normalize_allergen(value)
+        if code is None:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail={
+                    "code": "unknown_allergen",
+                    "message": f"'{value}' is not one of the 14 EU allergens",
+                    "allowed": list(EU_ALLERGENS),
+                },
+            )
+        if code not in codes:
+            codes.append(code)
+    return codes
+
+
+def _nutrient_rows(nutrients: CustomFoodNutrients) -> list[FoodNutrient]:
+    return [
+        FoodNutrient(
+            nutrient_code=code,
+            amount_per_100g=Decimal(amount),
+            unit="kcal" if "kcal" in code else "g",
+        )
+        for code, amount in nutrients.model_dump(exclude_none=True).items()
+    ]
+
+
+async def _ensure_unique_name(
+    db: AsyncSession, user: User, name: str, exclude_id: uuid.UUID | None = None
+) -> None:
+    stmt = select(Food.id).where(
+        Food.owner_user_id == user.id, func.lower(Food.name) == name.lower()
+    )
+    if exclude_id is not None:
+        stmt = stmt.where(Food.id != exclude_id)
+    if (await db.execute(stmt)).first():
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="food_already_exists")
 
 
 @router.get("/foods", response_model=list[FoodResponse])
 async def list_foods(
     q: str | None = Query(None, description="Food name substring search"),
     category: str | None = Query(None, description="Food category filter"),
+    mine: bool = Query(False, description="Only the caller's custom foods"),
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
+    current_user: User | None = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db),
 ) -> list[FoodResponse]:
     """Search foods with nutrients, provenance, and approximate labelling (AC-49, AC-53)."""
     stmt = (
         select(Food)
         .options(selectinload(Food.nutrients), selectinload(Food.allergens))
-        .order_by(Food.name.asc())
+        .where(_visible_to(current_user))
+        .order_by(Food.name.asc(), Food.id.asc())
     )
+    if mine:
+        if current_user is None:
+            return []
+        stmt = stmt.where(Food.owner_user_id == current_user.id)
     if q:
         stmt = stmt.where(Food.name.ilike(f"%{q.strip()}%"))
     if category:
@@ -199,18 +277,86 @@ async def list_foods(
     return [_map_food_to_response(f) for f in foods]
 
 
-@router.get("/foods/{food_id}", response_model=FoodResponse)
-async def get_food(food_id: uuid.UUID, db: AsyncSession = Depends(get_db)) -> FoodResponse:
-    stmt = (
-        select(Food)
-        .options(selectinload(Food.nutrients), selectinload(Food.allergens))
-        .where(Food.id == food_id)
+@router.post("/foods", response_model=FoodResponse, status_code=status.HTTP_201_CREATED)
+async def create_custom_food(
+    payload: CustomFoodCreate,
+    current_user: User = Depends(get_current_user_required),
+    _: None = Depends(verify_csrf),
+    db: AsyncSession = Depends(get_db),
+) -> FoodResponse:
+    """Add a custom food with per-100 g values the user supplies (D-32, AC-122).
+
+    The values are the user's own, so the food is marked approximate, its source is
+    "User-entered" and its allergens are unverified. Only its owner can see or log it,
+    and the planner never uses it (plans are built from reviewed recipes).
+    """
+    name = payload.name.strip()
+    await _ensure_unique_name(db, current_user, name)
+    food = Food(
+        name=name,
+        food_category=payload.food_category.strip().lower(),
+        serving_description=payload.serving_description.strip(),
+        default_serving_g=payload.default_serving_g,
+        state=payload.state,
+        approximate=True,
+        allergens_verified=False,
+        data_source=USER_ENTERED_SOURCE,
+        source_reference=None,
+        verified_at=None,
+        owner_user_id=current_user.id,
+        nutrients=_nutrient_rows(payload.nutrients),
+        allergens=[FoodAllergen(allergen_code=c) for c in _allergen_codes(payload.allergens)],
     )
-    result = await db.execute(stmt)
-    food = result.scalar_one_or_none()
-    if not food:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="food_not_found")
-    return _map_food_to_response(food)
+    db.add(food)
+    await db.commit()
+    return _map_food_to_response(await _load_visible_food(db, food.id, current_user))
+
+
+@router.get("/foods/{food_id}", response_model=FoodResponse)
+async def get_food(
+    food_id: uuid.UUID,
+    current_user: User | None = Depends(get_current_user_optional),
+    db: AsyncSession = Depends(get_db),
+) -> FoodResponse:
+    return _map_food_to_response(await _load_visible_food(db, food_id, current_user))
+
+
+@router.patch("/foods/{food_id}", response_model=FoodResponse)
+async def update_custom_food(
+    food_id: uuid.UUID,
+    payload: CustomFoodUpdate,
+    current_user: User = Depends(get_current_user_required),
+    _: None = Depends(verify_csrf),
+    db: AsyncSession = Depends(get_db),
+) -> FoodResponse:
+    """Edit one of the caller's custom foods; past logs keep their nutrient snapshots (AC-54)."""
+    food = await _load_visible_food(db, food_id, current_user)
+    if food.owner_user_id is None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="catalogue_food_read_only")
+
+    if payload.name is not None:
+        name = payload.name.strip()
+        await _ensure_unique_name(db, current_user, name, exclude_id=food.id)
+        food.name = name
+    if payload.food_category is not None:
+        food.food_category = payload.food_category.strip().lower()
+    if payload.serving_description is not None:
+        food.serving_description = payload.serving_description.strip()
+    if "default_serving_g" in payload.model_fields_set:
+        food.default_serving_g = payload.default_serving_g
+    if payload.state is not None:
+        food.state = payload.state
+    if payload.nutrients is not None:
+        food.nutrients.clear()
+        await db.flush()  # remove old rows before re-adding the same (food_id, code) keys
+        food.nutrients.extend(_nutrient_rows(payload.nutrients))
+    if payload.allergens is not None:
+        codes = _allergen_codes(payload.allergens)
+        food.allergens.clear()
+        await db.flush()
+        food.allergens.extend(FoodAllergen(allergen_code=c) for c in codes)
+    await db.commit()
+    return _map_food_to_response(await _load_visible_food(db, food.id, current_user))
 
 
 @router.delete("/foods/{food_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -220,8 +366,13 @@ async def delete_food(
     _: None = Depends(verify_csrf),
     db: AsyncSession = Depends(get_db),
 ) -> None:
-    """Delete a food item, refusing with 409 if referenced in history or recipes (AC-55)."""
-    # Check recipe ingredients
+    """Delete one of the caller's custom foods.
+
+    A food referenced in history or recipes returns 409 (AC-55); catalogue foods are
+    read-only (403), and another user's custom food is not found (404).
+    """
+    food = await _load_visible_food(db, food_id, current_user)
+
     rec_ref = await db.execute(
         select(RecipeIngredient.id).where(RecipeIngredient.food_id == food_id).limit(1)
     )
@@ -231,7 +382,6 @@ async def delete_food(
             detail="food_referenced_in_recipe",
         )
 
-    # Check planned meal items
     plan_ref = await db.execute(
         select(PlannedMealItem.id).where(PlannedMealItem.food_id == food_id).limit(1)
     )
@@ -241,7 +391,6 @@ async def delete_food(
             detail="food_referenced_in_history",
         )
 
-    # Check nutrition log items
     log_ref = await db.execute(
         select(NutritionLogItem.id).where(NutritionLogItem.food_id == food_id).limit(1)
     )
@@ -251,10 +400,8 @@ async def delete_food(
             detail="food_referenced_in_history",
         )
 
-    # Fetch food
-    food = await db.get(Food, food_id)
-    if not food:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="food_not_found")
+    if food.owner_user_id is None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="catalogue_food_read_only")
 
     await db.delete(food)
     await db.commit()
