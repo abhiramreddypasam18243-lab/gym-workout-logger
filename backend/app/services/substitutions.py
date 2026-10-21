@@ -9,6 +9,7 @@ from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.domain.allergens import normalize_allergen
 from app.domain.grocery import (
     GroceryItemInput,
     aggregate_grocery_items,
@@ -92,7 +93,9 @@ class SubstitutionService:
         c_stmt = select(UserFoodConstraint).where(UserFoodConstraint.user_id == user_id)
         user_constraints = (await self.db.execute(c_stmt)).scalars().all()
         user_allergies = {
-            c.constraint_value.lower() for c in user_constraints if c.constraint_type == "allergy"
+            normalize_allergen(c.constraint_value) or c.constraint_value.lower()
+            for c in user_constraints
+            if c.constraint_type == "allergy"
         }
         user_diet_tags = {
             c.constraint_value.lower() for c in user_constraints if c.constraint_type == "diet_tag"
@@ -307,7 +310,9 @@ class SubstitutionService:
         c_stmt = select(UserFoodConstraint).where(UserFoodConstraint.user_id == user_id)
         user_constraints = (await self.db.execute(c_stmt)).scalars().all()
         user_allergies = {
-            c.constraint_value.lower() for c in user_constraints if c.constraint_type == "allergy"
+            normalize_allergen(c.constraint_value) or c.constraint_value.lower()
+            for c in user_constraints
+            if c.constraint_type == "allergy"
         }
         user_diet_tags = {
             c.constraint_value.lower() for c in user_constraints if c.constraint_type == "diet_tag"
@@ -407,7 +412,7 @@ class SubstitutionService:
             c_stmt = select(UserFoodConstraint).where(UserFoodConstraint.user_id == user_id)
             user_constraints = (await self.db.execute(c_stmt)).scalars().all()
             user_allergies = {
-                c.constraint_value.lower()
+                normalize_allergen(c.constraint_value) or c.constraint_value.lower()
                 for c in user_constraints
                 if c.constraint_type == "allergy"
             }

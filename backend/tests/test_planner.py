@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy.orm import selectinload
 
 from app.api.deps import get_db
+from app.domain.allergens import EU_ALLERGENS
 from app.main import app
 from app.models.nutrition import (
     Food,
@@ -158,22 +159,8 @@ async def test_ac_56_determinism_over_20_runs(seeded_planner_client):
 async def test_ac_57_allergen_property_test(seeded_planner_client):
     client, session, user, goal = seeded_planner_client
 
-    allergens = [
-        "cereals_gluten",
-        "crustaceans",
-        "eggs",
-        "fish",
-        "peanuts",
-        "soybeans",
-        "milk",
-        "tree_nuts",
-        "celery",
-        "mustard",
-        "sesame",
-        "sulphites",
-        "lupin",
-        "molluscs",
-    ]
+    # The 14 catalogue codes; the settings UI and the foods must use the same ones (D-31)
+    allergens = list(EU_ALLERGENS)
 
     for allergen in allergens:
         # Clear previous constraints and set this allergen

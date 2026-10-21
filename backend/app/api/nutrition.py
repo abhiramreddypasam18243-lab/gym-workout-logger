@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import check_nutrition_access, verify_csrf
 from app.database import get_db
+from app.domain.allergens import EU_ALLERGENS, normalize_allergen
 from app.domain.targets import GOAL_FACTORS, calculate_target_estimate
 from app.models.nutrition import NutritionGoal
 from app.models.user import Session, User, UserCuisinePreference, UserFoodConstraint
@@ -344,18 +345,33 @@ async def update_user_nutrition_preferences(
     user, _session = auth
 
     if payload.allergies is not None:
+        # The planner's allergy filter is an exact match on catalogue codes (S9, D-31)
+        allergy_codes: list[str] = []
+        for raw in payload.allergies:
+            code = normalize_allergen(raw)
+            if code is None:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail={
+                        "code": "unknown_allergen",
+                        "message": f"'{raw}' is not one of the 14 EU allergens",
+                        "allowed": list(EU_ALLERGENS),
+                    },
+                )
+            if code not in allergy_codes:
+                allergy_codes.append(code)
         await db.execute(
             delete(UserFoodConstraint).where(
                 UserFoodConstraint.user_id == user.id,
                 UserFoodConstraint.constraint_type == "allergy",
             )
         )
-        for a in payload.allergies:
+        for code in allergy_codes:
             db.add(
                 UserFoodConstraint(
                     user_id=user.id,
                     constraint_type="allergy",
-                    constraint_value=a.lower().strip(),
+                    constraint_value=code,
                     is_hard_constraint=True,
                 )
             )

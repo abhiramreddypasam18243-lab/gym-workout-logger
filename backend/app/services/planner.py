@@ -18,6 +18,7 @@ from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.domain.allergens import normalize_allergen
 from app.domain.nutrients import (
     NutrientProfile,
     RecipeIngredientInput,
@@ -184,7 +185,9 @@ class DietPlannerService:
         user_constraints = (await self.db.execute(constraints_stmt)).scalars().all()
 
         user_allergies = {
-            c.constraint_value.lower() for c in user_constraints if c.constraint_type == "allergy"
+            normalize_allergen(c.constraint_value) or c.constraint_value.lower()
+            for c in user_constraints
+            if c.constraint_type == "allergy"
         }
         user_diet_tags = {
             c.constraint_value.lower() for c in user_constraints if c.constraint_type == "diet_tag"

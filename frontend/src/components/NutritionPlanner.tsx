@@ -3,13 +3,14 @@ import { Utensils, Shield, Calculator, AlertCircle, Check, Heart, Sliders } from
 import { api, ApiError } from '../api/client'
 import { useAuth } from '../context/AuthContext'
 
+// Codes must match the catalogue's food tags exactly; the planner filter is an exact match (D-31)
 const EU_ALLERGENS = [
-  'cereals_gluten',
+  'gluten',
   'crustaceans',
   'eggs',
   'fish',
   'peanuts',
-  'soybeans',
+  'soy',
   'milk',
   'tree_nuts',
   'celery',
@@ -19,6 +20,12 @@ const EU_ALLERGENS = [
   'lupin',
   'molluscs',
 ]
+
+const ALLERGEN_LABELS: Record<string, string> = {
+  gluten: 'cereals with gluten',
+  soy: 'soybeans',
+  tree_nuts: 'tree nuts',
+}
 
 const DIET_TAGS = [
   'vegan',
@@ -712,7 +719,7 @@ export const NutritionPlanner: React.FC = () => {
                       style={{ accentColor: 'var(--accent-rose)' }}
                     />
                     <span style={{ fontSize: '0.8125rem', color: checked ? 'var(--text-main)' : 'var(--text-muted)', textTransform: 'capitalize' }}>
-                      {allergen.replace('_', ' ')}
+                      {ALLERGEN_LABELS[allergen] ?? allergen}
                     </span>
                   </label>
                 )
