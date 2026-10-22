@@ -74,7 +74,7 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
       setRoutineId(prefilledRoutine.id)
       const mapped: ActiveExercise[] = prefilledRoutine.exercises.map((re, idx) => ({
         exercise_id: re.exercise_id,
-        name: re.exercise?.name || `Exercise ${idx + 1}`,
+        name: re.exercise_name || re.exercise?.name || `Exercise ${idx + 1}`,
         order_in_session: idx + 1,
         notes: re.notes || '',
         rep_min: re.rep_min,

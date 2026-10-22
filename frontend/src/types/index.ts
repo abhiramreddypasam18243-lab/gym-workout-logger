@@ -47,6 +47,7 @@ export interface RoutineExercise {
   rep_max: number
   notes?: string | null
   exercise?: Exercise
+  exercise_name?: string | null
 }
 
 export interface Routine {
@@ -98,7 +99,8 @@ export interface WorkoutExercise {
   exercise_id: string
   order_in_session: number
   notes?: string | null
-  exercise: Exercise
+  exercise?: Exercise
+  exercise_name?: string | null
   sets: WorkoutSet[]
 }
 

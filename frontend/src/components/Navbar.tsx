@@ -84,6 +84,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header
+      className="app-header"
       style={{
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         background: 'var(--bg-surface)',
@@ -150,6 +151,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="text-gradient-cyan">STRENGTH</span>
             </div>
             <div
+              className="brand-sub"
               style={{
                 fontSize: '0.6875rem',
                 fontWeight: 600,
@@ -192,8 +194,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           aria-label="Open Command Palette"
         >
           <Search size={14} style={{ color: 'var(--accent-primary)' }} />
-          <span>Search or Ctrl+K</span>
+          <span className="search-label">Search or Ctrl+K</span>
           <span
+            className="search-label"
             style={{
               background: 'rgba(255, 255, 255, 0.07)',
               padding: '1px 5px',

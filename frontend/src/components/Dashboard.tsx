@@ -165,13 +165,14 @@ export const Dashboard: React.FC<{
           color: 'var(--accent-emerald)',
           border: '1px solid color-mix(in srgb, var(--accent-emerald) 30%, transparent)',
         }
-      case 'Above target':
+      case 'Above planned calorie range':
         return {
           background: 'color-mix(in srgb, var(--accent-amber) 15%, transparent)',
           color: 'var(--accent-amber)',
           border: '1px solid color-mix(in srgb, var(--accent-amber) 30%, transparent)',
         }
-      case 'Below target':
+      case 'Below planned calorie range':
+      case 'Protein below target':
         return {
           background: 'color-mix(in srgb, var(--accent-primary) 15%, transparent)',
           color: 'var(--accent-primary)',
@@ -551,20 +552,25 @@ export const Dashboard: React.FC<{
 
         {analyticsData?.days && analyticsData.days.length > 0 ? (
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem', textAlign: 'left' }}>
+            {/* Wide on purpose: on phones it scrolls sideways inside its card rather than squashing columns */}
+            <table style={{ width: '100%', minWidth: '560px', borderCollapse: 'collapse', fontSize: '0.8125rem', textAlign: 'left' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-muted)' }}>
                   <th style={{ padding: '0.625rem 0.5rem' }}>Date</th>
                   <th style={{ padding: '0.625rem 0.5rem' }}>Energy (Logged / Planned)</th>
                   <th style={{ padding: '0.625rem 0.5rem' }}>Protein (Logged / Planned)</th>
-                  <th style={{ padding: '0.625rem 0.5rem' }}>Carbs</th>
-                  <th style={{ padding: '0.625rem 0.5rem' }}>Fat</th>
                   <th style={{ padding: '0.625rem 0.5rem' }}>Neutral Status Label</th>
                 </tr>
               </thead>
               <tbody>
                 {analyticsData.days.map((d: any) => {
-                  const hasLogs = d.logged_meals_count > 0
+                  // Field names follow GET /api/analytics/nutrition (planned vs logged per day, AC-83)
+                  const hasLogs = Boolean(d.is_logged)
+                  const kcal = (v: any) => Math.round(Number(v)).toLocaleString()
+                  const grams = (v: any) => Math.round(Number(v))
+                  const signed = (v: number, digits = 0) => `${v > 0 ? '+' : ''}${v.toFixed(digits)}`
+                  const energyDiff = Number(d.calories_difference)
+                  const proteinDiff = Number(d.protein_difference_g)
                   return (
                     <tr
                       key={d.date}
@@ -573,7 +579,7 @@ export const Dashboard: React.FC<{
                         background: hasLogs ? 'transparent' : 'var(--bg-surface)',
                       }}
                     >
-                      <td style={{ padding: '0.625rem 0.5rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                      <td style={{ padding: '0.625rem 0.5rem', fontWeight: 600, color: 'var(--text-main)', whiteSpace: 'nowrap' }}>
                         {d.date}
                         {!hasLogs && (
                           <span style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', display: 'block' }}>
@@ -582,20 +588,20 @@ export const Dashboard: React.FC<{
                         )}
                       </td>
                       <td style={{ padding: '0.625rem 0.5rem' }}>
-                        {hasLogs ? (
+                        {hasLogs && d.planned_calories != null ? (
                           isCaloriesHidden ? (
                             <span style={{ color: 'var(--text-dim)' }}>Hidden</span>
                           ) : (
                             <div>
-                              <span>{d.comparison.logged_energy_kcal} / {d.comparison.planned_energy_kcal} kcal</span>
+                              <span>{kcal(d.logged_calories)} / {kcal(d.planned_calories)} kcal</span>
                               <span
                                 style={{
                                   fontSize: '0.6875rem',
                                   marginLeft: '0.375rem',
-                                  color: d.comparison.delta_energy_kcal >= 0 ? 'var(--accent-amber)' : 'var(--accent-primary)',
+                                  color: energyDiff >= 0 ? 'var(--accent-amber)' : 'var(--accent-primary)',
                                 }}
                               >
-                                ({d.comparison.delta_energy_kcal > 0 ? '+' : ''}{d.comparison.delta_energy_kcal} kcal, {d.comparison.delta_energy_percentage > 0 ? '+' : ''}{d.comparison.delta_energy_percentage}%)
+                                ({signed(energyDiff)} kcal, {signed(Number(d.calories_difference_pct), 1)}%)
                               </span>
                             </div>
                           )
@@ -604,28 +610,22 @@ export const Dashboard: React.FC<{
                         )}
                       </td>
                       <td style={{ padding: '0.625rem 0.5rem' }}>
-                        {hasLogs ? (
+                        {hasLogs && d.planned_protein_g != null ? (
                           <div>
-                            <span>{d.comparison.logged_protein_g}g / {d.comparison.planned_protein_g}g</span>
+                            <span>{grams(d.logged_protein_g)}g / {grams(d.planned_protein_g)}g</span>
                             <span
                               style={{
                                 fontSize: '0.6875rem',
                                 marginLeft: '0.375rem',
-                                color: d.comparison.delta_protein_g >= 0 ? 'var(--accent-emerald)' : 'var(--accent-rose)',
+                                color: proteinDiff >= 0 ? 'var(--accent-emerald)' : 'var(--accent-rose)',
                               }}
                             >
-                              ({d.comparison.delta_protein_g > 0 ? '+' : ''}{d.comparison.delta_protein_g}g, {d.comparison.delta_protein_percentage > 0 ? '+' : ''}{d.comparison.delta_protein_percentage}%)
+                              ({signed(proteinDiff)}g, {signed(Number(d.protein_difference_pct), 1)}%)
                             </span>
                           </div>
                         ) : (
                           <span style={{ color: 'var(--text-dim)' }}>—</span>
                         )}
-                      </td>
-                      <td style={{ padding: '0.625rem 0.5rem' }}>
-                        {hasLogs ? `${d.comparison.logged_carbs_g}g` : '—'}
-                      </td>
-                      <td style={{ padding: '0.625rem 0.5rem' }}>
-                        {hasLogs ? `${d.comparison.logged_fat_g}g` : '—'}
                       </td>
                       <td style={{ padding: '0.625rem 0.5rem' }}>
                         {hasLogs ? (
@@ -635,10 +635,11 @@ export const Dashboard: React.FC<{
                               borderRadius: '2px',
                               fontSize: '0.75rem',
                               fontWeight: 600,
-                              ...getNeutralBadgeStyle(d.comparison.status_label),
+                              whiteSpace: 'nowrap',
+                              ...getNeutralBadgeStyle(d.status_label),
                             }}
                           >
-                            {d.comparison.status_label}
+                            {d.status_label}
                           </span>
                         ) : (
                           <span style={{ color: 'var(--text-dim)', fontSize: '0.75rem' }}>

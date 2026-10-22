@@ -219,7 +219,7 @@ export const RoutinesManager: React.FC<RoutinesManagerProps> = ({ onStartRoutine
                       }}
                     >
                       <span style={{ color: 'var(--text-main)', fontWeight: 500 }}>
-                        {re.exercise?.name || `Exercise ${idx + 1}`}
+                        {re.exercise_name || re.exercise?.name || `Exercise ${idx + 1}`}
                       </span>
                       <span className="badge badge-blue">
                         {re.target_sets} sets × {re.rep_min}-{re.rep_max} reps

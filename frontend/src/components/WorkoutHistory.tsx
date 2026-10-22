@@ -281,7 +281,7 @@ export const WorkoutHistory: React.FC = () => {
                         marginBottom: '0.65rem',
                       }}>
                         <span style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.925rem' }}>
-                          {we.exercise?.name || 'Exercise'}
+                          {we.exercise_name || we.exercise?.name || 'Exercise'}
                         </span>
                         <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                           {we.sets.length} {we.sets.length === 1 ? 'set' : 'sets'}
