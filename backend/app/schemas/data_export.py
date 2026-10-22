@@ -185,6 +185,7 @@ class CompleteUserDataExport(BaseModel):
     workout_sessions: list[WorkoutSessionExportData] = Field(default_factory=list)
     custom_exercises: list[CustomExerciseExportData] = Field(default_factory=list)
     custom_foods: list[CustomFoodExportData] = Field(default_factory=list)
+    muscle_set_targets: dict[str, int] = Field(default_factory=dict)
     meal_plans: list[MealPlanExportData] = Field(default_factory=list)
     nutrition_logs: list[NutritionLogExportData] = Field(default_factory=list)
 

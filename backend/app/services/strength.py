@@ -74,6 +74,8 @@ class StrengthAnalyticsService:
 
         # Group working sets by local session date
         daily_best: dict[date, dict[str, Any]] = {}
+        # Heaviest working set per date, any rep count (D-33); not an estimate
+        daily_top: dict[date, tuple[Decimal, int]] = {}
 
         for sess in sessions:
             # Convert started_at to user's timezone
@@ -98,6 +100,11 @@ class StrengthAnalyticsService:
                 for s in we.sets:
                     if s.is_warmup:
                         continue  # Exclude warmups (AC-39)
+
+                    load = Decimal(str(s.load_kg))
+                    top = daily_top.get(sess_date)
+                    if s.reps > 0 and (top is None or load > top[0] or (load == top[0] and s.reps > top[1])):
+                        daily_top[sess_date] = (load, s.reps)
 
                     e1rm_res = calculate_epley_e1rm(
                         load_kg=Decimal(str(s.load_kg)),
@@ -127,15 +134,19 @@ class StrengthAnalyticsService:
             e1rm_val = item["e1rm_kg"]
             load_val = item["load_kg"]
 
+            top_load, top_reps = daily_top.get(s_date, (load_val, item["reps"]))
+
             if is_lb:
                 # Convert exact decimals for lb display (AC-16, AC-42, AC-96)
                 e1rm_disp_dec = kg_to_lb(e1rm_val)
                 load_disp_dec = kg_to_lb(load_val)
                 display_e1rm = f"{e1rm_disp_dec:.1f}"
                 display_load = f"{load_disp_dec:.1f}"
+                display_top = f"{kg_to_lb(top_load):.1f}"
             else:
                 display_e1rm = f"{e1rm_val:.1f}"
                 display_load = f"{load_val:.1f}"
+                display_top = f"{top_load:.1f}"
 
             formatted_trends.append({
                 "session_id": item["session_id"],
@@ -144,6 +155,8 @@ class StrengthAnalyticsService:
                 "e1rm_exact": str(e1rm_val.normalize()),
                 "load": display_load,
                 "reps": item["reps"],
+                "top_set_load": display_top,
+                "top_set_reps": top_reps,
                 "unit": "lb" if is_lb else "kg",
                 "is_estimated": True,  # Always labelled estimated (AC-39, AC-42)
             })

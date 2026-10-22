@@ -108,6 +108,7 @@ All numeric thresholds are consolidated in `backend/app/config.py`. They are **p
 | **Protein Target** | 1.6 to 2.2 g/kg | Morton RW, et al. *Br J Sports Med.* 2018; 52(6):376–384 (resistance training meta-analysis) |
 | **Strength Surplus** | +5% TDEE | Helms ER, et al. *J Sports Med Phys Fitness.* 2015 (lean mass accrual without fat gain) |
 | **Muscle-Building Surplus** | +10% TDEE | *Initial placeholder for review* (D-29); no source cited yet |
+| **Overload step** | +2.5 kg upper / +5 kg lower body (+5 / +10 lb) | *Initial placeholder for review* (D-33); a hint, not coaching advice |
 | **e1RM Formula** | Epley | Epley B. *Boyd Epley Workout.* Lincoln, NE: Univ. of Nebraska; 1985 (valid for 1–12 reps) |
 
 ---

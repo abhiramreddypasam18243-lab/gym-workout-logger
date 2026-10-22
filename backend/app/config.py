@@ -4,6 +4,8 @@ Safety thresholds are kept here in one configuration module (ag.md safety rule).
 All numeric values marked 'initial' in the spec are placeholders for review.
 """
 
+from decimal import Decimal
+
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -35,6 +37,15 @@ class Settings(BaseSettings):
     # Safety thresholds (spec §3, D-16)
     ESTIMATE_FLOOR_KCAL: int = 1500
     PLAN_MINIMUM_KCAL: int = 1200
+
+    # Progressive overload hint (D-33): placeholder step sizes for review, not coaching advice
+    OVERLOAD_STEP_UPPER_KG: Decimal = Decimal("2.5")
+    OVERLOAD_STEP_LOWER_KG: Decimal = Decimal("5")
+    OVERLOAD_STEP_UPPER_LB: Decimal = Decimal("5")
+    OVERLOAD_STEP_LOWER_LB: Decimal = Decimal("10")
+    LOWER_BODY_MUSCLES: list[str] = ["quads", "hamstrings", "glutes", "calves"]
+    DEFAULT_REP_MIN: int = 8
+    DEFAULT_REP_MAX: int = 12
 
     # Session
     SESSION_LIFETIME_DAYS: int = 14

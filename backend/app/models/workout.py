@@ -197,3 +197,20 @@ class WorkoutSet(Base):
     workout_exercise: Mapped["WorkoutExercise"] = relationship(
         "WorkoutExercise", back_populates="sets"
     )
+
+
+class MuscleSetTarget(Base):
+    """A user's weekly working-set goal for one muscle group (D-34, AC-125)."""
+
+    __tablename__ = "muscle_set_targets"
+    __table_args__ = (
+        UniqueConstraint("user_id", "muscle", name="uq_muscle_set_target_user_muscle"),
+        CheckConstraint("weekly_sets BETWEEN 1 AND 40", name="chk_muscle_set_target_range"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    muscle: Mapped[str] = mapped_column(String(50), nullable=False)
+    weekly_sets: Mapped[int] = mapped_column(Integer, nullable=False)

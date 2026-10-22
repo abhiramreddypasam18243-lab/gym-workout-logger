@@ -85,7 +85,8 @@ export const StrengthAnalytics: React.FC = () => {
       allTimeBest: best,
       e1rmGain: gain,
       maxE1rm: Math.max(...values),
-      minE1rm: Math.min(...values),
+      // The top-set line shares the axis, and a top set is never above that day's e1RM
+      minE1rm: Math.min(...values, ...trends.map((t) => Number(t.top_set_load ?? t.e1rm) || 0)),
     }
   }, [trends])
 
@@ -111,6 +112,15 @@ export const StrengthAnalytics: React.FC = () => {
       const y = pad.top + plotH - ((val - minVal) / range) * plotH
       return { x, y, data: t, idx }
     })
+
+    // Heaviest working set per day (D-33): actual weight lifted, drawn straight, not smoothed
+    const topPoints = points.map((pt) => {
+      const val = Number(pt.data.top_set_load ?? pt.data.load) || 0
+      return { x: pt.x, y: pad.top + plotH - ((val - minVal) / range) * plotH }
+    })
+    const topPath = topPoints.length === 1
+      ? `M ${topPoints[0].x - 40} ${topPoints[0].y} L ${topPoints[0].x + 40} ${topPoints[0].y}`
+      : topPoints.map((pt, i) => `${i === 0 ? 'M' : 'L'} ${pt.x} ${pt.y}`).join(' ')
 
     // Generate smooth cubic bezier SVG path
     let curvePath = ''
@@ -142,7 +152,7 @@ export const StrengthAnalytics: React.FC = () => {
       return { val, y }
     })
 
-    return { width, height, pad, plotW, plotH, minVal, maxVal, points, curvePath, areaPath, gridTicks, areaBottom }
+    return { width, height, pad, plotW, plotH, minVal, maxVal, points, topPoints, topPath, curvePath, areaPath, gridTicks, areaBottom }
   }, [trends, minE1rm, maxE1rm])
 
   return (
@@ -404,7 +414,7 @@ export const StrengthAnalytics: React.FC = () => {
                   viewBox={`0 0 ${chartGeometry.width} ${chartGeometry.height}`}
                   style={{ width: '100%', height: 'auto', display: 'block', minWidth: '550px' }}
                   role="img"
-                  aria-label="Estimated 1RM Progression Area Graph"
+                  aria-label="Estimated 1RM and top-set weight over time"
                 >
                   <defs>
                     <linearGradient id="curveGradient" x1="0" y1="0" x2="0" y2="1">
@@ -460,6 +470,18 @@ export const StrengthAnalytics: React.FC = () => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
+
+                  {/* Top-set line */}
+                  <path
+                    d={chartGeometry.topPath}
+                    fill="none"
+                    style={{ stroke: 'var(--text-muted)' }}
+                    strokeWidth="2"
+                    strokeDasharray="6 5"
+                  />
+                  {chartGeometry.topPoints.map((pt, i) => (
+                    <rect key={`top-${i}`} x={pt.x - 3.5} y={pt.y - 3.5} width={7} height={7} style={{ fill: 'var(--text-muted)' }} />
+                  ))}
 
                   {/* Data Nodes */}
                   {chartGeometry.points.map((pt) => {
@@ -559,16 +581,25 @@ export const StrengthAnalytics: React.FC = () => {
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
                       Best set: {chartGeometry.points[hoveredIdx].data.load} {chartGeometry.points[hoveredIdx].data.unit} × {chartGeometry.points[hoveredIdx].data.reps} reps
                     </div>
+                    {chartGeometry.points[hoveredIdx].data.top_set_load && (
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        Top set: {chartGeometry.points[hoveredIdx].data.top_set_load} {chartGeometry.points[hoveredIdx].data.unit} × {chartGeometry.points[hoveredIdx].data.top_set_reps} reps
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             ) : null}
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem', flexWrap: 'wrap', gap: '0.5rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-subtle)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', fontSize: '0.75rem', color: 'var(--text-dim)' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-primary)', display: 'inline-block' }} />
                   Estimated 1RM
+                </span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <span style={{ width: '14px', borderTop: '2px dashed var(--text-muted)', display: 'inline-block' }} />
+                  Top set (heaviest weight)
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-amber)', display: 'inline-block' }} />
