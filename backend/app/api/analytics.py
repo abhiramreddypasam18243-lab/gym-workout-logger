@@ -7,9 +7,11 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_session
+from app.api.deps import get_current_session, verify_csrf
 from app.database import get_db
 from app.models.user import Session, User
+from app.schemas.progression import MuscleSetTargetsUpdate
+from app.services.progression import ProgressionService
 from app.services.strength import StrengthAnalyticsService
 
 router = APIRouter(prefix="/api/analytics", tags=["analytics"])
@@ -90,3 +92,47 @@ async def get_exercise_prs(
         exercise_id=exercise_id,
         units=units_str,
     )
+
+
+@router.get("/next-load/{exercise_id}")
+async def get_next_load_hint(
+    exercise_id: uuid.UUID,
+    auth: Annotated[tuple[User, Session], Depends(get_current_session)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+    rep_min: int | None = Query(None, ge=1, le=50),
+    rep_max: int | None = Query(None, ge=1, le=50),
+) -> dict[str, Any]:
+    """Progressive overload hint from the last session of this exercise (D-33, AC-123)."""
+    user, _session = auth
+    return await ProgressionService(db).next_load_hint(
+        user_id=user.id,
+        exercise_id=exercise_id,
+        rep_min=rep_min,
+        rep_max=rep_max,
+        units=user.profile.units if user.profile else "kg",
+        user_timezone=user.profile.timezone if user.profile else "UTC",
+    )
+
+
+@router.get("/weekly-volume")
+async def get_weekly_volume(
+    auth: Annotated[tuple[User, Session], Depends(get_current_session)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> dict[str, Any]:
+    """Working sets per muscle group this week against the user's targets (D-34, AC-125)."""
+    user, _session = auth
+    return await ProgressionService(db).weekly_volume(
+        user.id, user.profile.timezone if user.profile else "UTC"
+    )
+
+
+@router.put("/weekly-volume/targets")
+async def put_weekly_volume_targets(
+    payload: MuscleSetTargetsUpdate,
+    auth: Annotated[tuple[User, Session], Depends(get_current_session)],
+    _csrf: Annotated[None, Depends(verify_csrf)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> dict[str, Any]:
+    """Replace the user's weekly set targets per muscle group (D-34, AC-125)."""
+    user, _session = auth
+    return {"targets": await ProgressionService(db).replace_targets(user.id, payload.targets)}

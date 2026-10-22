@@ -321,6 +321,24 @@ export const api = {
   },
 
   // Strength Analytics (AC-39 to AC-44)
+  // Progressive overload hint from the last session (D-33)
+  async getNextLoad(exerciseId: string, repMin?: number, repMax?: number): Promise<any> {
+    const query = new URLSearchParams()
+    if (repMin) query.set('rep_min', String(repMin))
+    if (repMax) query.set('rep_max', String(repMax))
+    const qs = query.toString() ? `?${query.toString()}` : ''
+    return request<any>(`/api/analytics/next-load/${exerciseId}${qs}`)
+  },
+
+  // Working sets per muscle this week against targets (D-34)
+  async getWeeklyVolume(): Promise<{ week_start: string; week_end: string; muscles: any[] }> {
+    return request<any>('/api/analytics/weekly-volume')
+  },
+
+  async putWeeklyVolumeTargets(targets: Record<string, number>): Promise<{ targets: Record<string, number> }> {
+    return request<any>('/api/analytics/weekly-volume/targets', { method: 'PUT', body: JSON.stringify({ targets }) })
+  },
+
   async getStrengthTrends(exerciseId: string, days?: number): Promise<any[]> {
     const query = new URLSearchParams({ exercise_id: exerciseId })
     if (days) query.set('days', days.toString())

@@ -20,6 +20,7 @@ import { apiClient } from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { kgToLb } from '../utils/units'
 import { MotivationalQuoteCard } from './MotivationalQuoteCard'
+import { WeeklyVolumeCard } from './WeeklyVolumeCard'
 
 // A log item's snapshot is per serving for recipes and per 100 g for foods (as in the API)
 function logItemAmount(it: any, key: string): number {
@@ -445,6 +446,9 @@ export const Dashboard: React.FC<{
           </div>
         </div>
       </div>
+
+      {/* Weekly sets per muscle against targets (D-34) */}
+      <WeeklyVolumeCard />
 
       {/* Secondary Nutrition Overview Row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>

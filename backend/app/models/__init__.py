@@ -25,6 +25,7 @@ from app.models.user import (
 )
 from app.models.workout import (
     Exercise,
+    MuscleSetTarget,
     RoutineExercise,
     WorkoutExercise,
     WorkoutRoutine,
@@ -38,6 +39,7 @@ __all__ = [
     "Session",
     "UserProfile",
     "UserFoodConstraint",
+    "MuscleSetTarget",
     "UserCuisinePreference",
     "Exercise",
     "WorkoutRoutine",

@@ -225,6 +225,8 @@ Everything else follows the blueprint: `ON DELETE CASCADE` for owned child rows,
 | GET, POST | `/api/workouts`; GET, PATCH, DELETE `/api/workouts/{id}` | Sessions |
 | GET | `/api/analytics/strength` | Strength trends, PRs, volume |
 | GET | `/api/analytics/consistency` | Sessions per week |
+| GET | `/api/analytics/next-load/{exercise_id}` | Overload hint (D-33) |
+| GET, PUT | `/api/analytics/weekly-volume`, `/api/analytics/weekly-volume/targets` | Weekly sets per muscle and targets (D-34) |
 | GET, POST | `/api/foods`, `/api/recipes` | Catalogue search |
 | POST, PATCH, DELETE | `/api/foods`, `/api/foods/{id}` | The caller's custom foods (D-32); `GET /api/foods?mine=true` lists only them |
 | GET, POST | `/api/nutrition/goals`; POST `/api/nutrition/goals/estimate` | Versioned targets; an estimate with assumptions |
@@ -425,6 +427,9 @@ Dates and clocks in tests are injected, so results are deterministic.
 - [ ] **AC-42** (FR-05) The trend endpoint returns, per exercise, the best e1RM per session date (user timezone) within the window, converts units for lb users, and returns an empty list with 200 when there is no data.
 - [ ] **AC-43** (NFR) e1RM uses exact decimals: 82.5 kg × 3 reps gives exactly 90.75.
 - [ ] **AC-44** (5.2) Sessions on a Monday, Wednesday and Saturday give 3 for that week, a week with none gives 0, and a session with only warm-up sets is not counted.
+- [ ] **AC-123** (D-33) With a rep range of 8–12: sets of 12, 12, 13 at 60 kg suggest 62.5 kg (upper body); 12, 11, 10 at 60 kg keep 60 kg; a set below 8 keeps the load; warm-ups are ignored and only sets at the heaviest load count (60×12, 60×12, 70×6 keeps 70 kg). Via the API, a squat session of 3×12 at 100 kg suggests 105 kg; a lb user's bench 2×12 at 100 lb suggests 105 lb; no history returns `no_history`; rep_max below rep_min returns 422; an unknown exercise returns 404.
+- [ ] **AC-124** (D-33) A day with 100 kg × 5 and 90 kg × 12 reports best e1RM 126.0 from 90 × 12 and top set 100.0 × 5.
+- [ ] **AC-125** (D-34) With targets quads 3, chest 10, back 12 and this week's sets 3 quads (plus a warm-up) and 2 chest, the weekly volume shows quads 3/3 met, chest 2/10, back 0/12; last week's and other users' sets are not counted; targets of 0 or 41 or a blank muscle return 422; targets appear in the export.
 
 ### Catalogue and nutrient maths
 - [ ] **AC-45** (FR-09) 150 g of a food with 20 g protein per 100 g gives exactly 30 g protein.
@@ -622,6 +627,8 @@ Steps 5 and 6 (training) are independent of steps 7 to 9 (nutrition) once step 4
 | D-30 | 2026-10-20 | A daily budget is a strict cap: serving sizes are limited to those whose cost fits the slot's share, so no day exceeds the budget; substitutions obey the plan's budget and time caps | Budget as ranking only, letting servings scale to meet calories (₹150/day plans averaged ₹229/day) | User: "budget is important". Low budgets now fall short of calorie targets instead (₹150/day ≈ 2,340 of 2,800 kcal), flagged by existing target_deviation warnings |
 | D-31 | 2026-10-21 | Allergy constraints and food tags use one set of 14 codes (`gluten`, `crustaceans`, `eggs`, `fish`, `peanuts`, `soy`, `milk`, `tree_nuts`, `celery`, `mustard`, `sesame`, `sulphites`, `lupin`, `molluscs`) in `app/domain/allergens.py`; the API maps old spellings (`soybeans`, `cereals_gluten`) and rejects unknown codes; a migration rewrites saved rows; seed foods must use the 14 codes | Rename the catalogue tags to the UI spellings | Review found the settings screen saved `soybeans`/`cereals_gluten` while foods were tagged `soy`/`gluten`, so those allergies never matched the exact-match filter (S9). Fixing at the API boundary also protects older clients |
 | D-32 | 2026-10-21 | Custom-food editor (stretch): users add foods with per-100 g kcal, protein, carbohydrate, fat (and optional fibre) and EU-14 allergens; stored in `foods` with `owner_user_id`, labelled `User-entered`, `approximate`, allergens unverified; visible to and loggable by the owner only; never used by the planner; catalogue foods are read-only | Let custom foods into the planner; serving-based entry | User chose per-100 g entry for logging only. Keeps the planner on reviewed recipes (D-19) and invents no nutrient data |
+| D-33 | 2026-10-21 | Progressive overload hint by double progression: when every working set at the last session's heaviest load reaches the top of the rep range (routine's, else 8–12), suggest one step more (+2.5 kg upper body, +5 kg lower body; +5/+10 lb), otherwise keep the load; never suggest less. Step sizes are *initial* placeholders in `config.py`. The e1RM chart also plots the heaviest working set per day | Percentage-based or RPE-based progression; auto-filling loads | Simple, explainable and testable; a suggestion the user accepts with one tap, not coaching advice |
+| D-34 | 2026-10-21 | Weekly working-set targets per muscle group (`muscle_set_targets`, 1–40 sets), counted by the exercise's primary muscle for the current Monday-start week in the user's timezone; warm-ups excluded; included in export and deletion | Volume in kg per muscle; secondary muscles counted as half sets | Sets per muscle is the common way lifters plan volume and needs no extra exercise data |
 
 ## 19. Open Questions
 

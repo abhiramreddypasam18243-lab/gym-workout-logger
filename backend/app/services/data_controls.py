@@ -22,6 +22,7 @@ from app.models.nutrition import (
 from app.models.user import Session, User, UserCuisinePreference, UserFoodConstraint, UserProfile
 from app.models.workout import (
     Exercise,
+    MuscleSetTarget,
     RoutineExercise,
     WorkoutExercise,
     WorkoutRoutine,
@@ -271,6 +272,14 @@ class DataControlsService:
             for cf in (await self.db.execute(cust_food_stmt)).scalars().all()
         ]
 
+        # 8c. Weekly set targets per muscle (D-34)
+        muscle_targets = {
+            t.muscle: t.weekly_sets
+            for t in (
+                await self.db.execute(select(MuscleSetTarget).where(MuscleSetTarget.user_id == user_id))
+            ).scalars()
+        }
+
         # 9. Meal Plans
         plans_stmt = (
             select(MealPlan)
@@ -372,6 +381,7 @@ class DataControlsService:
             "workout_sets": workout_sets_count,
             "custom_exercises": len(custom_exercises_data),
             "custom_foods": len(custom_foods_data),
+            "muscle_set_targets": len(muscle_targets),
             "meal_plans": len(meal_plans_data),
             "planned_meals": planned_meals_count,
             "planned_meal_items": planned_meal_items_count,
@@ -395,6 +405,7 @@ class DataControlsService:
             workout_sessions=workout_sessions_data,
             custom_exercises=custom_exercises_data,
             custom_foods=custom_foods_data,
+            muscle_set_targets=muscle_targets,
             meal_plans=meal_plans_data,
             nutrition_logs=nutrition_logs_data,
         )
@@ -476,6 +487,7 @@ class DataControlsService:
         await self.db.execute(delete(Exercise).where(Exercise.owner_user_id == user_id))
         # Custom foods go after logs and plans, which reference them (RESTRICT)
         await self.db.execute(delete(Food).where(Food.owner_user_id == user_id))
+        await self.db.execute(delete(MuscleSetTarget).where(MuscleSetTarget.user_id == user_id))
 
         # 7. Delete Nutrition Goals and Constraints
         await self.db.execute(delete(NutritionGoal).where(NutritionGoal.user_id == user_id))

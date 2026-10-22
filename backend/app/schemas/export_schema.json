@@ -1004,6 +1004,13 @@
       "title": "Custom Foods",
       "type": "array"
     },
+    "muscle_set_targets": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Muscle Set Targets",
+      "type": "object"
+    },
     "meal_plans": {
       "items": {
         "$ref": "#/$defs/MealPlanExportData"

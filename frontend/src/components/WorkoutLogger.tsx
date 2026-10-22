@@ -4,6 +4,7 @@ import { api, ApiError } from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { playSetCompleteSound, playMicroClick } from '../utils/audio'
 import { MotivationalQuoteCard } from './MotivationalQuoteCard'
+import { OverloadHint } from './OverloadHint'
 import type { Exercise, Routine } from '../types'
 
 interface ActiveSet {
@@ -21,6 +22,8 @@ interface ActiveExercise {
   name: string
   order_in_session: number
   notes?: string
+  rep_min?: number
+  rep_max?: number
   sets: ActiveSet[]
 }
 
@@ -74,6 +77,8 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
         name: re.exercise?.name || `Exercise ${idx + 1}`,
         order_in_session: idx + 1,
         notes: re.notes || '',
+        rep_min: re.rep_min,
+        rep_max: re.rep_max,
         sets: [
           {
             set_number: 1,
@@ -462,6 +467,20 @@ export const WorkoutLogger: React.FC<WorkoutLoggerProps> = ({ prefilledRoutine, 
                   <Trash2 size={16} />
                 </button>
               </div>
+
+              <OverloadHint
+                exerciseId={ex.exercise_id}
+                repMin={ex.rep_min}
+                repMax={ex.rep_max}
+                onUseLoad={(load) => {
+                  const updated = [...exercises]
+                  updated[exIdx] = {
+                    ...updated[exIdx],
+                    sets: updated[exIdx].sets.map((st) => (st.is_warmup ? st : { ...st, load_display: load })),
+                  }
+                  setExercises(updated)
+                }}
+              />
 
               {/* Set Table */}
               <div style={{ overflowX: 'auto', marginBottom: '0.75rem' }}>
