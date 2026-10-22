@@ -421,3 +421,24 @@ p, span, label { color: var(--text-muted); }
 }
 .theme-pill:hover { transform: scale(1.12); }
 .theme-pill.active { border-color: var(--text-main); }
+
+/* Phones: the header scrolls away instead of covering a third of the screen,
+   and drops the tagline and search label (the search icon stays). */
+@media (max-width: 640px) {
+  .app-header { position: static !important; }
+  .app-header .brand-sub,
+  .app-header .search-label { display: none; }
+  .app-header nav.nav-scroll { width: 100%; }
+  .disclaimer-banner { padding: 0.35rem 0.75rem; font-size: 0.6875rem; }
+  .tab-switcher { width: 100%; }
+}
+
+/* A row of tab buttons scrolls on its own instead of widening the page */
+.tab-switcher {
+  display: flex;
+  overflow-x: auto;
+  max-width: 100%;
+  scrollbar-width: none;
+}
+.tab-switcher::-webkit-scrollbar { display: none; }
+.tab-switcher .btn { flex-shrink: 0; white-space: nowrap; }

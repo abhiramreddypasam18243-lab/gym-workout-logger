@@ -272,7 +272,7 @@ export const NutritionPlanner: React.FC = () => {
         </div>
 
         {/* Tab switcher */}
-        <div style={{ display: 'flex', background: 'var(--bg-surface-elevated)', padding: '0.25rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
+        <div className="tab-switcher" style={{ background: 'var(--bg-surface-elevated)', padding: '0.25rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
           <button
             type="button"
             className={`btn btn-sm ${activeTab === 'targets' ? 'btn-primary' : 'btn-ghost'}`}
