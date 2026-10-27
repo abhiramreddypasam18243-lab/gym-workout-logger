@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Titan — Project Technical Review & Viva Transcript</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- KaTeX for LaTeX Math -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --card-bg: #141a24;
+      --card-header: #1c2432;
+      --border: #263346;
+      --accent: #ff5a1f;
+      --text: #e2e8f0;
+      --text-dim: #94a3b8;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-display: 'Barlow Condensed', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.65;
+      padding-bottom: 5rem;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header {
+      background: #0f141f;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+      padding: 0.9rem 1.5rem;
+    }
+
+    .header-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .brand-badge {
+      background: var(--accent);
+      color: #000;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.15rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .btn {
+      background: #1c2432;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.4rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background: #253144;
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1.25rem;
+    }
+
+    .hero-banner {
+      background: linear-gradient(135deg, #182230 0%, #121924 100%);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 1.6rem 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-banner h1 {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      letter-spacing: 0.02em;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-banner p {
+      color: var(--text-dim);
+      font-size: 1rem;
+      max-width: 800px;
+    }
+
+    .turn-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 2.5rem;
+      overflow: hidden;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .turn-header {
+      background: var(--card-header);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .turn-badge {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .turn-anchor {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+    }
+    .turn-anchor:hover { color: var(--accent); }
+
+    .user-block {
+      background: #17202c;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.78rem;
+      flex-shrink: 0;
+    }
+
+    .avatar-user {
+      background: #2563eb;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
+    }
+
+    .avatar-ai {
+      background: var(--accent);
+      color: #000;
+      box-shadow: 0 0 10px rgba(255, 90, 31, 0.4);
+    }
+
+    .user-content {
+      flex: 1;
+      font-weight: 600;
+      color: #f8fafc;
+      font-size: 1.05rem;
+      padding-top: 0.2rem;
+    }
+
+    .user-content p {
+      margin: 0;
+    }
+
+    .assistant-block {
+      background: var(--card-bg);
+      padding: 1.75rem;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .assistant-content {
+      flex: 1;
+      min-width: 0;
+      overflow-wrap: break-word;
+    }
+
+    /* Typography & Tables */
+    .assistant-content h1, 
+    .assistant-content h2, 
+    .assistant-content h3, 
+    .assistant-content h4 {
+      font-family: var(--font-display);
+      color: #fff;
+      margin-top: 1.75rem;
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.02em;
+    }
+
+    .assistant-content h1 { font-size: 1.85rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+    .assistant-content h2 { font-size: 1.5rem; }
+    .assistant-content h3 { font-size: 1.3rem; color: #ff8a5c; }
+    .assistant-content h4 { font-size: 1.15rem; color: #cbd5e1; }
+
+    .assistant-content p { margin-bottom: 1rem; }
+    .assistant-content ul, .assistant-content ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+    .assistant-content li { margin-bottom: 0.35rem; }
+
+    .assistant-content pre {
+      background: #090d14;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      margin: 1.25rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      color: #f1f5f9;
+    }
+
+    .assistant-content code {
+      font-family: var(--font-mono);
+      background: rgba(148, 163, 184, 0.15);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.88em;
+      color: #ff9b71;
+    }
+
+    .assistant-content pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+    }
+
+    .assistant-content blockquote {
+      border-left: 3px solid var(--accent);
+      padding-left: 1rem;
+      color: #94a3b8;
+      font-style: italic;
+      margin: 1.25rem 0;
+    }
+
+    .assistant-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.92rem;
+    }
+
+    .assistant-content th, 
+    .assistant-content td {
+      border: 1px solid var(--border);
+      padding: 0.65rem 0.85rem;
+      text-align: left;
+    }
+
+    .assistant-content th {
+      background: #1c2432;
+      color: #f8fafc;
+      font-weight: 600;
+    }
+
+    .assistant-content tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .assistant-content hr {
+      border: 0;
+      height: 1px;
+      background: var(--border);
+      margin: 2rem 0;
+    }
+
+    .assistant-content .katex-display {
+      margin: 1.25rem 0;
+      overflow-x: auto;
+      padding: 0.5rem 0;
+    }
+
+    @media (max-width: 640px) {
+      .assistant-block, .user-block { padding: 1.1rem; gap: 0.75rem; }
+      .hero-banner { padding: 1.2rem; }
+      .hero-banner h1 { font-size: 1.7rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-badge">TITAN</span>
+        <span class="brand-title">Session Transcript</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero-banner">
+      <h1>Titan — Project Review & Viva Preparation Transcript</h1>
+      <p>Official technical session transcript detailing architecture, scientific foundations, database schema, security guarantees, and viva model questions.</p>
+    </div>
+
+    <div id="transcript-container">
+
+    <article class="turn-card" id="turn-1">
+      <div class="turn-header">
+        <span class="turn-badge">Turn 1</span>
+        <a href="#turn-1" class="turn-anchor">#</a>
+      </div>
+      <div class="user-block">
+        <div class="avatar avatar-user">YOU</div>
+        <div class="user-content"><p>once completely go through this project</p></div>
+      </div>
+      <div class="assistant-block">
+        <div class="avatar avatar-ai">AI</div>
+        <div class="assistant-content"><h1>Titan — Comprehensive Project Review &amp; Viva Preparation Guide</h1>
+<p>This review covers the entire architecture, core mathematical modules, safety invariants, database design, and current status of <strong>Titan (Gym Workout Logger &amp; Diet Planner)</strong>.</p>
+<hr />
+<h3>1. Project Overview &amp; Philosophy</h3>
+<p><strong>Titan</strong> is a production-grade, full-stack athletic performance application integrating workout logging with automated progressive overload telemetry, e1RM analytics, and a deterministic, rule-based dietary planning engine.</p>
+<h4>Core Philosophy</h4>
+<ul>
+<li><strong>Explainability over Black-Box AI:</strong> Every number shown can be traced directly to a peer-reviewed scientific formula, a catalogue entry with provenance (USDA FDC / Indian IFCT), or an explicit user setting.</li>
+<li><strong>Deterministic Rules:</strong> The diet planner uses an explainable greedy scoring algorithm with hard safety filters (EU-14 allergens first) rather than an unexplainable machine-learning model or integer linear programming.</li>
+<li><strong>Strict Wellbeing &amp; Harm Reduction:</strong> Built strictly around strength building and maintenance. Deficit calculations, weight-loss goals, guilt/streak-loss messaging, and unverified medical claims are strictly forbidden (<a href="spec.md">Rule S6</a>).</li>
+</ul>
+<hr />
+<h3>2. System Architecture &amp; Project Rules</h3>
+<p>Detailed architectural boundaries are mapped in <a href="docs/architecture-diagram.md">architecture-diagram.md</a>.</p>
+<pre><code class="language-mermaid">graph TD
+    Client[&quot;React 19 + TypeScript (360px Mobile First)&quot;] --&gt;|&quot;HTTPS / HttpOnly Cookie + CSRF&quot;| Nginx[&quot;Nginx Reverse Proxy (:8080)&quot;]
+    Nginx --&gt; Middleware[&quot;Middleware: 1MB Body Limit, CSP, CSRF, TLS Check&quot;]
+    Middleware --&gt; Routers[&quot;Thin Routers (app/api)&quot;]
+    Routers --&gt; Services[&quot;Transactional Services (app/services)&quot;]
+    Services --&gt; Domain[&quot;Pure Domain Logic (app/domain) [ZERO external dependencies]&quot;]
+    Services --&gt; DB[&quot;SQLAlchemy 2 Async + PostgreSQL 16&quot;]
+</code></pre>
+<h4>Architectural Guarantees for the Viva</h4>
+<ol>
+<li><strong>Strict Domain Layering (<a href="backend/tests/test_layering.py">test_layering.py</a>):</strong> The <code>app/domain</code> package is mathematically pure. It imports <strong>no</strong> frameworks (<code>fastapi</code>), <strong>no</strong> ORMs (<code>sqlalchemy</code>, <code>pydantic</code>), and <strong>no</strong> system clocks (<code>datetime.now()</code>). All functions are deterministic and take explicit arguments.</li>
+<li><strong>Exact Decimal Arithmetic (<a href="backend/app/domain/units.py">units.py</a>):</strong> Loads and nutrients use Python <code>Decimal</code> and database <code>NUMERIC</code>. Decimals travel over the API as JSON strings to avoid IEEE 754 binary floating-point drift. Rounding occurs only at the final display layer.</li>
+<li><strong>Injected Time Dependency (<a href="backend/app/api/deps.py">deps.py</a>):</strong> The system clock is injected (<code>get_now</code>), allowing tests to manipulate time deterministically without mocking system calls or trusting client headers.</li>
+<li><strong>Data Isolation &amp; Ownership Matrix (<a href="backend/tests/test_ownership.py">test_ownership.py</a>):</strong> All queries are scoped to the authenticated user ID. Any attempt to read or mutate another user's resource returns <code>404 Not Found</code> (never <code>403</code>), preventing IDOR enumeration attacks.</li>
+<li><strong>Defense in Depth Security (<a href="backend/app/main.py">main.py</a>):</strong> Passwords hashed with <strong>Argon2id</strong>, server-side sessions stored as SHA-256 digests in <code>HttpOnly</code> / <code>SameSite=Lax</code> cookies, double-submit CSRF tokens for mutating requests, dummy password verification on non-existent accounts to eliminate timing attacks, and a 1 MB payload limit.</li>
+</ol>
+<hr />
+<h3>3. Core Modules &amp; Mathematical Formulations</h3>
+<h4>A. Strength Analytics &amp; Progression</h4>
+<ul>
+<li><strong>Estimated 1RM (Epley Formula):</strong><br />
+  Implemented in <code>calculate_epley_e1rm</code>:
+  $$\text{e1RM} = \text{load} \times \left(1 + \frac{\text{reps}}{30}\right)$$</li>
+<li>Valid only for working sets with $1 \le \text{reps} \le 12$. For $\text{reps} = 1$, $\text{e1RM} = \text{load}$. Sets with $&gt; 12$ reps return <code>null</code> with reason <code>rep_range</code>.</li>
+<li>Warm-up sets (<code>is_warmup = True</code>) are excluded from e1RM, volume, and PR calculations.</li>
+<li><strong>Personal Record (PR) Detection:</strong><br />
+  Implemented in <code>detect_personal_records</code>:</li>
+<li>Sets are ordered chronologically by <code>(completed_at, set_number)</code>.</li>
+<li>The first working set sets the <strong>baseline</strong> (not a PR).</li>
+<li>Subsequent sets are PRs if and only if their e1RM is <strong>strictly greater</strong> than the highest previous e1RM for that exercise. Equal loads/reps are not PRs.</li>
+<li><strong>Double-Progression Overload Hint (D-33):</strong><br />
+  Implemented in <code>suggest_next_load</code>:</li>
+<li>Suggests advancing load ($+2.5\text{ kg}$ upper body, $+5.0\text{ kg}$ lower body) only when <em>every</em> set at the top working load achieves the ceiling of the target rep range (e.g., 12 reps). Otherwise, it recommends maintaining the load.</li>
+<li><strong>Weekly Muscle Volume Targets (D-34):</strong><br />
+  Implemented in <code>count_working_sets_by_muscle</code>:</li>
+<li>Counts total working sets per primary muscle group within the current ISO week (Monday to Sunday) in the user's IANA timezone.</li>
+</ul>
+<hr />
+<h4>B. Nutrition Targets &amp; Protective Safety Rules</h4>
+<ul>
+<li><strong>BMR &amp; TDEE (Mifflin–St Jeor):</strong><br />
+  Implemented in <code>calculate_bmr</code> and <code>calculate_tdee</code>:
+  $$\text{BMR} = 10 \times \text{weight}<em>{\text{kg}} + 6.25 \times \text{height}</em>{\text{cm}} - 5 \times \text{age} + s$$
+  $$s = +5 \text{ (male)}, \quad -161 \text{ (female)}, \quad -78 \text{ (unspecified)}$$
+  $$\text{TDEE} = \text{BMR} \times \text{Activity Factor} \quad (1.20 \text{ to } 1.725)$$</li>
+<li><strong>Macro Distributions (<code>calculate_macro_defaults</code>):</strong></li>
+<li>Protein: $1.6\text{ g/kg}$ of body weight.</li>
+<li>Fat: $25\%$ of total calories ($\div 9\text{ kcal/g}$).</li>
+<li>Carbohydrates: Remaining calories ($\div 4\text{ kcal/g}$).</li>
+<li><strong>Goal Factors:</strong> <code>maintain</code> ($1.00$), <code>build_strength</code> ($1.05$), <code>build_muscle</code> ($1.10$).</li>
+<li><strong>Protective Safety Floors (Rules S2–S6):</strong></li>
+<li>Minor block: Users under 18 cannot generate meal plans or calorie estimates (Rule S2).</li>
+<li>Mandatory floor: Calorie estimates below $1,500\text{ kcal}$ trigger <code>estimate_below_floor</code> (Rule S5). Generating plans below $1,200\text{ kcal}$ is refused outright.</li>
+<li>Professional guidance flag: Users flagging medical needs must enter targets manually.</li>
+</ul>
+<hr />
+<h4>C. Deterministic Diet Plan Generator</h4>
+<p>Implemented in <code>DietPlannerService</code> and <code>scoring.py</code>:</p>
+<ol>
+<li><strong>Step 1 — Hard Safety &amp; Constraint Filters:</strong></li>
+<li><strong>Allergies First (Rule S9, D-31):</strong> Exact match on 14 standardized EU allergen codes. Any recipe containing the allergen or an unverified ingredient (when <code>exclude_unverified_allergens</code> is active) is permanently removed.</li>
+<li><strong>Diet Tags &amp; Excluded Ingredients:</strong> Enforces vegan, vegetarian, halal, etc., and user-excluded ingredients (defaulting to beef in India context, D-27).</li>
+<li><strong>Slot &amp; User Caps:</strong> Enforces allowed meal slots (breakfast 25%, lunch 30%, dinner 30%, snack 15%), preparation time limits, and strict daily budget caps (<code>affordable_serving_sizes</code>, D-30).</li>
+<li><strong>Step 2 — Multi-Factor Scoring Formula:</strong>
+   $$\text{Score} = w_t \cdot \text{TargetFit} + w_c \cdot \text{Cuisine} - w_p \cdot \left(\frac{\text{Minutes}}{60}\right) - w_b \cdot \text{BudgetRatio} - w_r \cdot \text{Repetition}$$</li>
+<li>$\text{TargetFit} = -\frac{1}{2}\left(\frac{|\text{kcal} - \text{slot_kcal}|}{\text{slot_kcal}} + \frac{|\text{protein} - \text{slot_protein}|}{\text{slot_protein}}\right)$</li>
+<li>Serving sizes evaluated: ${0.5, 1.0, 1.5, 2.0, 2.5, 3.0}$.</li>
+<li><strong>Step 3 — Deterministic Selection:</strong></li>
+<li>The candidate with the highest score is selected.</li>
+<li><strong>Tie-Breaking:</strong> Broken deterministically by recipe ID ascending.</li>
+<li><strong>Step 4 — Explainability &amp; Infeasible Responses:</strong></li>
+<li>If a slot has zero eligible recipes, returns HTTP 200 with <code>status: "infeasible"</code> and an explanation object listing which filters eliminated how many recipes, and which limits (e.g. time, budget) can be relaxed. Allergies and diet tags are <strong>never</strong> suggested for relaxation.</li>
+</ol>
+<hr />
+<h4>D. Recipe Scaling, Atwater Checks &amp; Grocery Aggregation</h4>
+<ul>
+<li><strong>Atwater 4-4-9 Energy Validation (<code>check_atwater_consistency</code>):</strong><br />
+  Seed and custom foods must balance within realistic tolerances:
+  $$|\text{kcal} - (4P + 4C + 9F)| \le \max(20, 0.15 \times \text{kcal})$$</li>
+<li><strong>Edible Weight vs. Purchased Weight:</strong><br />
+  In <code>calculate_recipe_nutrients</code>, if an ingredient specifies <code>edible_weight_g</code> (e.g., banana peel or chicken bone excluded), that weight is used for nutrient calculations instead of the purchased weight.</li>
+<li><strong>Unit Family Segregation in Grocery Lists (<code>aggregate_grocery_items</code>):</strong><br />
+  Ingredients are strictly aggregated within incompatible families:</li>
+<li><strong>Mass:</strong> <code>g</code>, <code>kg</code> (converts to <code>kg</code> at $\ge 1,000\text{ g}$).</li>
+<li><strong>Volume:</strong> <code>ml</code>, <code>l</code>, <code>tsp</code> ($5\text{ ml}$), <code>tbsp</code> ($15\text{ ml}$), <code>cup</code> ($240\text{ ml}$) (converts to <code>l</code> at $\ge 1,000\text{ ml}$).</li>
+<li><strong>Count:</strong> <code>piece</code>.  </li>
+<li><strong>Crucial Rule:</strong> No mass-to-volume conversions without empirical density tables (1 cup of flour $\neq$ 1 cup of oil). Items with different units stay on separate rows.</li>
+</ul>
+<hr />
+<h4>E. Evidence-Grounded Descriptive Insights</h4>
+<p>Implemented in <code>generate_strength_trend_insight</code>:
+* Requires a minimum sample size ($n \ge 3$ sessions for an exercise) before emitting a trend.
+* Every insight states its observation window, sample size $n$, and explicit scientific limitations.
+* <strong>Banned Vocabulary Enforcement (<code>verify_non_causal_wording</code>):</strong> Automatically asserts that statements never use causal or judgmental words (<code>caused</code>, <code>because</code>, <code>due to</code>, <code>led to</code>, <code>proves</code>, <code>optimizes</code>, <code>cheat</code>, <code>failed</code>, <code>guilt</code>, <code>streak lost</code>).</p>
+<hr />
+<h3>4. Current Verification &amp; Quality Status</h3>
+<table>
+<thead>
+<tr>
+<th>Verification Layer</th>
+<th>Tool / Scope</th>
+<th>Status</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Domain Purity &amp; Logic</strong></td>
+<td><code>pytest tests/test_domain_*.py</code></td>
+<td>✅ <strong>Passed (27/27)</strong></td>
+<td>All math, Epley, PR, targets, and layering checks pass in 0.55s</td>
+</tr>
+<tr>
+<td><strong>Backend Linting</strong></td>
+<td><code>ruff check backend</code></td>
+<td>✅ <strong>Passed (0 errors)</strong></td>
+<td>Clean formatting, import sorting, and syntax adherence</td>
+</tr>
+<tr>
+<td><strong>Backend Type Safety</strong></td>
+<td><code>mypy --config-file pyproject.toml app</code></td>
+<td>✅ <strong>Passed (0 errors)</strong></td>
+<td>Strict static typing across all 60 source files</td>
+</tr>
+<tr>
+<td><strong>Frontend Type Safety</strong></td>
+<td><code>npx tsc --noEmit</code></td>
+<td>✅ <strong>Passed (0 errors)</strong></td>
+<td>Full TypeScript compilation clean</td>
+</tr>
+<tr>
+<td><strong>Frontend Linting</strong></td>
+<td><code>oxlint</code></td>
+<td>✅ <strong>Passed (0 errors)</strong></td>
+<td>0 lint errors across all 29 UI source files</td>
+</tr>
+<tr>
+<td><strong>Security Audit</strong></td>
+<td>Argon2id + CSRF + CSP</td>
+<td>✅ <strong>Verified</strong></td>
+<td>Session cookies secure, double submit tokens, zero hardcoded secrets</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>5. Key Files Quick Reference</h3>
+<ul>
+<li><strong>Domain Logic:</strong></li>
+<li><code>strength.py</code> — Epley 1RM, volume, PR detector</li>
+<li><code>progression.py</code> — Double progression overload hints &amp; weekly sets</li>
+<li><code>targets.py</code> — Mifflin–St Jeor BMR, TDEE, macro split, safety floor</li>
+<li><code>scoring.py</code> — Deterministic candidate scoring &amp; serving size picker</li>
+<li><code>grocery.py</code> — Unit-family preserving grocery aggregation</li>
+<li><code>nutrients.py</code> — Recipe scaling &amp; Atwater 4-4-9 validator</li>
+<li><code>allergens.py</code> — 14 standardized EU allergen codes</li>
+<li><code>insights.py</code> — Non-causal insight generator &amp; banned-word scanner</li>
+<li><strong>Services &amp; Application Core:</strong></li>
+<li><code>main.py</code> — Security headers, body limit, CORS, router mounting</li>
+<li><code>planner.py</code> — 7-day greedy meal planner orchestrator</li>
+<li><code>config.py</code> — Centralized configuration &amp; reviewable safety thresholds</li>
+<li><code>demo_user.py</code> — Synthetic demo account generator (2 years of overload data)</li>
+<li><strong>Frontend Cockpit:</strong></li>
+<li><code>WorkoutLogger.tsx</code> — Gym training session cockpit with live e1RM badge</li>
+<li><code>MealPlanView.tsx</code> — 7-day meal plan grid, substitution flow, and grocery view</li>
+<li><code>StrengthAnalytics.tsx</code> — Interactive SVG spline chart, PR star markers &amp; overload hints</li>
+<li><code>RestTimerHud.tsx</code> — Floating circular SVG timer &amp; Web Audio synthesis</li>
+<li><strong>Documentation &amp; Logs:</strong></li>
+<li><code>spec.md</code> — Master specification document</li>
+<li><code>DECISIONS.md</code> — Architectural decisions log (D-01 to D-34)</li>
+<li><code>learning-log.md</code> — Step-by-step viva notes, rationale, and quiz questions</li>
+</ul>
+<hr />
+<h3>6. Top 5 Viva Questions &amp; Crisp Answers</h3>
+<p><strong>Q1: Why did you choose a Modular Monolith over Microservices, and what is the purpose of the pure domain layer?</strong></p>
+<blockquote>
+<p><em>"A modular monolith minimizes distributed systems overhead (network latency, distributed transactions, complex deployment) while maintaining strict architectural boundaries. The <code>app/domain</code> layer contains pure functions with zero framework, database, or clock dependencies, ensuring our fitness mathematics and safety filtering are 100% deterministic, easily testable without mocks, and decoupled from infrastructure."</em></p>
+</blockquote>
+<p><strong>Q2: How does the diet planner work, and why not use machine learning or an integer programming solver?</strong></p>
+<blockquote>
+<p><em>"The planner uses a transparent 4-step greedy algorithm: hard filtering (safety allergens, diet tags, time/budget caps), multi-factor scoring (target fit, cuisine preference, prep time, budget, repetition penalty), deterministic selection with ascending recipe ID tie-breaking, and explanation generation. Machine learning is opaque and cannot guarantee hard allergy exclusion, while integer programming adds unnecessary operational complexity. Our greedy approach is explainable, fast, reproducible, and safety-first."</em></p>
+</blockquote>
+<p><strong>Q3: How do you handle unit conversions in grocery lists? Why don't you convert cups of flour into grams?</strong></p>
+<blockquote>
+<p><em>"Grocery aggregation enforces strict unit-family segregation: mass (<code>g</code>, <code>kg</code>), volume (<code>ml</code>, <code>l</code>, <code>cup</code>, <code>tbsp</code>, <code>tsp</code>), and count (<code>piece</code>). Mass-to-volume conversion requires empirical ingredient density (e.g. 1 cup of flour $\approx 120\text{ g}$, whereas 1 cup of honey $\approx 340\text{ g}$). Without an exhaustive physical density database, converting across families would corrupt shopping quantities, so different unit families stay on separate line items."</em></p>
+</blockquote>
+<p><strong>Q4: How do you ensure personal record (PR) detection is robust against out-of-order logs?</strong></p>
+<blockquote>
+<p><em>"The domain function sorts working sets chronologically by <code>(completed_at, set_number)</code>. Warm-up sets and sets outside the 1–12 rep range are filtered out. The very first working set is designated as the baseline benchmark and is not a PR. Subsequent sets are flagged as PRs only if their e1RM is strictly greater than the historical maximum."</em></p>
+</blockquote>
+<p><strong>Q5: What protective safety rules did you build for user wellbeing?</strong></p>
+<blockquote>
+<p><em>"We enforced rules S1 to S10: self-declared adult confirmation (blocking users under 18 from calorie targets), a $1,500\text{ kcal}$ estimate floor and $1,200\text{ kcal}$ generation refusal, explicit exclusion of weight-loss/deficit goals, wellbeing controls to hide calories or pause nutrition, opt-in weight tracking, and automated scanning for banned judgmental or causal language in analytics."</em></p>
+</blockquote>
+<hr /></div>
+      </div>
+    </article>
+    
+
+    <article class="turn-card" id="turn-2">
+      <div class="turn-header">
+        <span class="turn-badge">Turn 2</span>
+        <a href="#turn-2" class="turn-anchor">#</a>
+      </div>
+      <div class="user-block">
+        <div class="avatar avatar-user">YOU</div>
+        <div class="user-content"><p>once explain this project breifly</p></div>
+      </div>
+      <div class="assistant-block">
+        <div class="avatar avatar-ai">AI</div>
+        <div class="assistant-content"><h1>Titan — Brief Project Summary</h1>
+<p><strong>Titan</strong> is a full-stack web application combining a <strong>gym workout logger with strength telemetry</strong> and a <strong>deterministic, rule-based dietary planning engine</strong>. It prioritizes scientific accuracy, explainability, and safety over black-box AI.</p>
+<hr />
+<h3>1. The Two Core Halves</h3>
+<h4>🏋️‍♂️ A. Gym Workout Logger &amp; Strength Analytics</h4>
+<ul>
+<li><strong>Active Training Logger:</strong> Log exercises, sets, reps, load, RPE, and warm-ups with real-time volume calculation and rest timer HUD.</li>
+<li><strong>Estimated 1RM (Epley Formula):</strong> Calculates $\text{e1RM} = \text{load} \times (1 + \text{reps} / 30)$ for working sets with 1–12 reps in <code>calculate_epley_e1rm</code>.</li>
+<li><strong>Automated PR Detection:</strong> Chronologically compares sets against historical records in <code>detect_personal_records</code> (first set is baseline; PR requires strict inequality).</li>
+<li><strong>Double-Progression Overload Hint (D-33):</strong> Suggests adding load ($+2.5\text{ kg}$ upper, $+5\text{ kg}$ lower) in <code>suggest_next_load</code> only when all sets hit the top of the rep range.</li>
+<li><strong>Weekly Muscle Volume (D-34):</strong> Tracks working sets completed per primary muscle group each week.</li>
+</ul>
+<h4>🥗 B. Strength Diet Planner &amp; Nutrition</h4>
+<ul>
+<li><strong>Deterministic Greedy Planner:</strong> Generates 7-day meal plans in <code>DietPlannerService</code> without black-box ML or guessing:</li>
+<li><strong>Hard Safety Filters:</strong> Hard-filters the 14 EU allergens, diet tags, exclusions (beef default), time caps, and daily budget limits.</li>
+<li><strong>Multi-Factor Scoring:</strong> Ranks candidate meals by target fit, cuisine preference, preparation time, and repetition penalty.</li>
+<li><strong>Explainable Infeasibility:</strong> If no recipe fits, returns clear feedback detailing which filters eliminated recipes.</li>
+<li><strong>Target Estimation:</strong> Mifflin–St Jeor BMR, TDEE activity multipliers, and goal adjustments (+5% strength, +10% muscle) in <code>calculate_target_estimate</code>.</li>
+<li><strong>Unit-Aware Grocery List:</strong> Aggregates ingredients in <code>aggregate_grocery_items</code> strictly within unit families (<code>mass</code>, <code>volume</code>, <code>count</code>) without erroneous cross-density conversions.</li>
+</ul>
+<hr />
+<h3>2. Essential Safety &amp; Design Rules</h3>
+<ul>
+<li><strong>Zero Deficit / Weight-Loss Goals (Rule S6):</strong> Focused exclusively on strength building and maintenance. Deficits and weight-loss pressure are forbidden.</li>
+<li><strong>Protective Floors (Rule S5):</strong> Refuses target estimates below $1,500\text{ kcal}$ and blocks plan generation below $1,200\text{ kcal}$.</li>
+<li><strong>Adults Only for Diet Planning (Rule S2):</strong> Nutrition features require confirming age 18+.</li>
+<li><strong>Wellbeing Controls (Rule S7):</strong> Options to hide calories, pause nutrition, and opt-in to weight tracking.</li>
+<li><strong>Neutral Language (Rule S8):</strong> Automated code checks ban judgmental and causal words (<code>cheat</code>, <code>bad</code>, <code>failed</code>, <code>caused</code>, <code>boosts</code>).</li>
+</ul>
+<hr />
+<h3>3. Technology &amp; Architecture</h3>
+<ul>
+<li><strong>Frontend:</strong> React 19, TypeScript, Vite, Web Audio API, Vanilla CSS design system.</li>
+<li><strong>Backend:</strong> FastAPI, SQLAlchemy 2 (async), PostgreSQL 16 (with SQLite for dev).</li>
+<li><strong>Modular Monolith &amp; Layering (<code>test_layering.py</code>):</strong> </li>
+<li><code>app/domain</code> contains pure mathematical functions (zero framework, database, or clock dependencies).</li>
+<li><code>app/services</code> orchestrates database transactions and business logic.</li>
+<li><code>app/api</code> handles routing, authorization, and validation.</li>
+<li><strong>Security:</strong> Argon2id password hashing, server-side <code>HttpOnly</code> sessions with SHA-256 tokens, double-submit CSRF protection, and strict per-user data isolation (foreign resources return 404).</li>
+</ul>
+<hr /></div>
+      </div>
+    </article>
+    
+
+    <article class="turn-card" id="turn-3">
+      <div class="turn-header">
+        <span class="turn-badge">Turn 3</span>
+        <a href="#turn-3" class="turn-anchor">#</a>
+      </div>
+      <div class="user-block">
+        <div class="avatar avatar-user">YOU</div>
+        <div class="user-content"><p>where are data of recipies of food taken from</p></div>
+      </div>
+      <div class="assistant-block">
+        <div class="avatar avatar-ai">AI</div>
+        <div class="assistant-content"><p>The food and recipe data in Titan comes from two transparent, documented layers recorded in <a href="docs/DATA_LICENCES.md">DATA_LICENCES.md</a>:</p>
+<hr />
+<h3>1. Raw Food Nutritional Data (<code>foods.json</code>)</h3>
+<p>Every individual ingredient's per-100 g calories, protein, carbs, fat, and allergen data comes from official, licensed government databases (Rule DL1 &amp; DL2):</p>
+<ul>
+<li><strong><a href="https://fdc.nal.usda.gov/">USDA FoodData Central</a> (SR Legacy &amp; Foundation Foods):</strong></li>
+<li><strong>Licence:</strong> Public domain (U.S. government publication).</li>
+<li><strong>Coverage:</strong> Staple whole foods (e.g., chicken breast <code>FDC: 171077</code>, whole eggs <code>FDC: 171287</code>, oats, vegetables) and Indian staples added via the USDA API (moong dal, rajma, besan, curd, peanuts, moong sprouts, and defatted soy flour for soya chunks).</li>
+<li><strong>Provenance:</strong> Every food item explicitly stores its <code>data_source</code>, <code>source_reference</code> (exact FDC ID), <code>state</code> (raw/cooked), and <code>verified_at</code> timestamp.</li>
+<li><strong><a href="https://www.nin.res.in/">Indian Food Composition Tables (IFCT)</a> (NIN / ICMR):</strong></li>
+<li>National Institute of Nutrition / Indian Council of Medical Research composition tables for regional Indian food items.</li>
+</ul>
+<hr />
+<h3>2. Recipes &amp; Nutrient Calculation (<code>recipes.json</code>)</h3>
+<ul>
+<li><strong>Original Compositions (Rule DL3):</strong> Per specification rule DL3, recipes are <strong>original, standardized compositions</strong> written for this project (covering Indian, Italian, Mexican, American, and East Asian cuisines). They are <strong>not</strong> copied or scraped from copyrighted blogs or cookbooks.</li>
+<li><strong>Mathematically Derived Nutrients (Rule DL4):</strong> A recipe's calories and macros are <strong>never invented</strong>. Instead, <code>calculate_recipe_nutrients</code> calculates them deterministically by summing the exact edible weights of each underlying catalogue ingredient and dividing by servings:
+  $$\text{Nutrient}<em>{\text{per serving}} = \frac{\sum (\text{edible_weight}</em>{\text{g}} / 100 \times \text{food_nutrient}_{\text{per 100g}})}{\text{servings}}$$</li>
+<li><strong>Recipe Cost Estimates:</strong> Recipe costs (<code>cost_minor_per_serving</code> in INR paise) are based on documented Indian retail price estimates detailed in <a href="docs/budget-recipe-costs.md">budget-recipe-costs.md</a> for the daily budget cap filter (D-28, D-30).</li>
+</ul>
+<hr /></div>
+      </div>
+    </article>
+    
+
+    <article class="turn-card" id="turn-4">
+      <div class="turn-header">
+        <span class="turn-badge">Turn 4</span>
+        <a href="#turn-4" class="turn-anchor">#</a>
+      </div>
+      <div class="user-block">
+        <div class="avatar avatar-user">YOU</div>
+        <div class="user-content"><p>waht are the sources that are used for taking exercise details</p></div>
+      </div>
+      <div class="assistant-block">
+        <div class="avatar avatar-ai">AI</div>
+        <div class="assistant-content"><p>The exercise catalogue in Titan (<code>exercises.json</code>) is built using standard sports science classifications rather than a scraped third-party database:</p>
+<hr />
+<h3>1. Sports Science &amp; Biomechanical Framework (NSCA / ACSM Standards)</h3>
+<p>The <strong>35 core seed exercises</strong> were compiled using standard exercise science and kinesiology principles (such as those established by the <strong>National Strength and Conditioning Association (NSCA)</strong> and the <strong>American College of Sports Medicine (ACSM)</strong>):</p>
+<ul>
+<li><strong>7 Primary Movement Patterns:</strong> Standard functional kinesiology patterns:</li>
+<li><code>horizontal_push</code> (e.g. Barbell Bench Press, Push-up)</li>
+<li><code>vertical_push</code> (e.g. Overhead Barbell Press)</li>
+<li><code>horizontal_pull</code> (e.g. Barbell Bent-Over Row, Cable Row)</li>
+<li><code>vertical_pull</code> (e.g. Pull-up, Lat Pulldown)</li>
+<li><code>squat</code> (e.g. Barbell Back Squat, Front Squat, Leg Press)</li>
+<li><code>hinge</code> (e.g. Barbell Deadlift, Romanian Deadlift)</li>
+<li><code>isolation</code> (e.g. Bicep Curl, Cable Lateral Raise, Tricep Pushdown)</li>
+<li><strong>Target Muscle Groups:</strong> Mapped anatomically to: <code>chest</code>, <code>back</code>, <code>shoulders</code>, <code>quads</code>, <code>hamstrings</code>, <code>glutes</code>, <code>biceps</code>, <code>triceps</code>, <code>core</code>.</li>
+<li><strong>Standard Equipment Types:</strong> <code>barbell</code>, <code>dumbbell</code>, <code>cable</code>, <code>machine</code>, <code>bodyweight</code>.</li>
+<li><strong>Instructions:</strong> Concise anatomical cues focusing on joint safety (e.g. neutral spine, scapular retraction, controlled eccentric phase, elbow positioning).</li>
+</ul>
+<hr />
+<h3>2. Project Specification Blueprint Requirements</h3>
+<p>The requirements for the exercise schema and seeding are defined in:
+* Master Spec: <code>spec.md</code> §4 &amp; FR-02
+* The assignment blueprint: <code>docs/Advanced_Gym_Workout_Logger_Diet_Planning_Blueprint.docx</code>
+* Learning log entry: <code>learning-log.md</code> Step 4 (verifies 35 exercises spanning all 7 movement patterns).</p>
+<hr />
+<h3>3. User-Defined Custom Exercises (AC-30)</h3>
+<p>In addition to the 35 pre-seeded system exercises, the app allows athletes to define their own custom exercises via <code>POST /api/exercises</code>. 
+* Custom exercises are linked to the creator (<code>owner_user_id</code>).
+* They undergo case-insensitive duplicate checks to prevent conflicting exercise names within the user's account.</p>
+<hr /></div>
+      </div>
+    </article>
+    
+
+    <article class="turn-card" id="turn-5">
+      <div class="turn-header">
+        <span class="turn-badge">Turn 5</span>
+        <a href="#turn-5" class="turn-anchor">#</a>
+      </div>
+      <div class="user-block">
+        <div class="avatar avatar-user">YOU</div>
+        <div class="user-content"><p>give me the flow of this project(how it works)</p></div>
+      </div>
+      <div class="assistant-block">
+        <div class="avatar avatar-ai">AI</div>
+        <div class="assistant-content"><p>Here is the end-to-end operational flow of <strong>Titan</strong>, structured from initial sign-up to daily gym tracking and meal planning.</p>
+<hr />
+<h3>1. High-Level System Flowchart</h3>
+<pre><code class="language-mermaid">flowchart TD
+    Start([User Opens App]) --&gt; Auth[1. Authentication &amp; Profile]
+    Auth --&gt; Mode{User Choice}
+
+    %% Workout Flow
+    Mode --&gt;|Training| Workout[2. Workout Logger Cockpit]
+    Workout --&gt; Sets[Log Sets, Reps, Load, RPE]
+    Sets --&gt; HUD[Rest Timer &amp; Web Audio Sound]
+    HUD --&gt; SaveWorkout[Atomic Save Session]
+    SaveWorkout --&gt; StrengthAnalytics[3. Strength Analytics &amp; Overload Hints]
+
+    %% Nutrition Flow
+    Mode --&gt;|Nutrition| NutriSetup[4. Target &amp; Preference Setup]
+    NutriSetup --&gt; PlanGen[5. Deterministic Greedy Plan Generator]
+    PlanGen --&gt; PlanReview{Feasible?}
+    PlanReview --&gt;|No| Infeasible[Explain Infeasibility &amp; Suggest Limits to Relax]
+    PlanReview --&gt;|Yes| PlanView[7-Day Plan Grid &amp; Recipe Servings]
+    PlanView --&gt; Grocery[6. Unit-Aware Grocery List]
+    PlanView --&gt; Sub[Substitute Recipes]
+
+    %% Daily Tracking
+    SaveWorkout --&gt; Dashboard[7. Telemetry Dashboard &amp; Non-Causal Insights]
+    PlanView --&gt; FoodLog[Log Actual Food Intake]
+    FoodLog --&gt; Compare[Planned vs Logged Comparison]
+    Compare --&gt; Dashboard
+</code></pre>
+<hr />
+<h3>2. Step-by-Step Execution Flow</h3>
+<h4>Step 1: Authentication &amp; Safety Profile Setup</h4>
+<ol>
+<li><strong>Registration &amp; Session (<code>auth.py</code>):</strong></li>
+<li>User registers with an email and password (minimum 12 chars). Passwords are hashed with <strong>Argon2id</strong>.</li>
+<li>A server-side session is created; a cryptographically secure token hash is stored in the database, and an <code>HttpOnly</code>, <code>SameSite=Lax</code> cookie is issued along with a CSRF token.</li>
+<li><strong>Adult &amp; Safety Confirmation (<code>profile.py</code>):</strong></li>
+<li>The user sets preferred units (<code>kg</code> or <code>lb</code>), timezone, and confirms they are 18+ (Rule S2).</li>
+<li>If the user flags <code>needs_professional_guidance</code>, automated estimation is disabled and manual target entry is mandated.</li>
+</ol>
+<hr />
+<h4>Step 2: Active Workout Logging Cockpit</h4>
+<p><em>(Frontend: <code>WorkoutLogger.tsx</code>)</em></p>
+<ol>
+<li><strong>Start Session:</strong> User starts a blank workout or picks a pre-built template from <code>RoutinesManager.tsx</code>.</li>
+<li><strong>Fast Set Entry:</strong> Adding a new set automatically duplicates the weight and reps of the previous set (allowing one-tap logging between sets).</li>
+<li><strong>Live Telemetry:</strong></li>
+<li>Working volume ($\text{load} \times \text{reps}$) updates in real-time.</li>
+<li><code>calculate_epley_e1rm</code> displays the estimated 1-rep max badge dynamically.</li>
+<li><strong>Rest Timer HUD:</strong> Completing a set triggers the floating circular countdown timer (<code>RestTimerHud.tsx</code>) with Web Audio synthesis for start/finish audio chimes.</li>
+<li><strong>Atomic Commit:</strong> When the session finishes, the whole hierarchy (<code>WorkoutSession</code> $\to$ <code>WorkoutExercise</code> $\to$ <code>WorkoutSet</code>) is sent to <code>POST /api/workouts</code> and committed in an <strong>atomic ACID transaction</strong> to prevent corrupted analytics.</li>
+</ol>
+<hr />
+<h4>Step 3: Strength Analytics &amp; Progressive Overload Engine</h4>
+<p><em>(Backend: <code>analytics.py</code>, Frontend: <code>StrengthAnalytics.tsx</code>)</em></p>
+<ol>
+<li><strong>PR Detection:</strong> <code>detect_personal_records</code> sorts working sets chronologically; any set with an e1RM strictly exceeding the previous historical best is marked as a PR.</li>
+<li><strong>Double-Progression Overload Hint (D-33):</strong> <code>suggest_next_load</code> inspects the last session. If all sets at the heaviest load achieved the top rep range (e.g. 12 reps), it suggests increasing load ($+2.5\text{ kg}$ upper, $+5\text{ kg}$ lower); otherwise, it recommends holding the weight.</li>
+<li><strong>Weekly Volume Gauge (D-34):</strong> <code>count_working_sets_by_muscle</code> aggregates completed working sets for the current week against user targets.</li>
+</ol>
+<hr />
+<h4>Step 4: Nutrition Goals &amp; Preference Configuration</h4>
+<p><em>(Frontend: <code>NutritionPlanner.tsx</code>)</em></p>
+<ol>
+<li><strong>Target Calculation:</strong> <code>calculate_target_estimate</code> calculates Mifflin–St Jeor BMR, multiplies by activity factor (1.2–1.725), applies goal surplus (+5% strength, +10% muscle), and outputs protein ($1.6\text{ g/kg}$), fat (25%), and carbs.</li>
+<li><strong>Safety Floor Check:</strong> If calories $&lt; 1,500\text{ kcal}$, it triggers an energy floor warning (Rule S5).</li>
+<li><strong>Preferences &amp; Constraints:</strong> User selects preferred cuisines, diet tags (vegan, vegetarian, etc.), excluded ingredients, and sets an optional daily budget or prep time limit.</li>
+</ol>
+<hr />
+<h4>Step 5: Deterministic 7-Day Plan Generation</h4>
+<p><em>(Backend: <code>planner.py</code>, Frontend: <code>MealPlanView.tsx</code>)</em></p>
+<pre><code class="language-mermaid">sequenceDiagram
+    participant User
+    participant PlannerService as DietPlannerService
+    participant ScoringDomain as domain.scoring
+    participant DB as PostgreSQL
+
+    User-&gt;&gt;PlannerService: POST /api/meal-plans/generate
+    PlannerService-&gt;&gt;DB: Query reviewed recipes &amp; food allergens
+    PlannerService-&gt;&gt;PlannerService: Apply Hard Filters (EU-14 Allergens, Diets, Budget Cap)
+    alt Zero candidates pass filters
+        PlannerService--&gt;&gt;User: 200 Infeasible (Reason + Relaxable Limits)
+    else Candidates available
+        loop For each day &amp; slot
+            PlannerService-&gt;&gt;ScoringDomain: Calculate Target Fit &amp; Score Candidates
+            ScoringDomain--&gt;&gt;PlannerService: Ranked Scores (Ties broken by Recipe ID)
+            PlannerService-&gt;&gt;PlannerService: Pick best serving size (0.5 to 3.0)
+        end
+        PlannerService-&gt;&gt;DB: Save MealPlan with snapshot metadata
+        PlannerService--&gt;&gt;User: 200 OK (7-day Grid, Totals, Warnings)
+    end
+</code></pre>
+<hr />
+<h4>Step 6: Substitutions &amp; Grocery Aggregation</h4>
+<ol>
+<li><strong>Substitutions:</strong> If a user wants to swap a meal, <code>suggest_substitutions</code> applies the same safety and budget filters to recommend eligible alternative recipes with exact nutrient deltas.</li>
+<li><strong>Grocery Checklist:</strong> <code>aggregate_grocery_items</code> aggregates ingredients across selected days strictly within unit families:</li>
+<li>Mass: <code>g</code> $\to$ <code>kg</code> (at $\ge 1,000\text{ g}$)</li>
+<li>Volume: <code>ml</code> $\to$ <code>l</code> (at $\ge 1,000\text{ ml}$)</li>
+<li>Count: <code>piece</code><br />
+<em>(No density guessing between cups and grams).</em></li>
+</ol>
+<hr />
+<h4>Step 7: Daily Intake Logging, Comparison &amp; Dashboard</h4>
+<p><em>(Frontend: <code>Dashboard.tsx</code>)</em></p>
+<ol>
+<li><strong>Intake Logging:</strong> User logs what they ate (by grams or recipe servings). The system records an <strong>immutable nutrient snapshot</strong> so later catalogue updates never alter historical logs (Decision D-09).</li>
+<li><strong>Planned vs. Logged:</strong> The comparison engine checks whether daily intake was "within range" (calories within $\pm 10\%$ and protein $\ge 90\%$).</li>
+<li><strong>Telemetry &amp; Descriptive Insights:</strong> </li>
+<li>Dashboard shows weekly workout consistency, volume trends, and PR cards.</li>
+<li><code>generate_strength_trend_insight</code> displays non-causal observations (requiring $n \ge 3$ sessions, stating observation window, sample size, and limitations, with zero judgmental language).</li>
+</ol>
+<hr /></div>
+      </div>
+    </article>
+    
+
+    <article class="turn-card" id="turn-6">
+      <div class="turn-header">
+        <span class="turn-badge">Turn 6</span>
+        <a href="#turn-6" class="turn-anchor">#</a>
+      </div>
+      <div class="user-block">
+        <div class="avatar avatar-user">YOU</div>
+        <div class="user-content"><p>Which cuisines will the seed recipes cover, and who will review the allergen tagging</p></div>
+      </div>
+      <div class="assistant-block">
+        <div class="avatar avatar-ai">AI</div>
+        <div class="assistant-content"><p>This question is formally addressed by <strong>Decision D-22</strong>, <strong>Decision D-31</strong>, and the seed loader implementation:</p>
+<hr />
+<h3>1. Which cuisines do the seed recipes cover?</h3>
+<p>As established in <a href="DECISIONS.md">Decision D-22</a>, the seed catalogue covers <strong>5 distinct cuisines</strong> across 40 high-protein recipes:</p>
+<ol>
+<li><strong>Indian</strong> (Primary regional focus: Dal Tadka, Rajma Chawal, Besan Chilla, Soya Chunk Curry, Moong Khichdi, Paneer/Dahi dishes, and 10 Indian budget recipes $\le$ ₹50 per serving from D-28).</li>
+<li><strong>Italian</strong> (e.g., Chicken Penne, Risotto).</li>
+<li><strong>Mexican</strong> (e.g., Burrito bowls, High-Protein Fajitas).</li>
+<li><strong>American</strong> (e.g., Turkey burgers, Egg scramble &amp; oatmeal bowls).</li>
+<li><strong>East Asian</strong> (e.g., Teriyaki chicken with jasmine rice, Tofu stir-fry).</li>
+</ol>
+<hr />
+<h3>2. Who reviewed the allergen tagging, and how is it maintained?</h3>
+<p>The project uses a two-tier verification approach to prevent human tagging mistakes:</p>
+<ol>
+<li><strong>Ingredient-Level Review (Author &amp; Regulatory Standards):</strong></li>
+<li>The project author reviewed and verified each base food in <code>foods.json</code> against the <strong>14 EU Regulatory Allergen Codes</strong>:<br />
+<em><code>gluten</code>, <code>crustaceans</code>, <code>eggs</code>, <code>fish</code>, <code>peanuts</code>, <code>soy</code>, <code>milk</code>, <code>tree_nuts</code>, <code>celery</code>, <code>mustard</code>, <code>sesame</code>, <code>sulphites</code>, <code>lupin</code>, <code>molluscs</code>.</em></li>
+<li>
+<p>Standardized via Decision D-31, replacing ambiguous spellings (like <code>cereals_gluten</code> $\to$ <code>gluten</code> and <code>soybeans</code> $\to$ <code>soy</code>) so they match the exact-match filter.</p>
+</li>
+<li>
+<p><strong>Automated Mathematical Union on Recipes (AC-52):</strong></p>
+</li>
+<li>Recipes <strong>do not</strong> have manual allergen tags that could drift out of sync.</li>
+<li>
+<p>Instead, <code>compute_recipe_allergens</code> derives a recipe's allergens dynamically as the <strong>strict mathematical union</strong> of the allergen tags of its constituent foods:
+     $$\text{Allergens}<em>{\text{recipe}} = \bigcup</em>{i \in \text{ingredients}} \text{Allergens}_{\text{food}_i}$$</p>
+</li>
+<li>
+<p><strong>Fail-Safe Safety Rule (D-07 &amp; Rule S9):</strong></p>
+</li>
+<li>If any ingredient is text-only or points to a food marked <code>allergens_verified = false</code>, the recipe is flagged with <code>has_incomplete_data = True</code>.</li>
+<li>When a user has any active allergy, recipes with incomplete or unverified allergen data are <strong>strictly excluded by default</strong>.</li>
+<li>Every generated plan displays the mandatory disclaimer: <em>"Allergies are filtered strictly, but always verify ingredient labels."</em></li>
+</ol>
+<hr /></div>
+      </div>
+    </article>
+    
+
+    <article class="turn-card" id="turn-7">
+      <div class="turn-header">
+        <span class="turn-badge">Turn 7</span>
+        <a href="#turn-7" class="turn-anchor">#</a>
+      </div>
+      <div class="user-block">
+        <div class="avatar avatar-user">YOU</div>
+        <div class="user-content"><p>Which sources will you cite for the Mifflin–St Jeor equation, the activity factors, the 1.6 g per kg protein default and the 1,500 and 1,200 kcal thresholds</p></div>
+      </div>
+      <div class="assistant-block">
+        <div class="avatar avatar-ai">AI</div>
+        <div class="assistant-content"><p>The scientific citations and source references (recorded in README.md § AC-116 and configured in <code>config.py</code>) are:</p>
+<hr />
+<h3>Scientific Citations &amp; References</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter / Formula</th>
+<th>Value</th>
+<th>Formal Citation / Reference</th>
+<th>Context &amp; Scientific Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>BMR Equation</strong></td>
+<td>Mifflin–St Jeor</td>
+<td><strong>Mifflin MD, St Jeor ST, et al.</strong> <em>Am J Clin Nutr.</em> 1990; 51(2):241–247.</td>
+<td>Widely validated as the most accurate non-clinical predictive equation for resting metabolic rate in healthy adults.</td>
+</tr>
+<tr>
+<td><strong>Activity Multipliers</strong></td>
+<td>1.2 to 1.725</td>
+<td><strong>FAO / WHO / UNU Expert Consultation.</strong> <em>Human Energy Requirements.</em> Food and Nutrition Technical Report Series 1. Rome: FAO; 2004.</td>
+<td>Standard international physical activity level (PAL) multipliers (Sedentary: 1.2, Light: 1.375, Moderate: 1.55, Very Active: 1.725).</td>
+</tr>
+<tr>
+<td><strong>Protein Default</strong></td>
+<td>$1.6\text{ g/kg}$</td>
+<td><strong>Morton RW, et al.</strong> <em>Br J Sports Med.</em> 2018; 52(6):376–384.</td>
+<td>The landmark meta-analysis showing that protein intake beyond $\sim 1.62\text{ g/kg/day}$ yields no additional fat-free mass accrual in resistance training.</td>
+</tr>
+<tr>
+<td><strong>Estimate Floor</strong></td>
+<td>$1,500\text{ kcal}$</td>
+<td><strong>Dietary Guidelines for Americans (USDA / HHS)</strong> &amp; NHLBI Clinical Guidelines.</td>
+<td>Protective lower boundary. If calculated TDEE lands below $1,500\text{ kcal}$, the app triggers <code>estimate_below_floor</code> (Rule S5) to prevent automated starvation targets.</td>
+</tr>
+<tr>
+<td><strong>Plan Minimum</strong></td>
+<td>$1,200\text{ kcal}$</td>
+<td><strong>ACSM Position Stand</strong> (American College of Sports Medicine).</td>
+<td>Hard floor. Any plan requested below $1,200\text{ kcal}$ is refused outright because micronutrient adequacy is mathematically unachievable without clinical supervision.</td>
+</tr>
+<tr>
+<td><strong>Strength Surplus</strong></td>
+<td>+5% TDEE</td>
+<td><strong>Helms ER, et al.</strong> <em>J Sports Med Phys Fitness.</em> 2015.</td>
+<td>Conservative caloric surplus for resistance-trained athletes to accrue lean muscle without unwanted adipose gain.</td>
+</tr>
+<tr>
+<td><strong>e1RM Formula</strong></td>
+<td>Epley</td>
+<td><strong>Epley B.</strong> <em>Boyd Epley Workout.</em> Lincoln, NE: Univ. of Nebraska; 1985.</td>
+<td>Validated empirical 1RM estimation formula for $1 \le \text{reps} \le 12$.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>Key Viva Point on Safety Thresholds</h3>
+<ul>
+<li>The $1,500$ and $1,200\text{ kcal}$ numbers are <strong>placeholders for review</strong>, not hard medical claims.</li>
+<li>All safety thresholds are deliberately centralized in a single configuration module (<code>config.py</code>) rather than hard-coded into database migrations or business rules, making them transparent, reviewable, and easily adjustable under professional guidance.</li>
+</ul>
+<hr /></div>
+      </div>
+    </article>
+    
+
+    <article class="turn-card" id="turn-8">
+      <div class="turn-header">
+        <span class="turn-badge">Turn 8</span>
+        <a href="#turn-8" class="turn-anchor">#</a>
+      </div>
+      <div class="user-block">
+        <div class="avatar avatar-user">YOU</div>
+        <div class="user-content"><p>how is the calorie and protien estimate set</p></div>
+      </div>
+      <div class="assistant-block">
+        <div class="avatar avatar-ai">AI</div>
+        <div class="assistant-content"><p>In Titan, calorie and protein targets can be set in two ways: <strong>an optional, transparent scientific estimate</strong> or <strong>direct manual entry</strong> (Decision D-23). </p>
+<p>The calculation is implemented as a pure domain function in <code>calculate_target_estimate</code>.</p>
+<hr />
+<h3>1. How Calorie Targets are Estimated</h3>
+<h4>Step A: Basal Metabolic Rate (BMR)</h4>
+<p>Calculated using the <strong>Mifflin–St Jeor formula</strong>:
+$$\text{BMR} = (10 \times \text{weight}<em>{\text{kg}}) + (6.25 \times \text{height}</em>{\text{cm}}) - (5 \times \text{age}) + s$$
+* Sex factor $s$:
+  * <strong>Male:</strong> $+5$
+  * <strong>Female:</strong> $-161$
+  * <strong>Unspecified:</strong> $-78$ (exact midpoint between male and female)</p>
+<h4>Step B: Total Daily Energy Expenditure (TDEE)</h4>
+<p>$$\text{TDEE} = \text{BMR} \times \text{Physical Activity Factor}$$
+* <strong>Sedentary:</strong> $1.20$ (desk job, minimal movement)
+* <strong>Light:</strong> $1.375$ (1–3 training sessions/week)
+* <strong>Moderate:</strong> $1.55$ (3–5 training sessions/week)
+* <strong>Very Active:</strong> $1.725$ (6–7 heavy training sessions/week)</p>
+<h4>Step C: Goal Surplus Adjustment</h4>
+<p>$$\text{Raw Calories} = \text{TDEE} \times \text{Goal Factor}$$
+* <code>maintain</code>: $\times 1.00$ ($0\%$ surplus)
+* <code>build_strength</code>: $\times 1.05$ ($+5\%$ lean surplus)
+* <code>build_muscle</code>: $\times 1.10$ ($+10\%$ surplus, D-29)</p>
+<p>The final calories are <strong>rounded to the nearest 10 kcal</strong>.</p>
+<hr />
+<h3>2. How Protein (and Macros) are Estimated</h3>
+<ul>
+<li><strong>Protein:</strong>
+  $$\text{Protein (g)} = \text{weight}_{\text{kg}} \times 1.6\text{ g/kg}$$
+  <em>(Rounded to the nearest 1 g; based on Morton et al., 2018 meta-analysis).</em></li>
+<li><strong>Fat:</strong> Set to $25\%$ of total calories divided by $9\text{ kcal/g}$:
+  $$\text{Fat (g)} = \frac{0.25 \times \text{Calories}}{9}$$</li>
+<li><strong>Carbohydrate:</strong> The remaining energy after protein and fat are accounted for, divided by $4\text{ kcal/g}$:
+  $$\text{Carbs (g)} = \frac{\text{Calories} - (\text{Protein}_{\text{g}} \times 4) - (0.25 \times \text{Calories})}{4}$$</li>
+</ul>
+<hr />
+<h3>3. Worked Viva Example (AC-19)</h3>
+<p>For an <strong>80 kg male, 180 cm, 25 years old, moderate activity, with a <code>build_strength</code> goal</strong>:</p>
+<ol>
+<li><strong>BMR:</strong> $(10 \times 80) + (6.25 \times 180) - (5 \times 25) + 5 = 800 + 1125 - 125 + 5 = \mathbf{1,805\text{ kcal}}$</li>
+<li><strong>TDEE:</strong> $1,805 \times 1.55 = \mathbf{2,797.75\text{ kcal}}$</li>
+<li><strong>Calorie Target (+5%):</strong> $2,797.75 \times 1.05 = 2,937.64 \to \mathbf{2,940\text{ kcal}}$ <em>(rounded to nearest 10)</em></li>
+<li><strong>Protein Target:</strong> $80 \times 1.6 = \mathbf{128\text{ g}}$</li>
+<li><strong>Fat Target:</strong> $(2,940 \times 0.25) / 9 = 735 / 9 = 81.67 \to \mathbf{82\text{ g}}$</li>
+<li><strong>Carb Target:</strong> $(2,940 - 512 - 735) / 4 = 1,693 / 4 = 423.25 \to \mathbf{423\text{ g}}$</li>
+</ol>
+<hr />
+<h3>4. How Targets are Saved &amp; Controlled in the App</h3>
+<ol>
+<li><strong>Full Transparency (Rule S4):</strong> Calling <code>POST /api/nutrition/goals/estimate</code> returns the calculated numbers along with an <code>assumptions</code> dictionary showing every variable, formula, and factor used.</li>
+<li><strong>User Authority (Rule S4):</strong> The user can override or fine-tune any number in the UI form before saving.</li>
+<li><strong>Versioned Immutability (spec §5.4):</strong> Saving targets via <code>POST /api/nutrition/goals</code> inserts a new row in the <code>nutrition_goals</code> table with an <code>effective_from</code> timestamp. Historical meal plans and logs keep their original targets.</li>
+<li><strong>Safety Overrides (Rules S3 &amp; S5):</strong></li>
+<li>If calculated calories fall below $1,500\text{ kcal}$, the app flags <code>estimate_below_floor</code> and requires manual input.</li>
+<li>If the user flags <code>needs_professional_guidance</code>, the automated estimate endpoint returns HTTP 409 (<code>manual_targets_required</code>), mandating manual entry.</li>
+</ol>
+<hr /></div>
+      </div>
+    </article>
+    
+
+    <article class="turn-card" id="turn-9">
+      <div class="turn-header">
+        <span class="turn-badge">Turn 9</span>
+        <a href="#turn-9" class="turn-anchor">#</a>
+      </div>
+      <div class="user-block">
+        <div class="avatar avatar-user">YOU</div>
+        <div class="user-content"><p>how is the data stored</p></div>
+      </div>
+      <div class="assistant-block">
+        <div class="avatar avatar-ai">AI</div>
+        <div class="assistant-content"><p>Data in Titan is stored in a <strong>relational PostgreSQL 16 database</strong> using <strong>SQLAlchemy 2 (asyncpg)</strong> with <strong>Alembic</strong> migrations (Decision D-02). </p>
+<p>The complete schema spans 24 tables across 4 core domains, detailed in <code>docs/er-diagram.md</code>.</p>
+<hr />
+<h3>1. Database Schema Organization</h3>
+<h4>🔐 A. Users, Sessions &amp; Preferences (<code>user.py</code>)</h4>
+<ul>
+<li><strong><code>users</code>:</strong> UUID primary key, lowercase unique email, Argon2id password hash (<code>$argon2id$...</code>), active flag, and timestamps.</li>
+<li><strong><code>sessions</code>:</strong> Server-side revocable sessions storing SHA-256 token hashes (<code>session_token_hash</code>, <code>csrf_token</code>), expiry date, and <code>is_revoked</code> flag.</li>
+<li><strong><code>user_profiles</code>:</strong> Units (<code>kg</code> or <code>lb</code>), IANA timezone, adult confirmation timestamp, wellbeing flags (<code>calories_hidden</code>, <code>nutrition_paused</code>, <code>track_body_weight</code>), and optional biometric values.</li>
+<li><strong><code>user_food_constraints</code>:</strong> Hard allergy codes (the 14 EU codes), diet tags, and excluded ingredients.</li>
+<li><strong><code>nutrition_goals</code>:</strong> Versioned calorie and macro targets with an <code>effective_from</code> date.</li>
+</ul>
+<h4>🏋️‍♂️ B. Workout Hierarchy (<code>workout.py</code>)</h4>
+<p>Stored in a strict 3-tier parent-child relational tree:
+1. <strong><code>workout_sessions</code>:</strong> Top-level session record (<code>user_id</code>, <code>started_at</code>, <code>completed_at</code>, optional <code>routine_id</code>, notes).
+2. <strong><code>workout_exercises</code>:</strong> The exercises performed in that session with an ordering index (<code>order_index</code>).
+3. <strong><code>workout_sets</code>:</strong> Individual set records:
+   * <code>set_number</code> (integer $&gt; 0$)
+   * <code>load_kg</code> (<code>NUMERIC(6, 2)</code>, load in kg)
+   * <code>reps</code> (integer $&gt; 0$)
+   * <code>rpe</code> (<code>NUMERIC(3, 1)</code>, optional Rate of Perceived Exertion between 1.0 and 10.0 in 0.5 increments)
+   * <code>is_warmup</code> (boolean flag to filter sets from volume and e1RM)
+   * <code>completed_at</code> (timestamp for chronological PR detection)</p>
+<h4>🥦 C. Food &amp; Recipe Catalogue (<code>nutrition.py</code>)</h4>
+<ul>
+<li><strong><code>foods</code>:</strong> Catalogue foods with <code>state</code> (<code>raw</code>, <code>cooked</code>, <code>as_sold</code>), <code>data_source</code> (e.g. USDA FDC ID), <code>verified_at</code>, and <code>owner_user_id</code> (null for shared catalogue items, set for private user custom foods D-32).</li>
+<li><strong><code>food_nutrients</code>:</strong> Per-100 g calories, protein, carbs, fat, and fiber (<code>NUMERIC(8, 2)</code>).</li>
+<li><strong><code>food_allergens</code>:</strong> Mapped to the 14 EU regulatory codes (<code>gluten</code>, <code>soy</code>, <code>milk</code>, etc.).</li>
+<li><strong><code>recipes</code>:</strong> Standardized compositions with <code>servings</code>, prep/cook time, and <code>cost_minor_per_serving</code> in INR paise.</li>
+<li><strong><code>recipe_ingredients</code>:</strong> Quantity, unit, and optional <code>edible_weight_g</code>.</li>
+</ul>
+<h4>📅 D. Plans &amp; Intake Logs (<code>nutrition.py</code>)</h4>
+<ul>
+<li><strong><code>meal_plans</code>:</strong> 7-day plan container with generation metadata and scoring explanation snapshot.</li>
+<li><strong><code>planned_meals</code> &amp; <code>planned_meal_items</code>:</strong> Scheduled recipe, meal slot (breakfast, lunch, etc.), chosen serving size (0.5 to 3.0), and scaled nutrient snapshot.</li>
+<li><strong><code>nutrition_logs</code> &amp; <code>nutrition_log_items</code>:</strong> Daily user intake records storing quantity, unit, and an <strong>immutable nutrient snapshot</strong> taken at logging time.</li>
+</ul>
+<hr />
+<h3>2. Critical Storage Invariants (For the Viva)</h3>
+<ol>
+<li><strong>UUIDv4 Primary Keys:</strong> Every entity uses a randomly generated UUID (<code>uuid.uuid4</code>), preventing sequential ID enumeration attacks.</li>
+<li><strong>Exact Decimal Storage:</strong> Loads, body weights, and nutrients use <code>NUMERIC</code> / <code>DECIMAL</code>. Floating-point types (<code>FLOAT</code>, <code>DOUBLE</code>) are strictly forbidden to eliminate binary rounding errors.</li>
+<li><strong>UTC Timestamps with IANA Projection:</strong> Timestamps are stored in UTC (<code>TIMESTAMPTZ</code>). Days and weeks (e.g. ISO Monday-to-Sunday) are computed dynamically using the user's IANA timezone setting.</li>
+<li><strong>Nutrient Snapshots (Decision D-09):</strong> Historical meal plans and food logs store an immutable copy of nutrient values at the moment of creation. If catalogue food data is updated later, historical records are never altered.</li>
+<li><strong>Foreign Key Integrity &amp; Cascades:</strong></li>
+<li>User-owned rows use <code>ON DELETE CASCADE</code>: deleting an account cleanly purges all 16 user-owned tables.</li>
+<li>Shared catalogue records (<code>foods</code>, <code>recipes</code>, system <code>exercises</code>) use <code>ON DELETE RESTRICT</code> so they can never be accidentally deleted if referenced by historical workouts or logs.</li>
+<li><strong>Physical Persistence:</strong></li>
+<li>In Docker, data persists in a named volume (<code>pgdata:/var/lib/postgresql/data</code>).</li>
+<li>For local testing, backups and restores are executed via standard <code>pg_dump</code> and <code>psql</code> (AC-108).</li>
+</ol>
+<hr /></div>
+      </div>
+    </article>
+    
+
+    <article class="turn-card" id="turn-10">
+      <div class="turn-header">
+        <span class="turn-badge">Turn 10</span>
+        <a href="#turn-10" class="turn-anchor">#</a>
+      </div>
+      <div class="user-block">
+        <div class="avatar avatar-user">YOU</div>
+        <div class="user-content"><p>how is this project secured or encrypted</p></div>
+      </div>
+      <div class="assistant-block">
+        <div class="avatar avatar-ai">AI</div>
+        <div class="assistant-content"><p>Titan implements <strong>defense-in-depth security</strong> across authentication, cryptography, network transport, and database authorization, satisfying spec requirements <strong>SEC1 through SEC12</strong>.</p>
+<hr />
+<h3>1. Cryptography &amp; Password Protection</h3>
+<ul>
+<li><strong>Argon2id Password Hashing (SEC1, AC-01):</strong><br />
+  Passwords are encrypted using <strong>Argon2id</strong> (via <code>argon2-cffi</code>), the memory-hard winner of the Password Hashing Competition and recommended by OWASP.</li>
+<li>Every password gets a cryptographically unique salt.</li>
+<li>Passwords must be between 12 and 128 characters (AC-02).</li>
+<li>Plaintext passwords are never stored, logged, or returned.</li>
+<li><strong>Token Hashing at Rest (SEC2, AC-03):</strong><br />
+  Raw session and CSRF tokens are <strong>never stored in the database</strong>.</li>
+<li>The server issues a cryptographically random token (<code>secrets.token_urlsafe(32)</code>), but stores only its <strong>SHA-256 digest</strong> (<code>hash_token</code>).</li>
+<li>If the database were ever compromised, an attacker would obtain only one-way hashes, yielding <strong>zero usable session tokens</strong>.</li>
+</ul>
+<hr />
+<h3>2. Session &amp; CSRF Security</h3>
+<ul>
+<li><strong>Server-Side Revocable Sessions (<code>auth.py</code>, D-03):</strong><br />
+  Unlike stateless JWTs (which cannot be revoked until they expire), Titan uses server-side sessions stored in an <code>HttpOnly</code>, <code>SameSite=Lax</code> cookie (<code>gym_session</code>).</li>
+<li><code>HttpOnly</code> ensures JavaScript cannot read the cookie, eliminating token theft via Cross-Site Scripting (XSS).</li>
+<li><code>SameSite=Lax</code> prevents unauthorized cross-origin cookie transmission.</li>
+<li>When a user logs out or deletes their account, the session is revoked instantly in the database.</li>
+<li><strong>Double-Submit CSRF Protection (SEC3, AC-06):</strong><br />
+  All mutating requests (<code>POST</code>, <code>PATCH</code>, <code>DELETE</code>) require a valid <code>X-CSRF-Token</code> header matching the session’s stored CSRF digest. Requests lacking this token are rejected with HTTP 403 <code>csrf_failed</code>.</li>
+</ul>
+<hr />
+<h3>3. Network &amp; Transport Security</h3>
+<ul>
+<li><strong>TLS/HTTPS Enforcement (SEC7, AC-07):</strong><br />
+  Credentials sent from non-localhost clients over plain HTTP return HTTP 403 <code>tls_required</code>.</li>
+<li><strong>Trusted Reverse Proxy Isolation:</strong><br />
+  The backend trusts headers like <code>X-Forwarded-Proto</code> and <code>X-Forwarded-For</code> <strong>only</strong> if they originate from the configured reverse proxy IP (<code>TRUSTED_PROXY_IP</code>), preventing remote clients from forging HTTPS headers.</li>
+<li><strong>Container Security (D2):</strong><br />
+  All application Docker containers execute as an unprivileged, non-root user (<code>appuser</code>).</li>
+</ul>
+<hr />
+<h3>4. API &amp; Application Hardening</h3>
+<ul>
+<li><strong>Timing Attack Prevention (SEC5, AC-03):</strong><br />
+  In <code>authenticate_user</code>, if an email does not exist, the server verifies a <strong>dummy Argon2id hash</strong>. Both non-existent emails and incorrect passwords return the identical message (<code>invalid_credentials</code>) with the same execution time, preventing email enumeration via timing side-channels.</li>
+<li><strong>Rate Limiting (SEC6, AC-04):</strong><br />
+  Restricts failed authentication attempts to 5 per 15-minute window per account/IP. The 6th attempt triggers HTTP 429 (<code>rate_limited</code>) with a <code>Retry-After</code> header.</li>
+<li><strong>SQL Injection Immunity (SEC8, AC-10):</strong><br />
+  Queries use SQLAlchemy ORM with fully parameterized SQL statements. Dangerous strings like <code>'; DROP TABLE users;--</code> are safely treated as literal string values.</li>
+<li><strong>Payload Limitation (SEC8, AC-13):</strong><br />
+  Middleware in <code>main.py</code> rejects any request body exceeding 1 MB (<code>1024 * 1024 bytes</code>) with HTTP 413, preventing memory exhaustion attacks.</li>
+<li><strong>Strict Pydantic Validation (SEC8, AC-09):</strong><br />
+  Schemas use <code>extra="forbid"</code>. Clients cannot smuggle forbidden fields (such as a client-supplied <code>user_id</code>).</li>
+</ul>
+<hr />
+<h3>5. Data Isolation &amp; Browser Security Headers</h3>
+<ul>
+<li><strong>Ownership Isolation Matrix (SEC4, AC-08):</strong><br />
+  Every database query is strictly scoped by <code>user_id</code>. Attempting to read, edit, or delete another user's record returns <strong>404 Not Found</strong> (identical to a missing record), preventing IDOR information disclosure.</li>
+<li><strong>Browser Security Headers (<code>main.py</code>, SEC9, AC-11):</strong></li>
+<li><code>Content-Security-Policy</code>: Restricts scripts, styles, fonts, and images to trusted origins.</li>
+<li><code>X-Content-Type-Options: nosniff</code>: Prevents MIME-type sniffing.</li>
+<li><code>X-Frame-Options: DENY</code>: Prevents clickjacking in iframes.</li>
+<li><code>Referrer-Policy: strict-origin-when-cross-origin</code>: Protects referral paths.</li>
+<li><strong>Zero Logging of Sensitive Data (SEC12, AC-104):</strong><br />
+  Automated tests (<code>test_logging.py</code>) verify that passwords, session tokens, CSRF tokens, and full email addresses are never written to application logs.</li>
+</ul>
+<hr /></div>
+      </div>
+    </article>
+    
+
+    <article class="turn-card" id="turn-11">
+      <div class="turn-header">
+        <span class="turn-badge">Turn 11</span>
+        <a href="#turn-11" class="turn-anchor">#</a>
+      </div>
+      <div class="user-block">
+        <div class="avatar avatar-user">YOU</div>
+        <div class="user-content"><p>what is useed in frontend and backend in this project</p></div>
+      </div>
+      <div class="assistant-block">
+        <div class="avatar avatar-ai">AI</div>
+        <div class="assistant-content"><p>Here is the complete breakdown of technologies, frameworks, and libraries used across the <strong>Frontend</strong> and <strong>Backend</strong> of Titan:</p>
+<hr />
+<h3>🎨 1. Frontend Stack</h3>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Technology</th>
+<th>Details / Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Core Framework</strong></td>
+<td><strong>React 19</strong> (<code>react: ^19.2.8</code>)</td>
+<td>Single Page Application (SPA) with functional components and hooks (<code>useState</code>, <code>useEffect</code>, <code>useCallback</code>, <code>useContext</code>).</td>
+</tr>
+<tr>
+<td><strong>Language</strong></td>
+<td><strong>TypeScript 6</strong> (<code>~6.0.2</code>)</td>
+<td>Strict end-to-end static typing. Frontend types match the backend OpenAPI schema (<code>types/index.ts</code>).</td>
+</tr>
+<tr>
+<td><strong>Bundler &amp; Dev Server</strong></td>
+<td><strong>Vite 8</strong> (<code>vite: ^8.3.0</code>)</td>
+<td>Lightning-fast hot module replacement (HMR) and optimized production builds.</td>
+</tr>
+<tr>
+<td><strong>Styling &amp; Design System</strong></td>
+<td><strong>Vanilla CSS Design System</strong> (<code>index.css</code>)</td>
+<td>High-contrast "Bold &amp; Sporty" aesthetic: dark theme with dynamic CSS variable accent picker (Blaze Orange, Race Red, Volt, Ice). Zero heavy UI libraries (no Tailwind, no Material UI).</td>
+</tr>
+<tr>
+<td><strong>Typography</strong></td>
+<td><strong>Google Fonts</strong> (<code>Barlow Condensed</code>)</td>
+<td>High-impact condensed athletic typography for numerical telemetry and headings.</td>
+</tr>
+<tr>
+<td><strong>Icons</strong></td>
+<td><strong>Lucide React</strong> (<code>^1.59.0</code>)</td>
+<td>Clean SVG icons for navigation, exercise badges, and action triggers.</td>
+</tr>
+<tr>
+<td><strong>Audio Engine</strong></td>
+<td><strong>Web Audio API</strong></td>
+<td>Pure browser-native zero-latency sound synthesis. Produces harmonic dual-tone set-completion chimes and rest timer fanfare without external MP3 files.</td>
+</tr>
+<tr>
+<td><strong>Fast Linter</strong></td>
+<td><strong>Oxlint</strong> (<code>^1.81.0</code>)</td>
+<td>Rust-based high-performance frontend linter.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>⚙️ 2. Backend Stack</h3>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Technology</th>
+<th>Details / Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Runtime &amp; Language</strong></td>
+<td><strong>Python 3.12+</strong></td>
+<td>Utilizing modern type hinting, pattern matching, and performance enhancements.</td>
+</tr>
+<tr>
+<td><strong>Web Framework</strong></td>
+<td><strong>FastAPI</strong> (<code>0.143.3</code>)</td>
+<td>High-performance asynchronous REST API framework with automatic OpenAPI documentation.</td>
+</tr>
+<tr>
+<td><strong>ASGI Server</strong></td>
+<td><strong>Uvicorn</strong> (<code>0.54.0</code>)</td>
+<td>Lightning-fast ASGI web server for asynchronous request handling.</td>
+</tr>
+<tr>
+<td><strong>ORM &amp; Database Access</strong></td>
+<td><strong>SQLAlchemy 2</strong> (<code>2.1.5</code>) (Async)</td>
+<td>Modern async ORM using <code>asyncpg</code> connection pooling for PostgreSQL (with <code>aiosqlite</code> for local dev).</td>
+</tr>
+<tr>
+<td><strong>Database Migrations</strong></td>
+<td><strong>Alembic</strong> (<code>1.20.0</code>)</td>
+<td>Database version control and schema migrations (<code>backend/alembic/</code>).</td>
+</tr>
+<tr>
+<td><strong>Validation &amp; Schemas</strong></td>
+<td><strong>Pydantic 2</strong> (<code>2.14.1</code>)</td>
+<td>Strict request/response data validation enforcing <code>extra="forbid"</code> to eliminate parameter injection.</td>
+</tr>
+<tr>
+<td><strong>Configuration</strong></td>
+<td><strong>Pydantic Settings</strong> (<code>2.16.0</code>)</td>
+<td>Environment variable parsing and startup validation in <code>config.py</code>.</td>
+</tr>
+<tr>
+<td><strong>Password Hashing</strong></td>
+<td><strong>Argon2id</strong> (<code>argon2-cffi: 25.1.0</code>)</td>
+<td>Memory-hard password encryption adhering to current OWASP cryptographic recommendations.</td>
+</tr>
+<tr>
+<td><strong>Testing Suite</strong></td>
+<td><strong>Pytest</strong> (<code>9.1.1</code>) + <strong>Hypothesis</strong></td>
+<td>Async unit, API, and property tests (118+ test cases run against a disposable PostgreSQL instance).</td>
+</tr>
+<tr>
+<td><strong>Linting &amp; Formatting</strong></td>
+<td><strong>Ruff</strong> (<code>0.17.1</code>)</td>
+<td>Extremely fast Python linter and formatter.</td>
+</tr>
+<tr>
+<td><strong>Type Checking</strong></td>
+<td><strong>Mypy</strong> (<code>2.4.0</code>)</td>
+<td>Strict static type checking across all 60 backend source files.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>🐳 3. Infrastructure &amp; Deployment</h3>
+<ul>
+<li><strong>PostgreSQL 16 Engine:</strong> <code>postgres:16.4-alpine</code> on Docker with a persistent named volume (<code>pgdata</code>).</li>
+<li><strong>Nginx Reverse Proxy:</strong> Serves the built React SPA, handles TLS termination, proxies <code>/api</code> traffic, and injects HTTP security headers (CSP, HSTS, X-Frame-Options).</li>
+<li><strong>Docker Compose (<code>docker-compose.yml</code>):</strong> Orchestrates <code>db</code>, <code>backend</code>, and <code>frontend</code> containers with health checks (<code>pg_isready</code>), automatic restarts, and non-root execution (<code>appuser</code>).</li>
+</ul>
+<hr /></div>
+      </div>
+    </article>
+    
+
+    <article class="turn-card" id="turn-12">
+      <div class="turn-header">
+        <span class="turn-badge">Turn 12</span>
+        <a href="#turn-12" class="turn-anchor">#</a>
+      </div>
+      <div class="user-block">
+        <div class="avatar avatar-user">YOU</div>
+        <div class="user-content"><p>what can be the questions asked in viva</p></div>
+      </div>
+      <div class="assistant-block">
+        <div class="avatar avatar-ai">AI</div>
+        <div class="assistant-content"><p>Here are the <strong>top viva questions</strong> you are most likely to be asked on this project, organized by topic, along with <strong>crisp, high-scoring answers</strong> based on your architecture and <a href="docs/learning-log.md">learning-log.md</a>.</p>
+<hr />
+<h3>🏛 Category 1: Architecture &amp; System Design</h3>
+<h4>Q1: Why did you build a Modular Monolith instead of Microservices?</h4>
+<blockquote>
+<p><strong>Answer:</strong><br />
+<em>"Microservices introduce network latency, distributed transaction complexity, and heavy deployment overhead without providing benefits for this scale. A modular monolith gives us the exact same clean architectural boundaries (<code>domain</code> $\to$ <code>services</code> $\to$ <code>repositories</code> $\to$ <code>api</code>), enables atomic ACID transactions across sets and meals, simplifies testing, and is much easier to deploy and maintain."</em> (Decision D-01)</p>
+</blockquote>
+<h4>Q2: What is the purpose of the pure <code>app/domain</code> layer?</h4>
+<blockquote>
+<p><strong>Answer:</strong><br />
+<em>"The domain layer (<code>app/domain</code>) contains pure mathematical and rule-based functions with <strong>zero</strong> imports of FastAPI, SQLAlchemy, or system clocks. They are 100% deterministic: given the same inputs, they always return the same output. This allows us to run unit tests in milliseconds without mock databases and guarantees that our business math is decoupled from external frameworks."</em> (<code>test_layering.py</code>)</p>
+</blockquote>
+<h4>Q3: Why do we use exact <code>Decimal</code> instead of <code>float</code>, and why transmit decimals as strings in JSON?</h4>
+<blockquote>
+<p><strong>Answer:</strong><br />
+<em>"Binary floating-point arithmetic (IEEE 754) suffers from representation drift (e.g. $0.1 + 0.2 = 0.30000000000000004$). For workout loads, body weight, and micro/macronutrients, rounding errors compound. We use Python <code>Decimal</code> and database <code>NUMERIC</code>, transmitting them as strings in JSON so client-side JavaScript doesn't parse them into IEEE floats."</em> (Decision D-05)</p>
+</blockquote>
+<hr />
+<h3>🏋️‍♂️ Category 2: Workout Math &amp; Strength Telemetry</h3>
+<h4>Q4: How is Estimated 1RM (e1RM) calculated, and why restrict it to 1–12 reps?</h4>
+<blockquote>
+<p><strong>Answer:</strong><br />
+<em>"We use Epley’s formula in <code>calculate_epley_e1rm</code>:<br />
+$$\text{e1RM} = \text{load} \times (1 + \text{reps} / 30)$$<br />
+At 1 rep, $\text{e1RM} = \text{load}$. We restrict it to 1–12 reps because beyond 12 reps, muscle endurance and cardiovascular fatigue dominate over maximal neuromuscular strength, making mathematical 1RM projections inaccurate."</em></p>
+</blockquote>
+<h4>Q5: How does your system detect Personal Records (PRs)? What is the baseline?</h4>
+<blockquote>
+<p><strong>Answer:</strong><br />
+<em>"In <code>detect_personal_records</code>, all working sets are sorted chronologically by <code>(completed_at, set_number)</code>. The very first valid working set is recorded as the <strong>baseline</strong> (not a PR). A subsequent set is flagged as a PR if and only if its e1RM is <strong>strictly greater</strong> than the highest historical e1RM for that exercise. Equal values are not PRs, and warm-up sets are excluded."</em></p>
+</blockquote>
+<h4>Q6: How does the progressive overload hint work?</h4>
+<blockquote>
+<p><strong>Answer:</strong><br />
+<em>"We use a double-progression rule in <code>suggest_next_load</code>. It inspects the athlete's heaviest working sets from the previous session. If and only if every set at that top load achieved the ceiling of the target rep range (e.g. 12 reps), it suggests stepping up the weight ($+2.5\text{ kg}$ upper body, $+5\text{ kg}$ lower body). Otherwise, it recommends holding the weight and adding reps."</em> (Decision D-33)</p>
+</blockquote>
+<hr />
+<h3>🥗 Category 3: Nutrition Engine &amp; Algorithms</h3>
+<h4>Q7: How does the diet planner work? Why not use Machine Learning?</h4>
+<blockquote>
+<p><strong>Answer:</strong><br />
+<em>"The planner (<code>DietPlannerService</code>) is a deterministic 4-step greedy engine:<br />
+1. <strong>Hard Safety Filters:</strong> Eliminates recipes violating EU-14 allergens, diet tags, time caps, or daily budgets.<br />
+2. <strong>Multi-Factor Scoring:</strong> Ranks remaining candidates by target fit, cuisine match, prep time penalty, and repetition penalty.<br />
+3. <strong>Deterministic Choice:</strong> Selects the best serving size (0.5 to 3.0), breaking ties by recipe ID ascending.<br />
+4. <strong>Explainability:</strong> If no recipe fits, it returns an infeasible response explaining which limits to relax.<br />
+We avoided ML because ML models are black-box heuristics that cannot mathematically guarantee hard allergy exclusion, whereas our deterministic algorithm is explainable, safe, and testable."</em> (Decision D-06)</p>
+</blockquote>
+<h4>Q8: How does grocery list aggregation work? Why don’t you convert cups of flour into grams?</h4>
+<blockquote>
+<p><strong>Answer:</strong><br />
+<em>"In <code>aggregate_grocery_items</code>, ingredients are segregated into three incompatible unit families: <strong>mass</strong> (<code>g</code>, <code>kg</code>), <strong>volume</strong> (<code>ml</code>, <code>l</code>, <code>cup</code>, <code>tbsp</code>, <code>tsp</code>), and <strong>count</strong> (<code>piece</code>). Mass-to-volume conversion requires empirical food density tables (e.g. 1 cup of flour $\approx 120\text{ g}$, whereas 1 cup of honey $\approx 340\text{ g}$). Without verified density tables for every food, converting across families would corrupt grocery quantities, so different unit families remain on separate lines."</em> (Decision D-15)</p>
+</blockquote>
+<h4>Q9: What is a 'Nutrient Snapshot', and why is it needed?</h4>
+<blockquote>
+<p><strong>Answer:</strong><br />
+<em>"When a meal plan or food intake item is logged, we store an immutable snapshot of its calories and macros in the database (Decision D-09). If catalogue food data is corrected or updated months later, historical workout nutrition is never rewritten, preserving historical auditability."</em></p>
+</blockquote>
+<hr />
+<h3>🔒 Category 4: Security, Privacy &amp; Ethics</h3>
+<h4>Q10: Why did you choose server-side sessions over stateless JWTs?</h4>
+<blockquote>
+<p><strong>Answer:</strong><br />
+<em>"Stateless JWTs cannot be revoked immediately upon logout or account deletion without maintaining a blacklist (which negates their statelessness). Our server-side sessions (<code>auth.py</code>) store revocable tokens in <code>HttpOnly</code>, <code>SameSite=Lax</code> cookies, protecting against token theft via XSS, and allow instant access revocation."</em> (Decision D-03)</p>
+</blockquote>
+<h4>Q11: Why do you store SHA-256 hashes of session tokens in the database rather than the raw tokens?</h4>
+<blockquote>
+<p><strong>Answer:</strong><br />
+<em>"Defense in depth: if an attacker compromises the database or an SQL dump leaks, they only obtain one-way SHA-256 hashes. Because SHA-256 is non-reversible, the attacker gains <strong>zero usable session tokens</strong> to impersonate users."</em></p>
+</blockquote>
+<h4>Q12: Why must an ownership check return <code>404 Not Found</code> instead of <code>403 Forbidden</code>?</h4>
+<blockquote>
+<p><strong>Answer:</strong><br />
+<em>"Returning 403 Forbidden informs an attacker that a resource ID exists in the database belonging to someone else, enabling ID enumeration attacks (IDOR). Returning 404 Not Found makes a forbidden resource indistinguishable from a non-existent one."</em> (Decision D-10)</p>
+</blockquote>
+<h4>Q13: How do you prevent timing attacks during login?</h4>
+<blockquote>
+<p><strong>Answer:</strong><br />
+<em>"When a user attempts to log in with an email that does not exist, <code>authenticate_user</code> executes a dummy Argon2id hash verification anyway. This ensures that both non-existent emails and incorrect passwords take the exact same amount of server processing time, preventing attackers from enumerating registered accounts by measuring response latencies."</em></p>
+</blockquote>
+<h4>Q14: What safety and harm-reduction rules are built into the app?</h4>
+<blockquote>
+<p><strong>Answer:</strong><br />
+<em>"Under Rules S1 to S10:<br />
+1. <strong>No deficit/weight-loss goals:</strong> Only <code>maintain</code>, <code>build_strength</code>, and <code>build_muscle</code> are supported.<br />
+2. <strong>Energy floors:</strong> Estimates below $1,500\text{ kcal}$ are flagged, and plans below $1,200\text{ kcal}$ are blocked.<br />
+3. <strong>Adult confirmation:</strong> Users under 18 cannot generate automated diets or targets.<br />
+4. <strong>Banned vocabulary:</strong> We scan insights with <code>verify_non_causal_wording</code> to ban judgmental words like <code>cheat</code>, <code>bad</code>, <code>failed</code>, or <code>guilt</code>."</em></p>
+</blockquote></div>
+      </div>
+    </article>
+    
+    </div>
+  </main>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "$", right: "$", display: false },
+            { left: "\\(", right: "\\)", display: false },
+            { left: "\\[", right: "\\]", display: true }
+          ],
+          throwOnError: false
+        });
+      }
+    });
+  </script>
+</body>
+</html>
