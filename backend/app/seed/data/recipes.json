@@ -645,7 +645,7 @@
     "servings": 1.0,
     "cost_minor_per_serving": 9500,
     "cost_currency": "INR",
-    "diet_tags": ["vegetarian", "gluten_free", "high_protein", "dairy_free"],
+    "diet_tags": ["gluten_free", "high_protein", "dairy_free"],
     "meal_types": ["breakfast", "snack"],
     "ingredients": [
       {
@@ -1096,10 +1096,7 @@
     "servings": 1.0,
     "cost_minor_per_serving": 1900,
     "cost_currency": "INR",
-    "diet_tags": [
-      "vegetarian",
-      "budget_friendly"
-    ],
+    "diet_tags": ["vegetarian", "budget_friendly", "vegan"],
     "meal_types": [
       "breakfast",
       "snack"
@@ -1530,10 +1527,7 @@
     "servings": 2.0,
     "cost_minor_per_serving": 5300,
     "cost_currency": "INR",
-    "diet_tags": [
-      "vegetarian",
-      "high_protein"
-    ],
+    "diet_tags": ["vegetarian", "high_protein", "vegan"],
     "meal_types": [
       "breakfast"
     ],

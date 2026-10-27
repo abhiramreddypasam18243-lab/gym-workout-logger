@@ -5,17 +5,12 @@ import { useAuth } from '../context/AuthContext'
 import { EU_ALLERGENS, allergenLabel } from '../utils/allergens'
 import CustomFoods from './CustomFoods'
 
-const DIET_TAGS = [
-  'vegan',
-  'vegetarian',
-  'pescatarian',
-  'halal',
-  'kosher',
-  'gluten_free',
-  'dairy_free',
-]
+// Only tags and cuisines that catalogue recipes carry: a tag no recipe has makes every
+// plan infeasible (no recipe is certified halal or kosher yet). A vegan recipe also
+// counts as vegetarian, pescatarian and dairy-free (D-35).
+const DIET_TAGS = ['vegan', 'vegetarian', 'pescatarian', 'gluten_free', 'dairy_free']
 
-const CUISINES = ['indian', 'italian', 'mexican', 'american', 'east_asian', 'mediterranean']
+const CUISINES = ['indian', 'italian', 'mexican', 'american', 'east_asian']
 
 export const NutritionPlanner: React.FC = () => {
   const { profile, confirmAdult, refreshProfile } = useAuth()
@@ -721,11 +716,12 @@ export const NutritionPlanner: React.FC = () => {
               Dietary Restrictions (AC-59)
             </h2>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-              Only recipes carrying your selected diet tags will be considered candidates.
+              Only recipes meeting every selected diet will be considered. Eggs count as non-vegetarian.
             </p>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-              {DIET_TAGS.map((tag) => {
+              {/* Tags saved earlier but no longer offered stay visible so they can be removed */}
+              {[...DIET_TAGS, ...dietTags.filter((t) => !DIET_TAGS.includes(t))].map((tag) => {
                 const checked = dietTags.includes(tag)
                 return (
                   <button
@@ -819,7 +815,7 @@ export const NutritionPlanner: React.FC = () => {
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
-              {CUISINES.map((c) => {
+              {[...CUISINES, ...Object.keys(cuisinePrefs).filter((c) => !CUISINES.includes(c))].map((c) => {
                 const currentPref = cuisinePrefs[c] || 'neutral'
                 return (
                   <div key={c} style={{ background: 'var(--bg-surface)', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>

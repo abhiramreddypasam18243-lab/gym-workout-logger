@@ -9,7 +9,6 @@ from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.domain.allergens import normalize_allergen
 from app.domain.grocery import (
     GroceryItemInput,
     aggregate_grocery_items,
@@ -29,7 +28,6 @@ from app.models.nutrition import (
     Recipe,
     RecipeIngredient,
 )
-from app.models.user import UserCuisinePreference, UserFoodConstraint
 from app.schemas.meal_plan import (
     GroceryItemResponse,
     GroceryListResponse,
@@ -39,7 +37,47 @@ from app.schemas.meal_plan import (
     SubstitutionAcceptRequest,
     SubstitutionOptionResponse,
 )
-from app.services.planner import DEFAULT_SLOT_SHARES, PreparedRecipe
+from app.services.planner import (
+    PreparedRecipe,
+    load_user_food_rules,
+    slot_shares_for,
+)
+
+CUISINE_MATCH: dict[str, Decimal] = {
+    "preferred": Decimal("1.0"),
+    "like": Decimal("0.5"),
+    "avoid": Decimal("-1.0"),
+}
+
+
+def _recipe_load_options() -> list:  # type: ignore[type-arg]
+    return [
+        selectinload(Recipe.ingredients).selectinload(RecipeIngredient.food).selectinload(Food.nutrients),
+        selectinload(Recipe.ingredients).selectinload(RecipeIngredient.food).selectinload(Food.allergens),
+        selectinload(Recipe.diet_tags),
+        selectinload(Recipe.meal_types),
+    ]
+
+
+def _snapshot_items(meal: PlannedMeal, recipe: Recipe, servings: Decimal) -> list[PlannedMealItem]:
+    """Planned items for a recipe at a serving count, with nutrient snapshots (D-09)."""
+    items = []
+    for ing in recipe.ingredients:
+        nutrients_snapshot = {}
+        if ing.food:
+            nutrients_snapshot = {fn.nutrient_code: str(fn.amount_per_100g) for fn in ing.food.nutrients}
+        items.append(
+            PlannedMealItem(
+                planned_meal_id=meal.id,
+                food_id=ing.food_id,
+                recipe_id=recipe.id,
+                ingredient_name=ing.ingredient_name,
+                quantity=(ing.quantity * servings) / recipe.servings,
+                unit=ing.unit,
+                nutrient_snapshot=nutrients_snapshot,
+            )
+        )
+    return items
 
 
 class SubstitutionService:
@@ -77,6 +115,36 @@ class SubstitutionService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="meal_plan_not_found")
         return plan
 
+    async def _load_recipe_for_user(self, recipe_id: UUID, user_id: UUID) -> Recipe:
+        """A catalogue recipe or one of the user's own; anyone else's is not found (D-10)."""
+        stmt = (
+            select(Recipe)
+            .where(
+                Recipe.id == recipe_id,
+                or_(Recipe.owner_user_id.is_(None), Recipe.owner_user_id == user_id),
+            )
+            .options(*_recipe_load_options())
+        )
+        recipe = (await self.db.execute(stmt)).scalars().first()
+        if not recipe:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="recipe_not_found")
+        return recipe
+
+    async def _check_hard_constraints(self, recipe: Recipe, user_id: UUID) -> None:
+        """Allergies, unverified allergen data, diet tags and exclusions are never
+        overridden by a manual choice (S9, AC-75); time caps and cuisines are."""
+        rules = await load_user_food_rules(self.db, user_id)
+        broken = rules.violation(PreparedRecipe(recipe))
+        if broken:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail={
+                    "code": "violates_hard_constraint",
+                    "constraint": broken,
+                    "message": f"This recipe breaks one of your food rules ({broken}).",
+                },
+            )
+
     async def suggest_substitutions(
         self,
         user_id: UUID,
@@ -89,28 +157,7 @@ class SubstitutionService:
         if not current_meal:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="meal_not_found")
 
-        # Fetch user constraints
-        c_stmt = select(UserFoodConstraint).where(UserFoodConstraint.user_id == user_id)
-        user_constraints = (await self.db.execute(c_stmt)).scalars().all()
-        user_allergies = {
-            normalize_allergen(c.constraint_value) or c.constraint_value.lower()
-            for c in user_constraints
-            if c.constraint_type == "allergy"
-        }
-        user_diet_tags = {
-            c.constraint_value.lower() for c in user_constraints if c.constraint_type == "diet_tag"
-        }
-        user_excluded = {
-            c.constraint_value.lower()
-            for c in user_constraints
-            if c.constraint_type == "excluded_ingredient"
-        }
-
-        cuisines_stmt = select(UserCuisinePreference).where(
-            UserCuisinePreference.user_id == user_id
-        )
-        user_cuisines = (await self.db.execute(cuisines_stmt)).scalars().all()
-        cuisine_prefs = {c.cuisine_code.lower(): c.preference_level.lower() for c in user_cuisines}
+        rules = await load_user_food_rules(self.db, user_id)
 
         # Calculate current meal scaled nutrients
         curr_cal = Decimal("0")
@@ -129,21 +176,16 @@ class SubstitutionService:
         recipes_stmt = (
             select(Recipe)
             .where(or_(Recipe.owner_user_id.is_(None), Recipe.owner_user_id == user_id))
-            .options(
-                selectinload(Recipe.ingredients)
-                .selectinload(RecipeIngredient.food)
-                .selectinload(Food.nutrients),
-                selectinload(Recipe.ingredients)
-                .selectinload(RecipeIngredient.food)
-                .selectinload(Food.allergens),
-                selectinload(Recipe.diet_tags),
-                selectinload(Recipe.meal_types),
-            )
+            .options(*_recipe_load_options())
         )
         db_recipes = (await self.db.execute(recipes_stmt)).scalars().all()
 
         slot = current_meal.meal_type.lower()
-        slot_share = DEFAULT_SLOT_SHARES.get(slot, Decimal("0.25"))
+        # The slot's share as the generator used it: over the slots planned that day
+        day_slots = sorted(
+            {m.meal_type.lower() for m in plan.meals if m.plan_date == current_meal.plan_date}
+        )
+        slot_share = slot_shares_for(day_slots)[slot]
 
         target_kcal = None
         target_prot = None
@@ -169,30 +211,13 @@ class SubstitutionService:
 
             cand = PreparedRecipe(r)
 
-            # Hard filter 1: Slot compatibility
+            # Hard filters: slot compatibility, then the user's food rules (S9, AC-57-59)
             if slot not in cand.meal_types:
                 continue
-
-            # Hard filter 2: Allergens (Rule S9, AC-57)
-            if any(a in cand.allergens for a in user_allergies):
+            if rules.violation(cand):
                 continue
 
-            # Hard filter 3: Unverified allergens if any allergy set
-            if user_allergies and cand.has_incomplete_allergens:
-                continue
-
-            # Hard filter 4: Diet tags (AC-59)
-            if any(dt not in cand.diet_tags for dt in user_diet_tags):
-                continue
-
-            # Hard filter 5: Excluded ingredients (AC-59)
-            if any(
-                any(ex in token for token in cand.ingredient_search_tokens)
-                for ex in user_excluded
-            ):
-                continue
-
-            # Hard filter 6: time and budget caps of the plan
+            # Hard filter: time and budget caps of the plan
             if max_minutes is not None and cand.total_minutes > max_minutes:
                 continue
             sizes = affordable_serving_sizes(cand.cost_minor_per_serving, slot_budget)
@@ -216,12 +241,7 @@ class SubstitutionService:
                 slot_protein=target_prot,
             )
 
-            c_pref = cuisine_prefs.get(cand.cuisine_code.lower(), "neutral")
-            cuisine_match = (
-                Decimal("1.0")
-                if c_pref == "preferred"
-                else (Decimal("0.5") if c_pref == "like" else (Decimal("-1.0") if c_pref == "avoid" else Decimal("0.0")))
-            )
+            cuisine_match = CUISINE_MATCH.get(rules.cuisine_pref(cand), Decimal("0.0"))
 
             score = calculate_candidate_score(
                 target_fit=target_fit,
@@ -288,78 +308,13 @@ class SubstitutionService:
         if not current_meal:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="meal_not_found")
 
-        # Fetch replacement recipe
-        r_stmt = (
-            select(Recipe)
-            .where(Recipe.id == payload.recipe_id)
-            .options(
-                selectinload(Recipe.ingredients)
-                .selectinload(RecipeIngredient.food)
-                .selectinload(Food.allergens),
-                selectinload(Recipe.ingredients)
-                .selectinload(RecipeIngredient.food)
-                .selectinload(Food.nutrients),
-                selectinload(Recipe.diet_tags),
-            )
-        )
-        recipe = (await self.db.execute(r_stmt)).scalars().first()
-        if not recipe:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="recipe_not_found")
+        recipe = await self._load_recipe_for_user(payload.recipe_id, user_id)
+        await self._check_hard_constraints(recipe, user_id)
 
-        # Hard safety constraint verification (Rule S9, AC-75)
-        c_stmt = select(UserFoodConstraint).where(UserFoodConstraint.user_id == user_id)
-        user_constraints = (await self.db.execute(c_stmt)).scalars().all()
-        user_allergies = {
-            normalize_allergen(c.constraint_value) or c.constraint_value.lower()
-            for c in user_constraints
-            if c.constraint_type == "allergy"
-        }
-        user_diet_tags = {
-            c.constraint_value.lower() for c in user_constraints if c.constraint_type == "diet_tag"
-        }
-
-        # Check allergen violation
-        for ing in recipe.ingredients:
-            if ing.food:
-                for fa in ing.food.allergens:
-                    if fa.allergen_code.lower() in user_allergies:
-                        raise HTTPException(
-                            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                            detail="violates_hard_constraint",
-                        )
-
-        # Check diet tag violation
-        recipe_tags = {dt.diet_tag.lower() for dt in recipe.diet_tags}
-        if any(dt not in recipe_tags for dt in user_diet_tags):
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="violates_hard_constraint",
-            )
-
-        # Update meal metadata
         current_meal.recipe_id = recipe.id
         current_meal.title = recipe.name
         current_meal.servings = payload.servings
-
-        # Snapshot replacement items
-        new_items = []
-        for ing in recipe.ingredients:
-            scaled_qty = (ing.quantity * payload.servings) / recipe.servings
-            nutrients_snapshot = {}
-            if ing.food:
-                nutrients_snapshot = {fn.nutrient_code: str(fn.amount_per_100g) for fn in ing.food.nutrients}
-
-            new_item = PlannedMealItem(
-                planned_meal_id=current_meal.id,
-                food_id=ing.food_id,
-                recipe_id=recipe.id,
-                quantity=scaled_qty,
-                unit=ing.unit,
-                nutrient_snapshot=nutrients_snapshot,
-            )
-            new_items.append(new_item)
-
-        current_meal.items = new_items
+        current_meal.items = _snapshot_items(current_meal, recipe, payload.servings)
 
         # Mark plan status edited (AC-74)
         plan.status = "edited"
@@ -386,46 +341,10 @@ class SubstitutionService:
                 detail="servings_out_of_range",
             )
 
-        # If changing recipe
         recipe_to_use = current_meal.recipe
         if payload.recipe_id is not None and payload.recipe_id != current_meal.recipe_id:
-            r_stmt = (
-                select(Recipe)
-                .where(Recipe.id == payload.recipe_id)
-                .options(
-                    selectinload(Recipe.ingredients)
-                    .selectinload(RecipeIngredient.food)
-                    .selectinload(Food.allergens),
-                    selectinload(Recipe.ingredients)
-                    .selectinload(RecipeIngredient.food)
-                    .selectinload(Food.nutrients),
-                    selectinload(Recipe.diet_tags),
-                )
-            )
-            recipe_to_use = (await self.db.execute(r_stmt)).scalars().first()
-            if not recipe_to_use:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND, detail="recipe_not_found"
-                )
-
-            # Safety check: allergy is hard constraint (AC-75)
-            c_stmt = select(UserFoodConstraint).where(UserFoodConstraint.user_id == user_id)
-            user_constraints = (await self.db.execute(c_stmt)).scalars().all()
-            user_allergies = {
-                normalize_allergen(c.constraint_value) or c.constraint_value.lower()
-                for c in user_constraints
-                if c.constraint_type == "allergy"
-            }
-
-            for ing in recipe_to_use.ingredients:
-                if ing.food:
-                    for fa in ing.food.allergens:
-                        if fa.allergen_code.lower() in user_allergies:
-                            raise HTTPException(
-                                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                                detail="violates_hard_constraint",
-                            )
-
+            recipe_to_use = await self._load_recipe_for_user(payload.recipe_id, user_id)
+            await self._check_hard_constraints(recipe_to_use, user_id)
             current_meal.recipe_id = recipe_to_use.id
             current_meal.title = recipe_to_use.name
 
@@ -433,26 +352,7 @@ class SubstitutionService:
 
         # Re-snapshot items if recipe exists
         if recipe_to_use:
-            new_items = []
-            for ing in recipe_to_use.ingredients:
-                scaled_qty = (ing.quantity * servings_to_use) / recipe_to_use.servings
-                nutrients_snapshot = {}
-                if ing.food:
-                    nutrients_snapshot = {
-                        fn.nutrient_code: str(fn.amount_per_100g) for fn in ing.food.nutrients
-                    }
-
-                new_item = PlannedMealItem(
-                    planned_meal_id=current_meal.id,
-                    food_id=ing.food_id,
-                    recipe_id=recipe_to_use.id,
-                    quantity=scaled_qty,
-                    unit=ing.unit,
-                    nutrient_snapshot=nutrients_snapshot,
-                )
-                new_items.append(new_item)
-
-            current_meal.items = new_items
+            current_meal.items = _snapshot_items(current_meal, recipe_to_use, servings_to_use)
 
         plan.status = "edited"
         await self.db.commit()
@@ -490,7 +390,7 @@ class SubstitutionService:
                 food_category = "general"
                 is_text_only = item.food_id is None
                 food_id_str = str(item.food_id) if item.food_id else None
-                name = item.food.name if item.food else "Ingredient"
+                name = item.food.name if item.food else (item.ingredient_name or "Ingredient")
 
                 if item.food:
                     food_category = item.food.food_category

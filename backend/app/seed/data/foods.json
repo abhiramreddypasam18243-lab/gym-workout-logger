@@ -480,7 +480,7 @@
       "fat_g": 6.5,
       "fiber_g": 10.1
     },
-    "allergens": []
+    "allergens": ["gluten"]
   },
   {
     "name": "Whole Wheat Pasta",

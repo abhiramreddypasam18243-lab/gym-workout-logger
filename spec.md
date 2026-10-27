@@ -134,11 +134,11 @@ This app touches food, body data and health-adjacent decisions, so these rules a
 
 **Step 1: hard filters (safety first).** A recipe is a candidate for a slot only if it passes all of these:
 1. No ingredient carries any of the user's allergens, and (with `exclude_unverified_allergens` on and any allergy set) every ingredient has verified allergen data and a catalogue link (text-only ingredients are excluded).
-2. It satisfies every diet tag (vegan, vegetarian, pescatarian, halal, kosher, gluten-free, lactose-free, and so on) and contains no excluded ingredient.
+2. It satisfies every diet tag (vegan, vegetarian, pescatarian, halal, kosher, gluten-free, lactose-free, and so on; a tag counts as met when the recipe carries it or a tag implying it, D-35) and contains no excluded ingredient.
 3. It is allowed for the slot (`meal_types`).
 4. If a time cap is set, `prep_minutes + cook_minutes` is within it; if a daily budget is set, the recipe's cost fits the slot's share of it, at its chosen serving size (D-30).
 
-Allergy, diet and exclusion filters are **safety filters**. Time and budget are **user hard caps** applied when set. Cuisine preference and variety are **ranking factors only**.
+Allergy, diet and exclusion filters are **safety filters**. Time and budget are **user hard caps** applied when set. Cuisine preference and variety are **ranking factors only**, except that an avoided cuisine is used only when nothing else passes the filters, and a recipe is not repeated on one day while another fits (D-36).
 
 **Step 2: score** each candidate (at each allowed serving size `s` in {0.5, 1, 1.5, 2, 2.5, 3}), with nutrient values scaled by `s`:
 
@@ -430,6 +430,7 @@ Dates and clocks in tests are injected, so results are deterministic.
 - [ ] **AC-123** (D-33) With a rep range of 8–12: sets of 12, 12, 13 at 60 kg suggest 62.5 kg (upper body); 12, 11, 10 at 60 kg keep 60 kg; a set below 8 keeps the load; warm-ups are ignored and only sets at the heaviest load count (60×12, 60×12, 70×6 keeps 70 kg). Via the API, a squat session of 3×12 at 100 kg suggests 105 kg; a lb user's bench 2×12 at 100 lb suggests 105 lb; no history returns `no_history`; rep_max below rep_min returns 422; an unknown exercise returns 404.
 - [ ] **AC-124** (D-33) A day with 100 kg × 5 and 90 kg × 12 reports best e1RM 126.0 from 90 × 12 and top set 100.0 × 5.
 - [ ] **AC-125** (D-34) With targets quads 3, chest 10, back 12 and this week's sets 3 quads (plus a warm-up) and 2 chest, the weekly volume shows quads 3/3 met, chest 2/10, back 0/12; last week's and other users' sets are not counted; targets of 0 or 41 or a blank muscle return 422; targets appear in the export.
+- [ ] **AC-126** (S9, D-35, D-36) Recipes seeded into a database that already holds the foods link every named ingredient to its food (migration 007 repairs earlier rows); Rolled Oats carry `gluten` and a gluten allergy plan has no oat recipe; every seed recipe's diet tags agree with its ingredients; vegan, vegetarian and pescatarian users each get an `ok` plan of recipes meeting their diet; with Indian avoided no Indian meal is planned, and with every cuisine avoided the plan is still made with `cuisine_preference_unmet`; removal counts never exceed the recipe count; no recipe appears twice on one day; reloading a plan returns the same warnings and ingredient names (none shown as "Ingredient"); unknown or repeated meal slots return 422 and slots come back in day order; a manual edit or accepted substitution that breaks a diet tag or exclusion returns 422 `violates_hard_constraint` naming the rule; missing targets return 422 with code `targets_required`.
 
 ### Catalogue and nutrient maths
 - [ ] **AC-45** (FR-09) 150 g of a food with 20 g protein per 100 g gives exactly 30 g protein.
@@ -535,7 +536,7 @@ Dates and clocks in tests are injected, so results are deterministic.
 | FR-05 Strength metrics | AC-39 to AC-44 |
 | FR-06 Nutrition profile | AC-53, AC-57 to AC-61 |
 | FR-07 Nutrition targets | AC-18 to AC-23 |
-| FR-08 Diet-plan generator | AC-56 to AC-72 |
+| FR-08 Diet-plan generator | AC-56 to AC-72, AC-126 |
 | FR-09 Nutrient calculation | AC-45 to AC-47 |
 | FR-10 Substitutions | AC-73 to AC-76 |
 | FR-11 Grocery list | AC-77 to AC-81 |
@@ -629,6 +630,8 @@ Steps 5 and 6 (training) are independent of steps 7 to 9 (nutrition) once step 4
 | D-32 | 2026-10-21 | Custom-food editor (stretch): users add foods with per-100 g kcal, protein, carbohydrate, fat (and optional fibre) and EU-14 allergens; stored in `foods` with `owner_user_id`, labelled `User-entered`, `approximate`, allergens unverified; visible to and loggable by the owner only; never used by the planner; catalogue foods are read-only | Let custom foods into the planner; serving-based entry | User chose per-100 g entry for logging only. Keeps the planner on reviewed recipes (D-19) and invents no nutrient data |
 | D-33 | 2026-10-21 | Progressive overload hint by double progression: when every working set at the last session's heaviest load reaches the top of the rep range (routine's, else 8–12), suggest one step more (+2.5 kg upper body, +5 kg lower body; +5/+10 lb), otherwise keep the load; never suggest less. Step sizes are *initial* placeholders in `config.py`. The e1RM chart also plots the heaviest working set per day | Percentage-based or RPE-based progression; auto-filling loads | Simple, explainable and testable; a suggestion the user accepts with one tap, not coaching advice |
 | D-34 | 2026-10-21 | Weekly working-set targets per muscle group (`muscle_set_targets`, 1–40 sets), counted by the exercise's primary muscle for the current Monday-start week in the user's timezone; warm-ups excluded; included in export and deletion | Volume in kg per muscle; secondary muscles counted as half sets | Sets per muscle is the common way lifters plan volume and needs no extra exercise data |
+| D-35 | 2026-10-28 | Diet tags imply each other: a vegan recipe also meets vegetarian, pescatarian and dairy-free, and a vegetarian one meets pescatarian; eggs are not vegetarian in this catalogue; the seed rejects a tag its ingredients contradict; the settings screen offers only tags some recipe carries (halal and kosher are not offered: no recipe is certified); oats carry `gluten` (EU Regulation 1169/2011 Annex II) | Tag every recipe with every implied tag by hand; treat eggs as vegetarian | Review found vegan breakfasts missing, pescatarian and halal plans always infeasible, an egg dish tagged vegetarian beside untagged egg dishes, and oats passing a gluten allergy (S9) |
+| D-36 | 2026-10-28 | Avoided cuisines fill a slot only when no other candidate passes the hard filters, and then raise `cuisine_preference_unmet`; a recipe is not planned twice on one day while another candidate fits; removal counts are distinct recipes; plan-level notices are stored with the plan so a reload shows them | Avoid as a score penalty only; hard-filter avoided cuisines | AC-61 says avoided cuisines appear only when nothing else can fill the slot, and the −0.3 penalty let them win; still never infeasible because of cuisine (D-08) |
 
 ## 19. Open Questions
 

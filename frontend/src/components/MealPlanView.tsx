@@ -190,7 +190,7 @@ export const MealPlanView: React.FC = () => {
         setSelectedPlanId(res.id)
       }
     } catch (err: any) {
-      if (err instanceof ApiError && err.status === 422) {
+      if (err instanceof ApiError && err.code === 'targets_required') {
         setErrorMsg('Please set your nutrition targets first before generating a meal plan.')
       } else {
         setErrorMsg(err.message || 'Generation failed.')
@@ -250,8 +250,8 @@ export const MealPlanView: React.FC = () => {
       setActiveMealForSub(null)
       await loadPlans()
     } catch (err: any) {
-      if (err instanceof ApiError && err.status === 422) {
-        setSubError('Cannot substitute: this recipe violates your allergy or diet constraints (Rule S9, AC-75).')
+      if (err instanceof ApiError && err.code === 'violates_hard_constraint') {
+        setSubError('Cannot substitute: this recipe breaks your allergy, diet or exclusion rules (Rule S9, AC-75).')
       } else {
         setSubError(err.message || 'Failed to accept substitution.')
       }
