@@ -66,4 +66,5 @@ async def test_vegetarian_users_plan_uses_only_vegetarian_recipes(session_factor
     data = res.json()
     assert data["status"] == "ok"
     for m in data["meals"]:
-        assert "vegetarian" in RECIPES[m["title"]]["diet_tags"], m["title"]
+        # A vegan recipe is vegetarian too (D-35)
+        assert {"vegetarian", "vegan"} & set(RECIPES[m["title"]]["diet_tags"]), m["title"]

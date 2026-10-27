@@ -8,6 +8,7 @@ target snapshot preservation (AC-68), and transactional persistence (AC-71).
 """
 
 from collections import defaultdict
+from collections.abc import Iterable, Sequence
 from datetime import timedelta
 from decimal import Decimal
 from typing import Any
@@ -19,6 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.domain.allergens import normalize_allergen
+from app.domain.diet import contains_excluded, expand_diet_tags
 from app.domain.nutrients import (
     NutrientProfile,
     RecipeIngredientInput,
@@ -81,7 +83,8 @@ class PreparedRecipe:
 
         # Meal slots and diet tags
         self.meal_types = {mt.meal_type.lower() for mt in recipe.meal_types}
-        self.diet_tags = {dt.diet_tag.lower() for dt in recipe.diet_tags}
+        # Own tags plus implied ones: a vegan recipe also suits a vegetarian (D-35)
+        self.diet_tags = expand_diet_tags(dt.diet_tag for dt in recipe.diet_tags)
 
         # Collect allergens and calculate nutrients
         self.allergens: set[str] = set()
@@ -152,6 +155,69 @@ class PreparedRecipe:
             )
 
 
+class UserFoodRules:
+    """A user's hard food constraints and cuisine preferences, normalised for matching."""
+
+    def __init__(
+        self,
+        constraints: Sequence[UserFoodConstraint],
+        cuisines: Sequence[UserCuisinePreference],
+    ):
+        self.allergies = {
+            normalize_allergen(c.constraint_value) or c.constraint_value.lower()
+            for c in constraints
+            if c.constraint_type == "allergy"
+        }
+        self.diet_tags = {
+            c.constraint_value.strip().lower()
+            for c in constraints
+            if c.constraint_type == "diet_tag"
+        }
+        self.excluded = {
+            c.constraint_value.strip().lower()
+            for c in constraints
+            if c.constraint_type == "excluded_ingredient"
+        }
+        self.cuisine_prefs = {c.cuisine_code.lower(): c.preference_level.lower() for c in cuisines}
+
+    def cuisine_pref(self, cand: PreparedRecipe) -> str:
+        return self.cuisine_prefs.get(cand.cuisine_code.lower(), "neutral")
+
+    def violation(self, cand: PreparedRecipe) -> str | None:
+        """The first hard constraint the recipe breaks (S9, AC-57-59, AC-75), or None."""
+        for allergen in sorted(self.allergies):
+            if allergen in cand.allergens:
+                return f"allergy:{allergen}"
+        if self.allergies and cand.has_incomplete_allergens:
+            return "unverified_allergens"
+        for diet_tag in sorted(self.diet_tags):
+            if diet_tag not in cand.diet_tags:
+                return f"diet:{diet_tag}"
+        for ex_item in sorted(self.excluded):
+            if contains_excluded(cand.ingredient_search_tokens, ex_item):
+                return f"excluded:{ex_item}"
+        return None
+
+
+async def load_user_food_rules(db: AsyncSession, user_id: UUID) -> UserFoodRules:
+    constraints = (
+        await db.execute(select(UserFoodConstraint).where(UserFoodConstraint.user_id == user_id))
+    ).scalars().all()
+    cuisines = (
+        await db.execute(
+            select(UserCuisinePreference).where(UserCuisinePreference.user_id == user_id)
+        )
+    ).scalars().all()
+    return UserFoodRules(constraints, cuisines)
+
+
+def slot_shares_for(meal_slots: Iterable[str]) -> dict[str, Decimal]:
+    """Each slot's share of the day's targets, normalised over the slots in the plan."""
+    slots = list(meal_slots)
+    total = sum(DEFAULT_SLOT_SHARES.get(s, Decimal("0.25")) for s in slots)
+    return {s: DEFAULT_SLOT_SHARES.get(s, Decimal("0.25")) / total for s in slots}
+
+
 class DietPlannerService:
     """Orchestrates deterministic diet plan generation with safety guardrails."""
 
@@ -177,32 +243,18 @@ class DietPlannerService:
         if not active_goal:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="targets_required",
+                detail={
+                    "code": "targets_required",
+                    "message": "Set your nutrition targets before generating a meal plan.",
+                },
             )
 
         # 2. Fetch user food constraints and cuisine preferences (AC-57, AC-59, AC-61)
-        constraints_stmt = select(UserFoodConstraint).where(UserFoodConstraint.user_id == user_id)
-        user_constraints = (await self.db.execute(constraints_stmt)).scalars().all()
-
-        user_allergies = {
-            normalize_allergen(c.constraint_value) or c.constraint_value.lower()
-            for c in user_constraints
-            if c.constraint_type == "allergy"
-        }
-        user_diet_tags = {
-            c.constraint_value.lower() for c in user_constraints if c.constraint_type == "diet_tag"
-        }
-        user_excluded = {
-            c.constraint_value.lower()
-            for c in user_constraints
-            if c.constraint_type == "excluded_ingredient"
-        }
-
-        cuisines_stmt = select(UserCuisinePreference).where(
-            UserCuisinePreference.user_id == user_id
-        )
-        user_cuisines = (await self.db.execute(cuisines_stmt)).scalars().all()
-        cuisine_prefs = {c.cuisine_code.lower(): c.preference_level.lower() for c in user_cuisines}
+        rules = await load_user_food_rules(self.db, user_id)
+        user_allergies = rules.allergies
+        user_diet_tags = rules.diet_tags
+        user_excluded = rules.excluded
+        cuisine_prefs = rules.cuisine_prefs
 
         # 3. Fetch and prepare candidate recipes
         recipes_stmt = (
@@ -227,21 +279,17 @@ class DietPlannerService:
             prep_recipes.append(PreparedRecipe(r))
 
         # 4. Configure slot shares
-        total_share_weight = sum(
-            DEFAULT_SLOT_SHARES.get(slot, Decimal("0.25")) for slot in payload.meal_slots
-        )
-        slot_shares: dict[str, Decimal] = {
-            slot: (DEFAULT_SLOT_SHARES.get(slot, Decimal("0.25")) / total_share_weight)
-            for slot in payload.meal_slots
-        }
+        slot_shares = slot_shares_for(payload.meal_slots)
 
         # Track usage across plan for repetition constraints and scoring
         recipe_plan_count: dict[UUID, int] = defaultdict(int)
+        recipe_slot_count: dict[tuple[str, UUID], int] = defaultdict(int)
         previous_day_slot_recipe: dict[str, UUID | None] = {s: None for s in payload.meal_slots}
 
         planned_days_data: list[dict[str, Any]] = []
         planned_meals_records: list[dict[str, Any]] = []
-        constraints_applied_summary: dict[str, int] = defaultdict(int)
+        # Distinct recipes each filter removed; every slot re-applies the filters (AC-72)
+        constraints_applied_summary: dict[str, set[UUID]] = defaultdict(set)
         warnings: list[dict[str, Any]] = []
 
         preferred_cuisines_count = 0
@@ -283,13 +331,13 @@ class DietPlannerService:
                     for cand in candidates:
                         if allergen in cand.allergens:
                             removed += 1
+                            constraints_applied_summary[f"allergy:{allergen}"].add(cand.id)
                         else:
                             surviving.append(cand)
                     candidates = surviving
                     slot_filters_removed.append(
                         FilterRemovedCount(filter=f"allergy:{allergen}", removed=removed)
                     )
-                    constraints_applied_summary[f"allergy:{allergen}"] += removed
 
                 # Filter 2: Unverified allergens if any allergy set (AC-58)
                 if user_allergies:
@@ -298,13 +346,13 @@ class DietPlannerService:
                     for cand in candidates:
                         if cand.has_incomplete_allergens:
                             removed += 1
+                            constraints_applied_summary["unverified_allergens"].add(cand.id)
                         else:
                             surviving.append(cand)
                     candidates = surviving
                     slot_filters_removed.append(
                         FilterRemovedCount(filter="unverified_allergens", removed=removed)
                     )
-                    constraints_applied_summary["unverified_allergens"] += removed
 
                 # Filter 3: Diet tags (AC-59)
                 for diet_tag in sorted(user_diet_tags):
@@ -313,28 +361,28 @@ class DietPlannerService:
                     for cand in candidates:
                         if diet_tag not in cand.diet_tags:
                             removed += 1
+                            constraints_applied_summary[f"diet:{diet_tag}"].add(cand.id)
                         else:
                             surviving.append(cand)
                     candidates = surviving
                     slot_filters_removed.append(
                         FilterRemovedCount(filter=f"diet:{diet_tag}", removed=removed)
                     )
-                    constraints_applied_summary[f"diet:{diet_tag}"] += removed
 
                 # Filter 4: Excluded ingredients (AC-59)
                 for ex_item in sorted(user_excluded):
                     surviving = []
                     removed = 0
                     for cand in candidates:
-                        if any(ex_item in token for token in cand.ingredient_search_tokens):
+                        if contains_excluded(cand.ingredient_search_tokens, ex_item):
                             removed += 1
+                            constraints_applied_summary[f"excluded:{ex_item}"].add(cand.id)
                         else:
                             surviving.append(cand)
                     candidates = surviving
                     slot_filters_removed.append(
                         FilterRemovedCount(filter=f"excluded:{ex_item}", removed=removed)
                     )
-                    constraints_applied_summary[f"excluded:{ex_item}"] += removed
 
                 # Filter 5: Meal slot compatibility
                 surviving = []
@@ -342,13 +390,13 @@ class DietPlannerService:
                 for cand in candidates:
                     if slot.lower() not in cand.meal_types:
                         removed += 1
+                        constraints_applied_summary[f"meal_type:{slot}"].add(cand.id)
                     else:
                         surviving.append(cand)
                 candidates = surviving
                 slot_filters_removed.append(
                     FilterRemovedCount(filter=f"meal_type:{slot}", removed=removed)
                 )
-                constraints_applied_summary[f"meal_type:{slot}"] += removed
 
                 # Filter 6: User time cap (AC-60)
                 if payload.max_minutes is not None:
@@ -357,6 +405,7 @@ class DietPlannerService:
                     for cand in candidates:
                         if cand.total_minutes > payload.max_minutes:
                             removed += 1
+                            constraints_applied_summary[f"max_minutes:{payload.max_minutes}"].add(cand.id)
                         else:
                             surviving.append(cand)
                     candidates = surviving
@@ -365,7 +414,6 @@ class DietPlannerService:
                             filter=f"max_minutes:{payload.max_minutes}", removed=removed
                         )
                     )
-                    constraints_applied_summary[f"max_minutes:{payload.max_minutes}"] += removed
 
                 # Filter 7: Daily budget cap (AC-60)
                 if slot_budget is not None:
@@ -377,6 +425,7 @@ class DietPlannerService:
                             and (Decimal(cand.cost_minor_per_serving) * Decimal("0.5")) > slot_budget
                         ):
                             removed += 1
+                            constraints_applied_summary["daily_budget"].add(cand.id)
                             continue
                         surviving.append(cand)
                     candidates = surviving
@@ -385,7 +434,6 @@ class DietPlannerService:
                             filter=f"budget:{int(slot_budget)}", removed=removed
                         )
                     )
-                    constraints_applied_summary["daily_budget"] += removed
 
                 # If no candidates satisfy hard filters, return Infeasible response (AC-62, AC-72)
                 if not candidates:
@@ -404,22 +452,27 @@ class DietPlannerService:
                         message=f"No {slot} recipe satisfies all of your safety filters and limits.",
                     )
 
+                # Avoided cuisines fill a slot only when nothing else can (AC-61, D-36); the
+                # plan then carries a cuisine_preference_unmet warning
+                not_avoided = [c for c in candidates if rules.cuisine_pref(c) != "avoid"]
+                scored_candidates = not_avoided or candidates
+
                 # Variety & Repetition Constraint (AC-66)
                 # With >= 10 eligible candidates, no recipe appears > 2 times in 7 days for the same slot,
                 # and none on consecutive days for that slot.
-                scored_candidates = candidates
-                if len(candidates) >= 10:
-                    filtered_for_variety = []
+                if len(scored_candidates) >= 10:
                     prev_recipe_id = previous_day_slot_recipe.get(slot)
-                    for c in candidates:
-                        if prev_recipe_id and c.id == prev_recipe_id:
-                            continue
-                        if recipe_plan_count[c.id] >= 2:
-                            continue
-                        filtered_for_variety.append(c)
-
+                    filtered_for_variety = [
+                        c
+                        for c in scored_candidates
+                        if c.id != prev_recipe_id and recipe_slot_count[(slot, c.id)] < 2
+                    ]
                     if filtered_for_variety:
                         scored_candidates = filtered_for_variety
+
+                # The same dish is not planned twice in one day while another one fits (D-36)
+                not_today = [c for c in scored_candidates if c.id not in day_slot_recipes.values()]
+                scored_candidates = not_today or scored_candidates
 
                 # Candidate Evaluation & Scoring (AC-63, AC-64, AC-65)
                 evaluated_list: list[tuple[Decimal, str, PreparedRecipe, Decimal]] = []
@@ -445,8 +498,8 @@ class DietPlannerService:
                         slot_protein=slot_protein,
                     )
 
-                    c_pref = cuisine_prefs.get(cand.cuisine_code.lower(), "neutral")
-                    if c_pref in ("favorite", "preferred"):
+                    c_pref = rules.cuisine_pref(cand)
+                    if c_pref == "preferred":
                         cuisine_match = Decimal("1.0")
                     elif c_pref == "like":
                         cuisine_match = Decimal("0.5")
@@ -484,11 +537,12 @@ class DietPlannerService:
 
                 # Update tracking
                 recipe_plan_count[winning_cand.id] += 1
+                recipe_slot_count[(slot, winning_cand.id)] += 1
                 day_slot_recipes[slot] = winning_cand.id
                 total_planned_meals_count += 1
 
-                c_pref = cuisine_prefs.get(winning_cand.cuisine_code.lower(), "neutral")
-                if c_pref in ("favorite", "preferred"):
+                c_pref = rules.cuisine_pref(winning_cand)
+                if c_pref == "preferred":
                     preferred_cuisines_count += 1
                 elif c_pref == "avoid":
                     used_avoid_cuisine = True
@@ -575,19 +629,30 @@ class DietPlannerService:
 
         # 6. Cuisine preference check (AC-61)
         preferred_cuisines_set = {
-            c for c, p in cuisine_prefs.items() if p in ("favorite", "preferred")
+            c for c, p in cuisine_prefs.items() if p == "preferred"
         }
-        if preferred_cuisines_set and total_planned_meals_count > 0:
+        # Plan-level notices are stored with the plan so a reload shows them too
+        notices: list[dict[str, Any]] = []
+        if total_planned_meals_count > 0:
             preferred_ratio = preferred_cuisines_count / total_planned_meals_count
-            if preferred_ratio < 0.70 or used_avoid_cuisine:
-                warnings.append(
+            too_few_preferred = bool(preferred_cuisines_set) and preferred_ratio < 0.70
+            if too_few_preferred or used_avoid_cuisine:
+                reasons = []
+                if too_few_preferred:
+                    reasons.append(
+                        f"only {round(preferred_ratio * 100)}% of meals are from preferred cuisines"
+                    )
+                if used_avoid_cuisine:
+                    reasons.append("an avoided cuisine was the only option for some meals")
+                notices.append(
                     {
                         "warning": "cuisine_preference_unmet",
                         "preferred_share_pct": round(preferred_ratio * 100, 1),
                         "used_avoided_cuisine": used_avoid_cuisine,
-                        "message": "Fewer than 70% of meals match preferred cuisines or an avoided cuisine was used.",
+                        "message": "Cuisine preferences not fully met: " + "; ".join(reasons) + ".",
                     }
                 )
+        warnings.extend(notices)
 
         # 7. Assemble target snapshot (AC-68)
         target_snapshot = {
@@ -619,7 +684,8 @@ class DietPlannerService:
                     nutrient_values_approximate += n_values
         explanation = ExplanationBlock(
             constraints_applied=[
-                {"filter": k, "removed_count": v} for k, v in constraints_applied_summary.items()
+                {"filter": k, "removed_count": len(v)}
+                for k, v in constraints_applied_summary.items()
             ],
             scoring_weights={k: str(v) for k, v in DEFAULT_WEIGHTS.items()},
             generation_version="1.0",
@@ -632,6 +698,7 @@ class DietPlannerService:
         )
         # Stored with the plan so later reads show the explanation as generated (D-09)
         target_snapshot["explanation"] = explanation.model_dump()
+        target_snapshot["notices"] = notices
 
         # 8. Transactional persistence (AC-71)
         end_date = payload.start_date + timedelta(days=payload.days - 1)
@@ -669,6 +736,7 @@ class DietPlannerService:
                     planned_meal_id=planned_meal.id,
                     food_id=item_data["food_id"],
                     recipe_id=cand.id,
+                    ingredient_name=item_data["ingredient_name"],
                     quantity=scaled_qty,
                     unit=item_data["unit"],
                     nutrient_snapshot=item_data["nutrients_per_100g"],

@@ -5,7 +5,9 @@ from decimal import Decimal
 from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+from app.domain.diet import MEAL_SLOTS
 
 
 class MealPlanGenerateRequest(BaseModel):
@@ -20,6 +22,18 @@ class MealPlanGenerateRequest(BaseModel):
     )
     max_minutes: int | None = Field(default=None, ge=5, le=300)
     daily_budget_minor: int | None = Field(default=None, ge=0)
+
+    @field_validator("meal_slots")
+    @classmethod
+    def known_unique_slots(cls, slots: list[str]) -> list[str]:
+        """Slots are the four meal types, each once, in day order (breakfast first)."""
+        cleaned = [s.strip().lower() for s in slots]
+        unknown = sorted(set(cleaned) - set(MEAL_SLOTS))
+        if unknown:
+            raise ValueError(f"unknown meal slot(s): {', '.join(unknown)}; use {', '.join(MEAL_SLOTS)}")
+        if len(set(cleaned)) != len(cleaned):
+            raise ValueError("each meal slot may appear only once")
+        return [s for s in MEAL_SLOTS if s in cleaned]
 
 
 class FilterRemovedCount(BaseModel):

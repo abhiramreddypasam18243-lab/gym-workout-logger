@@ -120,7 +120,8 @@ async def get_meal_plan(
                 PlannedMealItemResponse(
                     id=it.id,
                     food_id=it.food_id,
-                    ingredient_name=it.food.name if it.food else "Ingredient",
+                    ingredient_name=it.ingredient_name
+                    or (it.food.name if it.food else "Ingredient"),
                     quantity=it.quantity,
                     unit=it.unit,
                     nutrient_snapshot=it.nutrient_snapshot,
@@ -248,7 +249,10 @@ async def get_meal_plan(
         target_snapshot=plan.target_snapshot,
         meals=response_meals,
         days=response_days,
-        warnings=[],
+        # Same notices as at generation: day deviations from the current totals, plus the
+        # plan-level notices stored with it (AC-61, AC-67)
+        warnings=[d for day in response_days for d in day.deviations]
+        + list((plan.target_snapshot or {}).get("notices", [])),
         explanation=explanation,
         disclaimer=DISCLAIMER_TEXT,
     )

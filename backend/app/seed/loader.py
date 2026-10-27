@@ -95,6 +95,42 @@ def compute_recipe_allergens(
     return allergen_union, has_incomplete_data
 
 
+MEAT_CATEGORIES = {"meat", "poultry", "fish_seafood"}
+ANIMAL_ALLERGENS = {"milk", "eggs", "fish", "crustaceans", "molluscs"}
+
+
+def validate_recipe_diet_tags(recipe: dict[str, Any], foods_by_name: dict[str, dict[str, Any]]) -> None:
+    """A diet tag must not contradict the recipe's ingredients (AC-59, D-35).
+
+    Vegetarian excludes meat, fish and eggs; vegan also excludes dairy; gluten-free and
+    dairy-free exclude the matching allergen. Tags that rely on unknown (text-only)
+    ingredients are rejected for vegan, gluten-free and dairy-free.
+    """
+    tags = {t.strip().lower() for t in recipe.get("diet_tags", [])}
+    categories: set[str] = set()
+    allergens: set[str] = set()
+    has_text_only = False
+    for ing in recipe.get("ingredients", []):
+        food = foods_by_name.get((ing.get("food_name") or "").strip().lower())
+        if food is None:
+            has_text_only = True
+            continue
+        categories.add(food["food_category"])
+        allergens |= {a.strip().lower() for a in food.get("allergens", [])}
+
+    problems: list[str] = []
+    if tags & {"vegan", "vegetarian"} and (categories & MEAT_CATEGORIES or "eggs" in allergens):
+        problems.append("vegetarian/vegan with meat, fish or eggs")
+    if "vegan" in tags and (allergens & ANIMAL_ALLERGENS or has_text_only):
+        problems.append("vegan with an animal or unverified ingredient")
+    if "gluten_free" in tags and ("gluten" in allergens or has_text_only):
+        problems.append("gluten_free with gluten or an unverified ingredient")
+    if "dairy_free" in tags and ("milk" in allergens or has_text_only):
+        problems.append("dairy_free with milk or an unverified ingredient")
+    if problems:
+        raise ValueError(f"Recipe '{recipe.get('name')}' has contradicting diet tags: {'; '.join(problems)}")
+
+
 async def seed_exercises(session: AsyncSession) -> int:
     """Load curated exercises into database idempotently (AC-51)."""
     with open(DATA_DIR / "exercises.json", encoding="utf-8") as f:
@@ -143,6 +179,7 @@ async def seed_foods(session: AsyncSession) -> tuple[int, dict[str, Food]]:
     existing_foods = {f.name.strip().lower(): f for f in existing_result.scalars().all()}
 
     inserted_count = 0
+    # Keyed by lower-case name, for foods inserted now and those already present
     all_foods_by_name: dict[str, Food] = dict(existing_foods)
 
     for f_data in foods_data:
@@ -194,7 +231,7 @@ async def seed_foods(session: AsyncSession) -> tuple[int, dict[str, Food]]:
             session.add(fa)
 
         existing_foods[name_lower] = food
-        all_foods_by_name[name_clean] = food
+        all_foods_by_name[name_lower] = food
         inserted_count += 1
 
     return inserted_count, all_foods_by_name
@@ -209,6 +246,11 @@ async def seed_recipes(session: AsyncSession, foods_by_name: dict[str, Food]) ->
         select(Recipe.name).where(Recipe.owner_user_id.is_(None))
     )
     existing_names = {row[0].strip().lower() for row in existing_result.all()}
+
+    with open(DATA_DIR / "foods.json", encoding="utf-8") as f:
+        seed_foods_by_name = {d["name"].strip().lower(): d for d in json.load(f)}
+    for r_data in recipes_data:
+        validate_recipe_diet_tags(r_data, seed_foods_by_name)
 
     inserted_count = 0
     for r_data in recipes_data:
@@ -247,7 +289,8 @@ async def seed_recipes(session: AsyncSession, foods_by_name: dict[str, Food]) ->
         # Add ingredients
         for ing in ingredients:
             food_name = ing.get("food_name")
-            food_obj = foods_by_name.get(food_name) if food_name else None
+            # Keys are lower-case names: foods already in the database come back that way
+            food_obj = foods_by_name.get(food_name.strip().lower()) if food_name else None
             food_id = food_obj.id if food_obj else None
 
             qty = Decimal(str(ing["quantity"]))

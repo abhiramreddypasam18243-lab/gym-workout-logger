@@ -277,6 +277,7 @@ class PlannedMealItem(Base):
     recipe_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("recipes.id", ondelete="RESTRICT"), nullable=True, index=True
     )
+    ingredient_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
     quantity: Mapped[Decimal] = mapped_column(Numeric(8, 2), nullable=False)
     unit: Mapped[str] = mapped_column(String(30), nullable=False)
     nutrient_snapshot: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
